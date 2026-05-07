@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BarChart3, Zap, Dna, Swords, Wifi, WifiOff, Globe, Briefcase, Store, TrendingUp, Presentation } from 'lucide-react'
+import NeuralBackground from './components/NeuralBackground'
 import LandingPage from './components/LandingPage'
 import DeliberationPanel from './components/DeliberationPanel'
 import AgentMonitor from './components/AgentMonitor'
@@ -85,11 +86,13 @@ function App() {
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg-void)' }}>
             {/* ── Ambient background ── */}
-            <div className="fixed inset-0 pointer-events-none -z-10">
-                <div className="absolute top-0 left-1/4 w-[800px] h-[600px] bg-blue-500/[0.03] rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 right-1/4 w-[600px] h-[500px] bg-purple-500/[0.03] rounded-full blur-[100px]" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/[0.02] rounded-full blur-[80px] animate-float" />
-            </div>
+            {/* Live neural network canvas */}
+        <NeuralBackground nodeCount={38} />
+        {/* Ambient radial glows */}
+        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+            <div className="absolute top-0 left-1/3 w-[600px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(79,143,255,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+            <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+        </div>
 
             {/* ── Header ── */}
             <motion.header
