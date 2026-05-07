@@ -243,6 +243,22 @@ html, body {
 
 .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
+/* ── Float animation ─────────────────────────────────────────── */
+@keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%      { transform: translate(-50%, -52%) scale(1.05); }
+}
+.animate-float { animation: float 8s ease-in-out infinite; }
+
+/* ── Scrollbar None ──────────────────────────────────────────── */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* ── Text Glow ───────────────────────────────────────────────── */
+.text-glow-blue { text-shadow: 0 0 20px rgba(59,130,246,0.4); }
+.text-glow-purple { text-shadow: 0 0 20px rgba(139,92,246,0.4); }
+.text-glow-green { text-shadow: 0 0 20px rgba(16,185,129,0.4); }
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
     .hide-mobile { display: none !important; }

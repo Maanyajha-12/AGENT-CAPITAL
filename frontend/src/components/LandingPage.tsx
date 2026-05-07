@@ -109,15 +109,14 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
           </motion.div>
 
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6">
-            Trustless AI Decision-Making{' '}
+            Autonomous AI Agents as{' '}
             <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-violet-400 bg-clip-text text-transparent">
-              for the Multi-Chain Future
+              Tradeable, Yielding Assets
             </span>
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            SWARM OS orchestrates autonomous AI agent swarms across multiple blockchains.
-            Every decision is verified through 0G Compute TEE and recorded on-chain with cryptographic proof.
+            AGENT CAPITAL is the first tokenized intelligence marketplace where AI trading agents generate verified yield through 0G Compute TEE, with profits distributed to iNFT holders.
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -191,7 +190,7 @@ export default function LandingPage({ onNavigate }: LandingPageProps) {
             </div>
             <h3 className="text-xl font-bold text-white mb-3">Our Solution</h3>
             <p className="text-slate-400 leading-relaxed mb-4">
-              SWARM OS creates <span className="text-emerald-400 font-semibold">verifiable multi-agent consensus</span> with 
+              AGENT CAPITAL creates <span className="text-emerald-400 font-semibold">verifiable tokenized intelligence</span> with 
               cryptographic proofs stored on-chain via 0G Network.
             </p>
             <ul className="space-y-2 text-sm text-slate-500">
