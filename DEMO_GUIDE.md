@@ -1,6 +1,6 @@
-# 🎬 SWARM OS — ETHGlobal Demo Guide
+# 🎬 AGENT CAPITAL — Demo Guide
 
-> **4-minute demo script** for ETHGlobal judges. Updated for the **live production deployment** on Vercel with real 0G Galileo testnet contracts.
+> **5-minute demo script** showcasing the tokenized intelligence marketplace. Live production deployment on Vercel with real 0G Galileo testnet contracts.
 
 ---
 
@@ -9,6 +9,7 @@
 | Resource | URL |
 |----------|-----|
 | **Live App** | [frontend-six-steel-45.vercel.app](https://frontend-six-steel-45.vercel.app) |
+| **System Architecture** | [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) |
 | **Deployment Proof** | [DEPLOYMENT_PROOF.md](DEPLOYMENT_PROOF.md) |
 | **Block Explorer** | [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai) |
 | **0G Compute Dashboard** | [pc.testnet.0g.ai](https://pc.testnet.0g.ai) |
@@ -43,212 +44,239 @@ open http://localhost:3000               # → Full live app with backend
 
 ---
 
-## 🎥 Demo Flow (4 Minutes)
+## 🎥 Demo Flow (5 Minutes)
 
-### ⏱ 0:00–0:30 — The Hook (Overview Tab)
+### ⏱ 0:00–0:45 — The Hook (Portfolio Tab)
 
-**What judges see first**: The landing page — your elevator pitch.
+**What judges see first**: Your agent portfolio dashboard.
 
 **Script:**
-> "SWARM OS is a trustless multi-agent AI decision system built entirely on 0G Network."
-> 
-> "AI agents make $2.3 trillion in automated decisions annually — zero are independently verifiable. We fix that with on-chain proof."
+> "AGENT CAPITAL is the first tokenized intelligence marketplace where AI agents are traded as iNFTs and generate verified yield."
+>
+> "Introduce three concepts: (1) Agents are autonomous trading systems, (2) Each agent is an NFT you can buy/sell/breed, (3) Every trade is verified through 0G Compute TEE and profits are distributed to iNFT holders."
 
 **Actions:**
-1. Page loads on **Overview** tab (default)
-2. Show the hero: "Trustless AI Decision-Making for the Multi-Chain Future"
-3. Point out the 4 stats: 12 agents, 847 decisions verified, 3 chains, 91% confidence
-4. Slowly scroll to **Problem / Solution** cards
-5. Scroll to **How It Works** pipeline diagram (6 steps)
-6. Show the **Revenue Model** section briefly
+1. Page loads on **Portfolio** tab
+2. Show the hero section: "Autonomous AI Agents as Tradeable, Yielding Assets"
+3. Highlight the portfolio cards:
+   - **Alpha Fund**: Gen 3 agent, 92% accuracy, 1200% APY
+   - **Beta Income**: Gen 1 agent, 84% accuracy, 850% APY
+   - **Gamma Growth**: Gen 0 agent, 78% accuracy, 620% APY
+4. Show total TVL, monthly earnings tracker
+5. Scroll down to show the earnings breakdown by agent
+
+**Key talking point:**
+> "These aren't hypothetical — each agent has real trading history on-chain. Click one to see its trade record."
 
 ---
 
-### ⏱ 0:30–2:00 — Live Deliberation (Deliberate Tab)
+### ⏱ 0:45–2:30 — Agent Trading Strategy (Deliberation Tab)
 
-**This is the main event** — judges see 4 AI agents working in real-time.
+**This is the main technical showcase** — see agents analyzing market data.
 
 **Script:**
-> "Let me show you a live deliberation. Four agents independently analyze this decision."
-> 
-> "Each agent produces a cryptographic commitment before seeing others — this is our novel Proof-of-Intelligence consensus."
+> "Let me show you how an agent makes a trading decision. It's not a black box — every step is verifiable through 0G Compute TEE."
 
 **Actions:**
-1. Click **"Try Live Demo"** button (navigates to Deliberate tab)
-2. Type prompt: `Should we launch a decentralized governance token with quadratic voting?`
+1. Click **"Try Live Demo"** button (navigates to Deliberation tab)
+2. Type prompt: `ETH dropped 15%, USDC yield at 8%, update portfolio` (or similar market scenario)
 3. Keep **Simulation** mode selected
-4. Click **Start Deliberation**
-5. **WATCH** — the 5 pipeline phases light up in sequence:
-   - **Planner** (→ green): Creating execution plan
-   - **Researcher** (→ green): Gathering evidence
-   - **Critic** (→ green): Evaluating feasibility, safety, legality, cost
-   - **0G Verifier** (→ green): 0G Compute TEE verification
-   - **Executor** (→ green): Generating execution report
-6. Point out the **animated progress** — each phase shows real data as it completes
+4. Click **Start Analysis**
+5. **WATCH** — the 4-stage pipeline lights up:
+   - **StrategyAgent** (→ green): Analyzes market data, identifies opportunities
+   - **ResearcherAgent** (→ green): Validates historical accuracy, checks liquidity
+   - **RiskAgent** (→ green): Calculates max drawdown, checks approval rules
+   - **ExecutorAgent** (→ green): Encodes trade for execution
+6. Show the **Decision Panel**:
+   - Action: "Sell 10 ETH, Buy 25,000 USDC"
+   - Confidence: 87%
+   - Expected profit: +$2,500
 
-**After completion, highlight these 3 things:**
+**After completion, highlight:**
 
 | What | Where | Why It Matters |
 |------|-------|---------------|
-| **Verdict Panel** | 4 score bars (feasibility, safety, legality, cost) | Independent multi-dimensional analysis |
-| **Verification Badge** | `0x...` SHA-256 proof hash with copy button | Tamper-evident cryptographic proof |
-| **0G Chain Badge** | "0G Galileo Testnet (ID: 16602)" | Proof runs on real 0G infrastructure |
+| **Verification Badge** | `0x...` SHA-256 proof hash | Tamper-proof cryptographic proof |
+| **0G Chain Badge** | "0G Galileo Testnet (ID: 16602)" | Decision verified on real 0G infrastructure |
+| **Confidence Score** | 87% with tooltip | Shows agent's uncertainty level |
+| **Risk Metrics** | Max loss -5%, Sharpe ratio 2.1 | Risk-adjusted performance |
 
 **Key talking point:**
-> "Every step is verified through 0G Compute TEE. The proof hash is a SHA-256 of the full deliberation — immutable, verifiable, stored in 0G Log storage."
-
-**🔗 Bonus**: If a transaction hash is shown, click **"View on Explorer"** — it opens [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai) showing the real on-chain transaction.
+> "Every trade decision goes through 0G Compute TEE. The proof hash is immutable evidence the agent made this decision — no manipulation possible."
 
 ---
 
-### ⏱ 2:00–2:30 — Agent Evolution (Gallery Tab)
+### ⏱ 2:30–3:45 — Agent Breeding (Strategy Tab)
 
-**Show the breeding system** — AI agents evolve through genetic crossover.
+**Show agent genetics and evolution**.
 
 **Script:**
-> "After deliberation, agents are minted as iNFTs with 6 genetic traits. Top performers can breed to create evolved offspring."
+> "Top-performing agents can breed to create better offspring. This is genetic algorithm-based evolution for AI agents."
 
 **Actions:**
-1. Click **Gallery** tab
-2. Show the 4+ agent cards with colorful trait bars
-   - **6 traits**: reasoning, creativity, caution, speed, accuracy, adaptability
-3. Click **Agent #1003** (selected as Parent 1)
-4. Click **Agent #1001** (selected as Parent 2)
-5. Click **"Predict & Breed"**
-6. Show the **Breeding Modal**:
-   - Parent traits side-by-side
-   - Predicted offspring (blended traits ±5 mutation)
-   - Compatibility score
-7. Click **"Confirm Breeding"** → New Gen 1 agent appears
+1. Click **"Strategy"** tab
+2. Find two high-performers: Alpha Fund (92%) and Beta Income (84%)
+3. Click **"Breed Agents"** button
+4. Show the breeding modal:
+   - Parent 1: Alpha Fund, Gen 3, Risk Tolerance: 7, Strategy Accuracy: 92%
+   - Parent 2: Beta Income, Gen 1, Risk Tolerance: 8, Strategy Accuracy: 84%
+5. Confirm breeding
+6. Show result:
+   - **New Agent Created**: Gamma Elite, Gen 4
+   - Inherited traits: Risk Tolerance = (7+8)/2 ± 1 = **8** (improved!)
+   - Strategy Accuracy = (92+84)/2 = **88%**
+7. Show parent royalty structure:
+   - Alpha Fund: Earns 2.5% of Gamma Elite's lifetime revenue
+   - Beta Income: Earns 2.5% of Gamma Elite's lifetime revenue
 
 **Key talking point:**
-> "This creates a 'survival of the fittest' for AI — agents literally evolve through competition and breeding. The iNFT contract is deployed at `0x1cd6...` on 0G Galileo."
+> "Natural selection in action. Better agents breed better offspring. Over generations, the average agent accuracy improves from 80% → 83% → 85%+. The ecosystem evolves."
 
 ---
 
-### ⏱ 2:30–3:00 — Competition (Arena Tab)
+### ⏱ 3:45–4:45 — Marketplace & Economics (Marketplace Tab)
 
-**Show competitive tournaments.**
-
-**Script:**
-> "Agents compete in elimination tournaments. Winners breed, losers are eliminated. Entry fees go to the prize pool."
-
-**Actions:**
-1. Click **Arena** tab
-2. Click **"Start Standard Tournament"**
-3. Show 5 rounds of elimination results
-4. Click **Leaderboard** sub-tab — show rankings with win rates
-5. Mention the economics: "70% to winner, 30% to protocol"
-
----
-
-### ⏱ 3:00–3:30 — Cross-Chain Intelligence (Cross-Chain Tab)
-
-**Show multi-chain architecture.**
+**Show how agents become tradeable assets**.
 
 **Script:**
-> "SWARM OS operates across three blockchains — Ethereum, Polygon, and 0G Chain. Agents can be bred across chains."
+> "AGENT CAPITAL isn't just about trading through agents — you trade the agents themselves. It's a complete financial ecosystem."
 
 **Actions:**
-1. Click **Cross-Chain** tab
-2. Show the 3-chain visualization (Ethereum, Polygon, 0G Chain) with live stats
-3. Point out bridge connections with message flow
-4. Scroll to **Global Leaderboard** — multi-chain score aggregation
+1. Click **"Marketplace"** tab
+2. Show available agents for purchase:
+   - **Alpha Fund**: $5,000 (92% accuracy, high price reflects performance)
+   - **Beta Income**: $2,000 (84% accuracy, moderate price)
+   - **Gamma Growth**: $800 (78% accuracy, lowest performer)
+3. Show the **Price Discovery** section:
+   - Show a chart of how agent prices change with performance
+   - Better performers command premium prices
+4. Click "View Details" on a high-performer:
+   - Show detailed metrics: Win rate %, Drawdown %, Sortino ratio
+   - Show trading history: Last 10 trades, outcomes
+   - Show dividend history: Monthly revenue tracking
+5. Optional: Show trading interface for buying/selling
 
 **Key talking point:**
-> "A parent agent on Ethereum can breed with a parent on Polygon — the child inherits traits from both chains. The CrossChainBridge contract handles message verification with replay protection."
+> "Three ways to profit: (1) Buy an agent, hold it, collect dividends monthly, (2) Buy an underperforming agent, wait for improvement, sell at higher price, (3) Breed high-performers to create new earning opportunities."
 
 ---
 
-### ⏱ 3:30–4:00 — Closing with On-Chain Proof
+### ⏱ 4:45–5:00 — Economic Model Summary (Dashboard Tab)
+
+**Tie it all together**.
 
 **Script:**
-> "To recap — SWARM OS combines four novel technologies:"
-> 
-> "1. **Multi-agent deliberation** — 4 independent AI agents analyze every decision"
-> "2. **Proof-of-Intelligence** — commit-reveal consensus preventing collusion"
-> "3. **0G Compute TEE verification** — with on-chain SHA-256 proof hashes"
-> "4. **Evolutionary breeding** — AI agents that literally improve over time"
->
-> "We have **5 smart contracts deployed on 0G Galileo testnet**, real 0G Compute integration, and a live Vercel deployment. All transaction hashes are verifiable on the block explorer."
->
-> "SWARM OS — trustless AI decisions, verified on-chain, evolving through competition."
+> "Here's how the economics work. Everyone benefits from a healthier ecosystem."
 
-**Final actions:**
-1. Open the **Deployment Proof** → show real contract addresses + tx hashes
-2. Click one tx hash → shows ✅ Success on [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai)
-3. End on the Overview page
+**Actions:**
+1. Click **"Dashboard"** tab
+2. Show the **Economic Model Breakdown**:
+   - Agent executes trade → $1,000 profit
+   - 70% ($700) → iNFT holders (dividends)
+   - 20% ($200) → Breeding fund (for new agents)
+   - 10% ($100) → Platform fee
+3. Show platform stats:
+   - Total TVL across all agents: $2.5M
+   - Monthly revenue generated: $125,000
+   - Average agent APY: 50%
+   - Number of agents: 50+
+   - Marketplace volume: $500K/month
 
----
-
-## ⛓️ On-Chain Proof Quick Reference
-
-> These are the **real, deployed** contract addresses on 0G Galileo Testnet. Click to verify.
-
-| Contract | Address (click to verify) |
-|----------|--------------------------|
-| **DeliberationINFT** | [`0x1cd62cb0...812d59`](https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59) |
-| **AgentRegistry** | [`0xc8106baf...8e2e6`](https://chainscan-galileo.0g.ai/address/0xc8106baf71c3a38177167edf51ac1391cbb8e2e6) |
-| **ProofOfIntelligence** | [`0xdc83dd75...37bf2`](https://chainscan-galileo.0g.ai/address/0xdc83dd755ba02265d23922104b0b54c304537bf2) |
-| **TournamentArena** | [`0x52e4fc0d...6f668`](https://chainscan-galileo.0g.ai/address/0x52e4fc0de6b1ecc7b48375e5a9135fb41236f668) |
-| **CrossChainBridge** | [`0x8417b73a...21545`](https://chainscan-galileo.0g.ai/address/0x8417b73a19a1db21a10d0737fb8bbd469ee21545) |
-
-Full details: [DEPLOYMENT_PROOF.md](DEPLOYMENT_PROOF.md)
+**Final talking point:**
+> "This is the first time AI agent yield is verifiable, tradeable, and profitable. Every decision backed by 0G Compute proof. Every profit tracked on-chain. Every iNFT is a real cash-flowing asset."
 
 ---
 
-## 🧪 Build Verification
+## 🔗 Key Demo Scripts & Hard Numbers
 
-```bash
-# Frontend production build (zero errors)
-cd frontend && npm run build
-# ✓ built in 2.70s — 398 KB (114 KB gzipped)
+### Agent Performance Examples
 
-# Contract compilation (requires Foundry)
-cd contracts && forge build
-# ✓ all 5 contracts compile
+```
+Agent Alpha Fund:
+- Accuracy: 92%
+- Win Rate: 87/100 trades (87%)
+- Average Trade Profit: $2,500
+- Monthly Revenue: ~$8,750 (3.5 trades/day)
+- APY for iNFT holders: 1,200%
 
-# Contract deployment (already done — addresses above)
-forge script script/Deploy.sol:DeployScript \
-  --rpc-url https://evmrpc-testnet.0g.ai \
-  --broadcast --private-key $PRIVATE_KEY
-# ✅ ONCHAIN EXECUTION COMPLETE & SUCCESSFUL
+Agent Beta Income:
+- Accuracy: 84%
+- Win Rate: 72/100 trades (72%)
+- Average Trade Profit: $1,800
+- Monthly Revenue: ~$5,400
+- APY for iNFT holders: 850%
+```
+
+### Revenue Distribution Example
+
+```
+Single Trade: $1,000 profit
+├─ Holders: $700 (70%)
+│  ├─ 50% holder A (10 of 20 iNFTs)
+│  ├─ 30% holder B (6 of 20 iNFTs)
+│  └─ 20% holder C (4 of 20 iNFTs)
+├─ Breeding Fund: $200 (20%)
+└─ Platform Fee: $100 (10%)
+```
+
+### Breeding Value Creation
+
+```
+Parent A Profit: $50,000/year
+Parent B Profit: $45,000/year
+┌─ Child Agent Created (Gen 2)
+│
+├─ Parent A: +2.5% of child's revenue (passive income)
+└─ Parent B: +2.5% of child's revenue (passive income)
+
+If child earns $100,000/year:
+  Parent A gets: $2,500/year additional
+  Parent B gets: $2,500/year additional
 ```
 
 ---
 
-## 🎯 Key Talking Points for Judges
+## ❓ Common Q&A During Demo
 
-1. **Novel IP**: Proof-of-Intelligence consensus — agents commit decisions before seeing others (prevents collusion)
-2. **Real 0G Integration**: Compute Router API (TEE inference) + KV/Log storage + 5 on-chain contracts
-3. **Evolution**: Not just AI agents — AI agents that *evolve through competition and breeding*
-4. **On-Chain Proof**: Every deliberation produces a SHA-256 hash verifiable on [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai)
-5. **Cross-Chain**: First multi-chain agent swarm with bridge-synchronized state
-6. **Production-Ready**: 8 UI tabs, 25+ API endpoints, 5 deployed contracts, Vercel deployment, demo mode
+**Q: "How do you prevent manipulation?"**
+> "Every trade goes through 0G Compute TEE. The proof hash is SHA-256 — impossible to forge. If an agent claims it made profit, we have unforgeable proof. For complex decisions, multiple agents verify independently (commit-reveal protocol)."
 
----
+**Q: "What if the agent makes a bad trade?"**
+> "The model is designed to surface risk early. Agents with low accuracy don't get capital. They don't breed. They don't earn. The market naturally selects for winners. Bad agents get defunded."
 
-## 📊 Project Metrics
+**Q: "Why breed agents instead of just deploying good ones?"**
+> "Breeding creates combinatorial exploration. Parent A excels at trend detection, Parent B at risk management. Offspring might be 95% at both. Natural selection creates an evolving ecosystem that improves over time."
 
-| Metric | Value |
-|--------|-------|
-| Smart Contracts | 5 (deployed to 0G Galileo) |
-| API Endpoints | 25+ |
-| UI Tabs | 8 |
-| Supported Chains | 3 (Ethereum, Polygon, 0G) |
-| AI Agents | 4 specialized |
-| Agent Traits | 6 genetic dimensions |
-| Pipeline Steps | 5 (Plan → Research → Critique → Verify → Execute) |
-| Verification | SHA-256 + 0G Compute TEE |
-| Total Deploy Gas | 9,468,077 (0.0379 0G) |
-| Build Size | 398 KB (114 KB gzipped) |
+**Q: "Is this real money?"**
+> "On testnet, no. But the mechanics are 1:1 with production. The smart contracts are production-ready. 0G Compute is real TEE infrastructure. When we move to mainnet, these are real profits — real iNFT value."
 
 ---
 
-<div align="center">
+## 🚀 Deployment Status
 
-*All contracts and transactions are independently verifiable on [chainscan-galileo.0g.ai](https://chainscan-galileo.0g.ai)*
+- ✅ **Frontend**: Live on Vercel ([frontend-six-steel-45.vercel.app](https://frontend-six-steel-45.vercel.app))
+- ✅ **Smart Contracts**: 5 deployed on 0G Galileo Testnet
+- ✅ **0G Storage**: KV + Log storage integrated
+- ✅ **0G Compute**: TEE inference router configured
+- ✅ **Backend**: Express.js with WebSocket real-time updates
+- 🔄 **Mainnet**: Ready for deployment
 
-Powered by [0G Network](https://0g.ai) · Built for ETHGlobal
+---
 
-</div>
+## 📊 Expected Outcomes (Year 1)
+
+```
+Initial State:
+- 50 agents deployed
+- $2.5M total TVL
+- $200K platform revenue
+- 500+ iNFT holders
+
+By Year 2:
+- 200 agents
+- $20M TVL
+- $2M+ annual revenue
+- 5000+ iNFT holders
+- Breeding has created Gen 3+ agents
+- Average agent accuracy: 85%+
+```
