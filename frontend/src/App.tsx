@@ -86,21 +86,21 @@ function App() {
     return (
         <div className="min-h-screen" style={{ background: 'var(--bg-void)' }}>
             {/* ── Ambient background ── */}
-            {/* Live neural network canvas */}
-        <NeuralBackground nodeCount={38} />
-        {/* Ambient radial glows */}
-        <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-            <div className="absolute top-0 left-1/3 w-[600px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(79,143,255,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-            <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-        </div>
+            {/* Live neural network canvas — z-index 0, behind everything */}
+            <NeuralBackground nodeCount={38} />
+            {/* Ambient radial glows */}
+            <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+                <div className="absolute top-0 left-1/3 w-[600px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(79,143,255,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+                <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+            </div>
 
             {/* ── Header ── */}
             <motion.header
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="border-b border-white/[0.04] sticky top-0 z-50"
-                style={{ background: 'rgba(2, 4, 8, 0.8)', backdropFilter: 'blur(24px) saturate(1.5)' }}
+                className="border-b sticky top-0"
+                style={{ borderColor: 'rgba(79,143,255,0.06)', background: 'rgba(2,3,5,0.88)', backdropFilter: 'blur(24px) saturate(1.8)', zIndex: 50 }}
             >
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
                     <div className="flex items-center justify-between">
@@ -174,11 +174,12 @@ function App() {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.15 }}
-                className="border-b sticky top-[57px] z-40"
+                className="border-b sticky top-[57px]"
                 style={{
-                    borderColor: 'rgba(100, 120, 180, 0.06)',
-                    background: 'rgba(2, 4, 8, 0.7)',
-                    backdropFilter: 'blur(20px) saturate(1.4)'
+                    borderColor: 'rgba(79,143,255,0.06)',
+                    background: 'rgba(2,3,5,0.92)',
+                    backdropFilter: 'blur(20px) saturate(1.6)',
+                    zIndex: 40
                 }}
             >
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
