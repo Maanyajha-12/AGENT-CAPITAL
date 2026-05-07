@@ -1,15 +1,15 @@
 <div align="center">
 
-# 🤖 SWARMOS
+# 💎 AGENT CAPITAL
 
-### Trustless Multi-Agent AI Decision-Making for the Multi-Chain Future
+### Autonomous AI Agents as Tradeable, Yielding Assets on 0G
 
 [![Built on 0G](https://img.shields.io/badge/Built%20on-0G%20Network-10b981?style=for-the-badge)](https://0g.ai)
 [![Live Demo](https://img.shields.io/badge/Live-Vercel-000?style=for-the-badge&logo=vercel)](https://frontend-six-steel-45.vercel.app)
 [![Contracts](https://img.shields.io/badge/Contracts-5%20on%20Galileo-blue?style=for-the-badge)](DEPLOYMENT_PROOF.md)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**SWARM OS orchestrates autonomous AI agent swarms across multiple blockchains. Every decision is verified through 0G Compute TEE and recorded on-chain with cryptographic proof.**
+**AGENT CAPITAL is the first tokenized intelligence marketplace where AI agents generate verified yield. Trade autonomous agents as iNFTs, earn dividends from their trading profits, breed high-performers to evolve the ecosystem.**
 
 🌐 **Live Demo**: [frontend-six-steel-45.vercel.app](https://frontend-six-steel-45.vercel.app) · 🔗 **On-Chain Proof**: [DEPLOYMENT_PROOF.md](DEPLOYMENT_PROOF.md) · 🎬 **Demo Guide**: [DEMO_GUIDE.md](DEMO_GUIDE.md)
 
@@ -17,15 +17,15 @@
 
 ---
 
-## 🌟 What is SWARM OS?
+## 🌟 What is AGENT CAPITAL?
 
-SWARM OS is a **multi-agent deliberation system** where four specialized AI agents independently analyze decisions through a structured pipeline, verify results through **0G Compute TEE**, and record outcomes as **on-chain iNFTs** with cryptographic proofs.
+AGENT CAPITAL is a **tokenized intelligence marketplace** where autonomous AI trading agents generate verified yield through sophisticated multi-step decision-making, recorded on-chain, and distributed to iNFT holders as dividends.
 
 ### The Problem
-AI agents make **$2.3 trillion** in automated decisions annually. **Zero are independently verifiable.**
+AI agents execute **$2.3 trillion** in automated trades annually. Most lack **independent verification, transparency, or verifiable yield attribution**.
 
 ### Our Solution
-Multi-agent consensus with cryptographic proof — 4 agents analyze independently, commit-reveal prevents collusion, 0G TEE provides verification, and everything goes on-chain.
+Tokenized agents as iNFTs with verified trading decisions through 0G Compute TEE, profitable trades recorded on-chain, revenue distributed to holders, and top performers can breed to evolve the ecosystem.
 
 ---
 
@@ -33,15 +33,16 @@ Multi-agent consensus with cryptographic proof — 4 agents analyze independentl
 
 | Feature | Description |
 |---------|-------------|
-| 🧠 **Multi-Agent Deliberation** | 4 specialized agents (Planner → Researcher → Critic → Executor) analyze every decision |
-| 🛡️ **Proof-of-Intelligence** | Novel commit-reveal consensus — agents commit hashed decisions before revealing |
-| 🔐 **0G Compute Verification** | TEE-verified inference with SHA-256 proof hashes |
-| 💾 **0G Storage** | KV + Log storage for persistent state (with in-memory fallback) |
-| 🧬 **Agent Evolution** | Top agents breed offspring with genetic crossover and ±5 mutation |
-| ⚔️ **Arena Tournaments** | Competitive elimination where agents evolve through competition |
-| 🌐 **Cross-Chain Swarms** | Agents operate across Ethereum, Polygon, and 0G Chain |
-| 📊 **Global Leaderboard** | Multi-chain score aggregation with per-chain rankings |
-| 🎭 **Demo Mode** | Full offline simulation — works without backend for judges |
+| 💰 **Agent Tokenization** | Each AI trading agent minted as ERC-7857 iNFT with traits and performance history |
+| 📊 **Verified Yield Generation** | 4-stage trading pipeline with 0G Compute verification producing proof-verified profits |
+| 🧬 **Agent Breeding Evolution** | Top performers (85%+ accuracy) can breed offspring with genetic trait crossover |
+| 💎 **Dividend Distribution** | 70% of trade profits distributed to iNFT holders automatically each month |
+| 🔄 **Portfolio Management** | Buy/sell agent iNFTs, hold for yield, delegate to fund managers |
+| 🛒 **Agent Marketplace** | Discover, price, and trade high-performing agents with real performance metrics |
+| 🔐 **0G Compute Verification** | TEE-verified trading decisions with SHA-256 proof hashes recorded on-chain |
+| 💾 **0G Storage** | KV store for portfolio state + Log storage for immutable trade audit trail |
+| 🌐 **Multi-Strategy Agents** | Yield Optimizer, Arbitrage Hunter, Trend Follower, Risk Manager strategies |
+| 📈 **Real-Time Monitoring** | Live WebSocket feeds for price updates, agent performance, dividend calculations |
 
 ---
 
@@ -360,3 +361,4 @@ MIT — see [LICENSE](LICENSE) for details.
 Powered by [0G Network](https://0g.ai) · [Anthropic Claude](https://anthropic.com)
 
 </div>
+# AGENT-CAPITAL
