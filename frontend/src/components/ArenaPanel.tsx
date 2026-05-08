@@ -1,358 +1,140 @@
-import React, { useState, useEffect } from "react";
-import "../styles/Arena.css";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Shield, Trophy, Flame, Star, CheckCircle, Award, TrendingUp, Users } from 'lucide-react';
 
-// ============================================================
-// Types
-// ============================================================
+const AGENTS = [
+  { id: 1, name: 'Yield Harvester+', totalTrades: 1247, winRate: 71.3, streak: 47, profitFactor: 2.8, sharpe: 1.94, years: 2.3, volume: 48.2, blowups: 0, score: 94, color: 'var(--accent-maroon)', badges: ['profitable_year', 'trending', 'institutional', 'risk_master'] },
+  { id: 2, name: 'Volatility Surge', totalTrades: 892,  winRate: 68.5, streak: 12, profitFactor: 2.1, sharpe: 1.67, years: 1.8, volume: 31.4, blowups: 0, score: 82, color: '#7c3aed', badges: ['profitable_year', 'trending', 'institutional'] },
+  { id: 3, name: 'Arbitrage Master', totalTrades: 567,  winRate: 74.2, streak: 28, profitFactor: 3.1, sharpe: 1.52, years: 1.2, volume: 22.8, blowups: 0, score: 79, color: '#d97706', badges: ['risk_master', 'institutional'] },
+  { id: 4, name: 'Stablecoin Pro',   totalTrades: 2341, winRate: 89.1, streak: 103,profitFactor: 4.2, sharpe: 1.34, years: 3.1, volume: 78.4, blowups: 0, score: 91, color: '#059669', badges: ['profitable_year', 'risk_master', 'institutional'] },
+  { id: 5, name: 'Epsilon Core',     totalTrades: 456,  winRate: 78.4, streak: 21, profitFactor: 2.6, sharpe: 2.01, years: 0.8, volume: 18.2, blowups: 0, score: 88, color: '#f59e0b', badges: ['trending', 'institutional', 'explosive'] },
+  { id: 6, name: 'Market Maker Pro', totalTrades: 345,  winRate: 63.2, streak: 5,  profitFactor: 1.8, sharpe: 1.28, years: 0.5, volume: 12.1, blowups: 0, score: 64, color: '#0891b2', badges: [] },
+];
 
-interface TournamentResult {
-  round: number;
-  agent_name: string;
-  agent_id: number;
-  generation: number;
-  score: number;
-  feedback: string;
-}
+const BADGE_META: Record<string, { label: string; emoji: string; desc: string; color: string; bg: string }> = {
+  profitable_year:  { label: 'Profitable Year',   emoji: '🏆', desc: 'Positive returns for 12+ consecutive months', color: '#d97706', bg: '#fffbeb' },
+  trending:         { label: 'Trending',           emoji: '🔥', desc: 'Top 5% performer this month',               color: '#dc2626', bg: '#fef2f2' },
+  institutional:    { label: 'Institutional-Grade', emoji: '💎', desc: 'Sharpe Ratio > 1.5',                        color: 'var(--accent-maroon)', bg: '#eff6ff' },
+  risk_master:      { label: 'Risk Master',        emoji: '🛡️', desc: 'Max drawdown < 10%',                        color: '#059669', bg: '#ecfdf5' },
+  explosive:        { label: 'Explosive Growth',   emoji: '🚀', desc: '>100% APY achieved honestly',               color: '#7c3aed', bg: '#f5f3ff' },
+};
 
-interface LeaderboardEntry {
-  rank: number;
-  agent_id: number;
-  agent_name: string;
-  generation: number;
-  wins: number;
-  losses: number;
-  win_rate: number;
-  avg_score: number;
-  best_score: number;
-  total_earnings: number;
-  breeding_count: number;
-}
-
-interface HistoryEntry {
-  tournament_id: string;
-  round: number;
-  winner: string;
-  avg_score: number;
-  participation: number;
-  timestamp: string;
-}
-
-type TabId = "tournament" | "leaderboard" | "history" | "stats";
-
-const API = import.meta.env.VITE_API_URL || "";
-
-// ============================================================
-// Helpers
-// ============================================================
-
-function ScoreBar({ score }: { score: number }) {
-  return (
-    <div className="match-bar-track">
-      <div className="match-bar-fill" style={{ width: `${score}%` }} />
-    </div>
-  );
-}
-
-// ============================================================
-// Component
-// ============================================================
+const LEADERBOARD = [...AGENTS].sort((a, b) => b.score - a.score);
 
 export default function ArenaPanel() {
-  const [tournament, setTournament] = useState<any>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>("tournament");
-  const [customPrompt, setCustomPrompt] = useState("");
-
-  useEffect(() => {
-    loadStaticData();
-  }, []);
-
-  const loadStaticData = async () => {
-    try {
-      const [lb, hist, st] = await Promise.all([
-        fetch(`${API}/api/arena/leaderboard`).then((r) => r.json()),
-        fetch(`${API}/api/arena/history`).then((r) => r.json()),
-        fetch(`${API}/api/arena/stats`).then((r) => r.json()),
-      ]);
-      setLeaderboard(lb.leaderboard ?? []);
-      setHistory(hist.history ?? []);
-      setStats(st);
-    } catch (err) {
-      console.error("[Arena] Failed to load static data:", err);
-    }
-  };
-
-  const runTournament = async (custom = false) => {
-    setLoading(true);
-    try {
-      const endpoint = custom ? "/api/arena/custom-tournament" : "/api/arena/tournament";
-      const body = custom
-        ? { prompt: customPrompt || "Create governance proposal", num_rounds: 5 }
-        : { numRounds: 5 };
-
-      const res = await fetch(`${API}${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      setTournament(data);
-      setActiveTab("tournament");
-      // Refresh leaderboard after tournament
-      await loadStaticData();
-    } catch (err) {
-      console.error("[Arena] Tournament failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const tabs: { id: TabId; label: string }[] = [
-    { id: "tournament",  label: "🎮 Current Tournament" },
-    { id: "leaderboard", label: "🏆 Leaderboard" },
-    { id: "history",     label: "📜 History" },
-    { id: "stats",       label: "📊 Statistics" },
-  ];
-
-  // Unique rounds in the tournament
-  const rounds: number[] = tournament
-    ? [...new Set<number>(tournament.results.map((r: TournamentResult) => r.round))].sort()
-    : [];
+  const [selected, setSelected] = useState(AGENTS[0]);
 
   return (
-    <div className="arena-panel">
-      {/* ── Header ── */}
-      <div className="arena-header">
-        <h1>⚔️ Agent Arena — Competitive Tournament</h1>
-        <p>Agents compete, evolve, and improve through natural selection</p>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="font-display" style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Agent Reputation</h1>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>On-chain verified reputation scores and achievement badges — powered by 0G Compute</p>
+      </motion.div>
 
-      {/* ── Controls ── */}
-      <div className="arena-controls">
-        <button
-          className="tournament-btn"
-          onClick={() => runTournament(false)}
-          disabled={loading}
-        >
-          {loading ? "⏳ Running…" : "🎮 Start Standard Tournament"}
-        </button>
-
-        <div className="custom-tournament">
-          <input
-            type="text"
-            placeholder="Custom prompt (e.g. Launch decentralised governance)"
-            value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
-            disabled={loading}
-            onKeyDown={(e) => e.key === "Enter" && !loading && runTournament(true)}
-          />
-          <button
-            className="custom-btn"
-            onClick={() => runTournament(true)}
-            disabled={loading}
-          >
-            🎯 Custom
-          </button>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.25rem' }}>
+        {/* Leaderboard */}
+        <div className="card" style={{ padding: '1.25rem', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+            <Trophy size={18} style={{ color: '#d97706' }} />
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Reputation Ranking</h3>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {LEADERBOARD.map((a, i) => (
+              <motion.div key={a.id} onClick={() => setSelected(a)}
+                style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: `1px solid ${selected.id === a.id ? a.color : 'var(--border-default)'}`, background: selected.id === a.id ? `${a.color}08` : 'var(--bg-elevated)', display: 'flex', alignItems: 'center', gap: '0.625rem' }}
+                whileHover={{ x: 2 }}
+              >
+                <span style={{ fontSize: i < 3 ? '1rem' : '0.8rem', fontWeight: 700, color: 'var(--text-dim)', width: 20, textAlign: 'center' }}>
+                  {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.82rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.name}</p>
+                  <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.2rem' }}>
+                    {a.badges.slice(0, 3).map(b => <span key={b} style={{ fontSize: '0.7rem' }}>{BADGE_META[b]?.emoji}</span>)}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 900, color: a.color, fontFamily: 'Outfit, sans-serif' }}>{a.score}</span>
+                  <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)' }}>score</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* ── Tabs ── */}
-      <div className="arena-tabs">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            className={`arena-tab${activeTab === t.id ? " active" : ""}`}
-            onClick={() => setActiveTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Tournament Tab ── */}
-      {activeTab === "tournament" && (
-        <div className="arena-tab-content">
-          {!tournament ? (
-            <div className="arena-empty">
-              <p>🎮 Run a tournament to see results here</p>
-            </div>
-          ) : (
-            <>
-              {/* Info banner */}
-              <div className="tournament-info">
-                <div className="tournament-info-item">
-                  <label>Tournament ID</label>
-                  <span>{tournament.tournament_id}</span>
-                </div>
-                <div className="tournament-info-item">
-                  <label>Prompt</label>
-                  <span>{tournament.prompt}</span>
-                </div>
-                <div className="tournament-info-item">
-                  <label>Rounds</label>
-                  <span>{tournament.rounds}</span>
-                </div>
+        {/* Selected agent detail */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Header */}
+          <motion.div key={selected.id} className="card" style={{ padding: '1.25rem', borderTop: `3px solid ${selected.color}` }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{selected.name}</h2>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>On-chain verified · 0G Compute reputation proof</p>
               </div>
+              <div style={{ textAlign: 'right' }}>
+                <div className="font-display" style={{ fontSize: '2rem', fontWeight: 900, color: selected.color }}>{selected.score}</div>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Rep Score</p>
+              </div>
+            </div>
 
-              {/* Bracket */}
-              <div className="tournament-bracket">
-                {rounds.map((round) => {
-                  const roundResults: TournamentResult[] = tournament.results
-                    .filter((r: TournamentResult) => r.round === round)
-                    .sort((a: TournamentResult, b: TournamentResult) => b.score - a.score);
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+              {[
+                { label: 'Total Trades', val: selected.totalTrades.toLocaleString() },
+                { label: 'Win Rate', val: `${selected.winRate}%` },
+                { label: 'Win Streak', val: `${selected.streak}` },
+                { label: 'Profit Factor', val: `${selected.profitFactor}x` },
+                { label: 'Sharpe Ratio', val: selected.sharpe.toFixed(2) },
+                { label: 'Years Active', val: `${selected.years}y` },
+                { label: 'Volume Traded', val: `$${selected.volume}M` },
+                { label: 'Blowups', val: `${selected.blowups}` },
+              ].map(({ label, val }) => (
+                <div key={label} style={{ background: 'var(--bg-elevated)', borderRadius: '8px', padding: '0.625rem', textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.6rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{label}</p>
+                  <p style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif' }}>{val}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
+          {/* Badges */}
+          <div className="card" style={{ padding: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <Award size={16} style={{ color: '#d97706' }} />
+              <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>Achievement Badges (ERC-721)</h3>
+            </div>
+            {selected.badges.length === 0 ? (
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>No badges earned yet — keep trading!</p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                {selected.badges.map(b => {
+                  const meta = BADGE_META[b];
                   return (
-                    <div key={round} className="bracket-round">
-                      <p className="bracket-round-title">Round {round}</p>
-                      <div className="agents-in-round">
-                        {roundResults.map((result, idx) => (
-                          <div key={result.agent_id} className="agent-match">
-                            <div className="match-header">
-                              <span className="match-rank">#{idx + 1}</span>
-                              <span className="match-score">{result.score}%</span>
-                            </div>
-                            <div className="match-name">
-                              {result.agent_name}{" "}
-                              <span className="match-gen">Gen {result.generation}</span>
-                            </div>
-                            <ScoreBar score={result.score} />
-                            <div className="match-feedback">{result.feedback}</div>
-                          </div>
-                        ))}
+                    <motion.div key={b} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ scale: 1.02 }}
+                      style={{ padding: '0.875rem', borderRadius: 'var(--radius-md)', background: meta.bg, border: `1px solid ${meta.color}30`, display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                      <span style={{ fontSize: '1.5rem' }}>{meta.emoji}</span>
+                      <div>
+                        <p style={{ fontSize: '0.78rem', fontWeight: 700, color: meta.color }}>{meta.label}</p>
+                        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{meta.desc}</p>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
+            )}
 
-              {/* Winner + Stats */}
-              <div className="tournament-bottom">
-                <div className="winner-card">
-                  <h2>🏆 Tournament Winner</h2>
-                  <p className="winner-name">{tournament.winner.agent_name}</p>
-                  <p className="winner-score">{tournament.winner.score}%</p>
-                  <p className="winner-gen">Generation {tournament.winner.generation}</p>
+            {/* Locked badges */}
+            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-dim)', marginTop: '1rem', marginBottom: '0.5rem' }}>Locked Badges</p>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {Object.entries(BADGE_META).filter(([k]) => !selected.badges.includes(k)).map(([k, meta]) => (
+                <div key={k} style={{ padding: '0.3rem 0.625rem', borderRadius: '99px', background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.5 }}>
+                  <span style={{ fontSize: '0.8rem' }}>{meta.emoji}</span>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{meta.label}</span>
                 </div>
-
-                <div className="tournament-stats-card">
-                  <h3>Tournament Statistics</h3>
-                  <div className="stat-mini-grid">
-                    <div className="stat-mini">
-                      <label>Average Score</label>
-                      <span className="stat-mini-value">{tournament.statistics.average_score}%</span>
-                    </div>
-                    <div className="stat-mini">
-                      <label>Highest Score</label>
-                      <span className="stat-mini-value">{tournament.statistics.highest_score}%</span>
-                    </div>
-                    <div className="stat-mini">
-                      <label>Lowest Score</label>
-                      <span className="stat-mini-value">{tournament.statistics.lowest_score}%</span>
-                    </div>
-                    <div className="stat-mini">
-                      <label>Total Matchups</label>
-                      <span className="stat-mini-value">{tournament.statistics.total_matchups}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* ── Leaderboard Tab ── */}
-      {activeTab === "leaderboard" && (
-        <div className="arena-tab-content">
-          <h2 className="leaderboard-header">🏆 Global Leaderboard</h2>
-          <table className="leaderboard-table">
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Agent</th>
-                <th>Gen</th>
-                <th>Wins</th>
-                <th>Win Rate</th>
-                <th>Avg Score</th>
-                <th>Best</th>
-                <th>Breeding</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboard.map((entry) => (
-                <tr key={entry.rank} className={entry.rank === 1 ? "top-row" : ""}>
-                  <td className="lb-rank">
-                    {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : entry.rank === 3 ? "🥉" : `#${entry.rank}`}
-                  </td>
-                  <td className="lb-name">{entry.agent_name}</td>
-                  <td>{entry.generation}</td>
-                  <td>{entry.wins}</td>
-                  <td>
-                    <div className="win-rate-cell">
-                      <div className="win-rate-track">
-                        <div className="win-rate-fill" style={{ width: `${entry.win_rate}%` }} />
-                      </div>
-                      <span>{entry.win_rate}%</span>
-                    </div>
-                  </td>
-                  <td className="lb-score">{entry.avg_score}%</td>
-                  <td>{entry.best_score}%</td>
-                  <td>{entry.breeding_count}×</td>
-                </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* ── History Tab ── */}
-      {activeTab === "history" && (
-        <div className="arena-tab-content">
-          <h2 className="history-header">📜 Tournament History</h2>
-          <div className="history-list">
-            {history.map((entry, idx) => (
-              <div key={idx} className="history-item">
-                <span className="history-round-badge">#{entry.round}</span>
-                <div>
-                  <p className="history-winner">🏆 {entry.winner}</p>
-                  <p className="history-meta">
-                    Avg Score: {entry.avg_score}% &nbsp;·&nbsp;{" "}
-                    {new Date(entry.timestamp).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))}
+            </div>
           </div>
         </div>
-      )}
-
-      {/* ── Stats Tab ── */}
-      {activeTab === "stats" && stats && (
-        <div className="arena-tab-content">
-          <h2 className="stats-header">📊 Arena Statistics</h2>
-          <div className="stats-grid">
-            {[
-              { label: "Total Tournaments",  value: stats.total_tournaments },
-              { label: "Total Rounds",        value: stats.total_rounds },
-              { label: "Total Matchups",      value: stats.total_matchups },
-              { label: "Active Agents",       value: stats.agents_active },
-              { label: "Highest Avg Score",   value: `${stats.highest_avg_score}%` },
-              { label: "Lowest Avg Score",    value: `${stats.lowest_avg_score}%` },
-              { label: "Avg Winner Score",    value: `${stats.avg_winner_score}%` },
-              { label: "Breeding Events",     value: stats.total_breeding_events },
-              { label: "Generations Created", value: stats.generations_created },
-            ].map((s) => (
-              <div key={s.label} className="stat-card">
-                <h3>{s.label}</h3>
-                <p className="stat-value">{s.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
