@@ -1,249 +1,364 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BarChart3, Zap, Dna, Swords, Wifi, WifiOff, Globe, Briefcase, Store, TrendingUp, Presentation } from 'lucide-react'
-import NeuralBackground from './components/NeuralBackground'
+import {
+  BarChart3, Zap, Dna, Swords, Wifi, WifiOff, Globe,
+  Briefcase, Store, TrendingUp, Trophy, Shield, Flame,
+  ArrowUpRight, ArrowDownRight, ChevronRight
+} from 'lucide-react'
 import LandingPage from './components/LandingPage'
 import DeliberationPanel from './components/DeliberationPanel'
-import AgentMonitor from './components/AgentMonitor'
-import SystemStats from './components/SystemStats'
 import Gallery from './components/Gallery'
 import ArenaPanel from './components/ArenaPanel'
 import CrossChainDashboard from './components/CrossChainDashboard'
-import PortfolioPanel from './components/PortfolioPanel'
 import MarketplacePanel from './components/MarketplacePanel'
 import StrategyPanel from './components/StrategyPanel'
-import PitchDeck from './components/PitchDeck'
 import Dashboard from './components/Dashboard'
 import PortfolioDashboard from './components/PortfolioDashboard'
+import Leaderboard from './components/Leaderboard'
+import SystemStats from './components/SystemStats'
 import WebSocketManager from './services/websocket'
 
-type TabId = 'overview' | 'portfolio' | 'marketplace' | 'strategy' | 'deliberate' | 'gallery' | 'arena' | 'crosschain' | 'analytics' | 'pitch'
+type TabId = 'overview' | 'portfolio' | 'leaders' | 'marketplace' | 'strategy' | 'deliberate' | 'gallery' | 'arena' | 'crosschain' | 'analytics'
 
 const pageVariants = {
-    initial: { opacity: 0, y: 16, scale: 0.99 },
-    animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
-    exit: { opacity: 0, y: -8, scale: 0.99, transition: { duration: 0.2 } },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] } },
+  exit:    { opacity: 0, y: -6,  transition: { duration: 0.15 } },
+}
+
+// Live ticker items
+const TICKER_ITEMS = [
+  { text: '🔥 Yield Harvester+ up +4.2% in last hour', positive: true },
+  { text: '⚡ Arbitrage Master executed $12,400 trade', positive: true },
+  { text: '💎 Stablecoin Pro hit 89.1% win rate', positive: true },
+  { text: '🚀 New agent "Omega Fund" deployed · Gen 3', positive: true },
+  { text: '📈 Platform TVL crossed $84M total', positive: true },
+  { text: '✅ 0G Compute verified 247 trades in last hour', positive: true },
+  { text: '🏆 Volatility Surge ranked #1 this week', positive: true },
+  { text: '💰 $2.3M profit distributed to investors today', positive: true },
+  { text: '🤖 Epsilon Core breeding cooldown complete', positive: true },
+  { text: '📊 Market Maker generated $8,420 in LP fees', positive: true },
+]
+
+function LiveTicker() {
+  const doubled = [...TICKER_ITEMS, ...TICKER_ITEMS]
+  return (
+    <div
+      style={{
+        background: 'linear-gradient(90deg, #3d1a00, #7f1d1d)',
+        borderBottom: '1px solid #5a1a00',
+        overflow: 'hidden',
+        height: '34px',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        className="ticker-track"
+        style={{ display: 'flex', gap: '3rem', whiteSpace: 'nowrap', alignItems: 'center' }}
+      >
+        {doubled.map((item, i) => (
+          <span key={i} style={{ fontSize: '0.72rem', fontWeight: 500, color: 'rgba(255,254,249,0.85)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            {item.text}
+            <span style={{ color: 'rgba(255,254,249,0.3)' }}>•</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function App() {
-    const [activeTab, setActiveTab] = useState<TabId>('overview')
-    const [wsConnected, setWsConnected] = useState(false)
-    const [systemHealth, setSystemHealth] = useState('checking')
+  const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const [wsConnected, setWsConnected] = useState(false)
+  const [systemHealth, setSystemHealth] = useState('checking')
+  const [showFOMO, setShowFOMO] = useState(true)
+  const [liveStat, setLiveStat] = useState({ investors: 12453, profit: 84.2 })
 
-    useEffect(() => {
-        const ws = WebSocketManager.getInstance()
-        ws.connect()
-        ws.onConnected(() => setWsConnected(true))
-        ws.onDisconnected(() => setWsConnected(false))
-        return () => { ws.disconnect() }
-    }, [])
+  useEffect(() => {
+    const ws = WebSocketManager.getInstance()
+    ws.connect()
+    ws.onConnected(() => setWsConnected(true))
+    ws.onDisconnected(() => setWsConnected(false))
+    return () => { ws.disconnect() }
+  }, [])
 
-    useEffect(() => {
-        const checkHealth = async () => {
-            try {
-                const apiUrl = import.meta.env.VITE_API_URL || ''
-                const response = await fetch(`${apiUrl}/api/health`)
-                setSystemHealth(response.ok ? 'healthy' : 'unhealthy')
-            } catch {
-                setSystemHealth('disconnected')
-            }
-        }
-        checkHealth()
-        const interval = setInterval(checkHealth, 10000)
-        return () => clearInterval(interval)
-    }, [])
-
-    const handleNavigate = (tab: string) => {
-        setActiveTab(tab as TabId)
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || ''
+        const response = await fetch(`${apiUrl}/api/health`)
+        setSystemHealth(response.ok ? 'healthy' : 'unhealthy')
+      } catch {
+        setSystemHealth('disconnected')
+      }
     }
+    checkHealth()
+    const interval = setInterval(checkHealth, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
-    const tabs: { id: TabId; label: string; icon: any }[] = [
-        { id: 'overview', label: 'Overview', icon: TrendingUp },
-        { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
-        { id: 'marketplace', label: 'Marketplace', icon: Store },
-        { id: 'strategy', label: 'Strategy', icon: BarChart3 },
-        { id: 'deliberate', label: 'Deliberate', icon: Zap },
-        { id: 'gallery', label: 'Gallery', icon: Dna },
-        { id: 'arena', label: 'Arena', icon: Swords },
-        { id: 'crosschain', label: 'Cross-Chain', icon: Globe },
-        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-        { id: 'pitch', label: 'Pitch', icon: Presentation },
-    ]
+  // Simulate live stat updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveStat(s => ({
+        investors: s.investors + Math.floor(Math.random() * 3),
+        profit: parseFloat((s.profit + Math.random() * 0.01).toFixed(1)),
+      }))
+    }, 8000)
+    return () => clearInterval(interval)
+  }, [])
 
-    const renderTab = () => {
-        switch (activeTab) {
-            case 'overview': return <Dashboard />
-            case 'portfolio': return <PortfolioDashboard />
-            case 'marketplace': return <MarketplacePanel />
-            case 'strategy': return <StrategyPanel />
-            case 'deliberate': return <DeliberationPanel />
-            case 'gallery': return <Gallery />
-            case 'arena': return <ArenaPanel />
-            case 'crosschain': return <CrossChainDashboard />
-            case 'analytics': return <SystemStats />
-            case 'pitch': return <PitchDeck />
-        }
+  const handleNavigate = (tab: string) => setActiveTab(tab as TabId)
+
+  const tabs: { id: TabId; label: string; icon: any; badge?: string }[] = [
+    { id: 'overview',    label: 'Overview',     icon: TrendingUp },
+    { id: 'portfolio',   label: 'Portfolio',    icon: Briefcase },
+    { id: 'leaders',     label: 'Leaderboard',  icon: Trophy,  badge: 'LIVE' },
+    { id: 'marketplace', label: 'Marketplace',  icon: Store,   badge: '500+' },
+    { id: 'strategy',    label: 'Strategies',   icon: BarChart3 },
+    { id: 'gallery',     label: 'Breeding',     icon: Dna },
+    { id: 'arena',       label: 'Reputation',   icon: Shield },
+    { id: 'crosschain',  label: 'Cross-Chain',  icon: Globe },
+    { id: 'deliberate',  label: 'Deliberate',   icon: Zap },
+    { id: 'analytics',   label: 'Analytics',    icon: BarChart3 },
+  ]
+
+  const renderTab = () => {
+    switch (activeTab) {
+      case 'overview':    return <Dashboard />
+      case 'portfolio':   return <PortfolioDashboard />
+      case 'leaders':     return <Leaderboard />
+      case 'marketplace': return <MarketplacePanel />
+      case 'strategy':    return <StrategyPanel />
+      case 'gallery':     return <Gallery />
+      case 'arena':       return <ArenaPanel />
+      case 'crosschain':  return <CrossChainDashboard />
+      case 'deliberate':  return <DeliberationPanel />
+      case 'analytics':   return <SystemStats />
     }
+  }
 
-    return (
-        <div className="min-h-screen" style={{ background: 'var(--bg-void)' }}>
-            {/* ── Ambient background ── */}
-            {/* Live neural network canvas — z-index 0, behind everything */}
-            <NeuralBackground nodeCount={38} />
-            {/* Ambient radial glows */}
-            <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 1 }}>
-                <div className="absolute top-0 left-1/3 w-[600px] h-[500px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(79,143,255,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
-                <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg-base)' }}>
+
+      {/* ── Live Ticker ── */}
+      <LiveTicker />
+
+      {/* ── Header ── */}
+      <motion.header
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        style={{
+          background: 'var(--bg-card)',
+          borderBottom: '1px solid var(--border-default)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          boxShadow: '0 1px 8px rgba(90,30,0,0.08)',
+        }}
+      >
+        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
+            {/* Logo */}
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}
+              onClick={() => setActiveTab('overview')}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  width: '36px', height: '36px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #7f1d1d, #b91c1c)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(127,29,29,0.35)',
+                }}
+              >
+                <TrendingUp size={18} color="#fff" />
+              </motion.div>
+              <div>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.01em' }}>
+                  AGENT <span className="gradient-text">CAPITAL</span>
+                </div>
+                <div style={{ fontSize: '0.6rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  AI Asset Management
+                </div>
+              </div>
             </div>
 
-            {/* ── Header ── */}
-            <motion.header
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="border-b sticky top-0"
-                style={{ borderColor: 'rgba(79,143,255,0.06)', background: 'rgba(2,3,5,0.88)', backdropFilter: 'blur(24px) saturate(1.8)', zIndex: 50 }}
-            >
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3.5 group cursor-default" onClick={() => setActiveTab('overview')}>
-                            <div className="relative">
-                                <motion.div
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="p-2.5 rounded-xl"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
-                                        boxShadow: '0 0 24px rgba(59, 130, 246, 0.3), 0 0 48px rgba(139, 92, 246, 0.15)'
-                                    }}
-                                >
-                                    <TrendingUp className="w-5 h-5 text-white" />
-                                </motion.div>
-                                <div className="absolute -inset-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 opacity-20 blur-lg animate-pulse" />
-                            </div>
-                            <div>
-                                <h1 className="text-xl font-black tracking-wider gradient-text" style={{ fontSize: '1.25rem' }}>AGENT CAPITAL</h1>
-                                <p className="text-[0.55rem] font-semibold tracking-[0.25em] uppercase" style={{ color: 'var(--text-dim)' }}>
-                                    Tokenized Intelligence Marketplace
-                                </p>
-                            </div>
-                        </div>
+            {/* Header right */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Platform stats */}
+              <div className="hide-mobile" style={{
+                display: 'flex', alignItems: 'center', gap: '1.25rem',
+                padding: '0.4rem 1rem',
+                background: 'var(--bg-elevated)',
+                borderRadius: 'var(--radius-full)',
+                border: '1px solid var(--border-default)',
+                fontSize: '0.72rem',
+              }}>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--accent-maroon)' }}>${liveStat.profit}M</span> profit
+                </span>
+                <span style={{ color: 'var(--border-default)' }}>|</span>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>{liveStat.investors.toLocaleString()}</span> investors
+                </span>
+              </div>
 
-                        <div className="flex items-center gap-2">
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${wsConnected
-                                    ? 'text-emerald-400'
-                                    : 'text-red-400'
-                                    }`}
-                                style={{
-                                    background: wsConnected ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)',
-                                    border: `1px solid ${wsConnected ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)'}`
-                                }}
-                            >
-                                <div className="relative">
-                                    {wsConnected ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-                                    {wsConnected && <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse" />}
-                                </div>
-                                <span className="hide-mobile">{wsConnected ? 'Live' : 'Demo'}</span>
-                            </motion.div>
-
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-                                style={{
-                                    background: systemHealth === 'healthy' ? 'rgba(16, 185, 129, 0.06)' : systemHealth === 'checking' ? 'rgba(59, 130, 246, 0.06)' : 'rgba(245, 158, 11, 0.06)',
-                                    border: `1px solid ${systemHealth === 'healthy' ? 'rgba(16, 185, 129, 0.12)' : systemHealth === 'checking' ? 'rgba(59, 130, 246, 0.12)' : 'rgba(245, 158, 11, 0.12)'}`,
-                                    color: systemHealth === 'healthy' ? '#10b981' : systemHealth === 'checking' ? '#3b82f6' : '#f59e0b'
-                                }}
-                            >
-                                <div className={`w-2 h-2 rounded-full ${systemHealth === 'healthy' ? 'bg-emerald-400 status-pulse' :
-                                    systemHealth === 'checking' ? 'bg-blue-400 animate-pulse' : 'bg-orange-400'
-                                    }`} />
-                                <span className="capitalize hide-mobile">{systemHealth === 'disconnected' ? 'demo' : systemHealth}</span>
-                            </motion.div>
-                        </div>
-                    </div>
-                </div>
-            </motion.header>
-
-            {/* ── Navigation Tabs ── */}
-            <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.15 }}
-                className="border-b sticky top-[57px]"
+              {/* Connection status */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
                 style={{
-                    borderColor: 'rgba(79,143,255,0.06)',
-                    background: 'rgba(2,3,5,0.92)',
-                    backdropFilter: 'blur(20px) saturate(1.6)',
-                    zIndex: 40
+                  display: 'flex', alignItems: 'center', gap: '0.375rem',
+                  padding: '0.375rem 0.75rem',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '0.72rem', fontWeight: 600,
+                  background: wsConnected ? 'var(--green-light)' : 'var(--maroon-light)',
+                  border: `1px solid ${wsConnected ? '#bbf7d0' : 'var(--border-maroon)'}`,
+                  color: wsConnected ? 'var(--accent-green)' : 'var(--accent-maroon)',
                 }}
-            >
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="relative flex overflow-x-auto scrollbar-none">
-                        {tabs.map(({ id, label, icon: Icon }) => (
-                            <button
-                                key={id}
-                                id={`tab-${id}`}
-                                onClick={() => setActiveTab(id)}
-                                className={`relative px-3.5 sm:px-4 py-3 font-medium text-[13px] flex items-center gap-1.5 transition-all duration-200 whitespace-nowrap ${activeTab === id
-                                    ? 'text-blue-400'
-                                    : 'hover:bg-white/[0.02]'
-                                    }`}
-                                style={{ color: activeTab === id ? '#60a5fa' : 'var(--text-muted)' }}
-                            >
-                                <Icon className={`w-3.5 h-3.5 transition-all duration-200 ${activeTab === id ? 'drop-shadow-[0_0_6px_rgba(96,165,250,0.6)]' : ''}`}
-                                    style={{ color: activeTab === id ? '#60a5fa' : undefined }}
-                                />
-                                <span className="hidden sm:inline">{label}</span>
-                                {activeTab === id && (
-                                    <motion.div
-                                        layoutId="tab-indicator"
-                                        className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full"
-                                        style={{ background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)' }}
-                                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                    />
-                                )}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </motion.div>
+              >
+                <div style={{
+                  width: '6px', height: '6px', borderRadius: '50%',
+                  background: wsConnected ? 'var(--accent-green)' : 'var(--accent-maroon)',
+                  ...(wsConnected ? { animation: 'status-pulse 2.4s ease-in-out infinite' } : {})
+                }} />
+                <span className="hide-mobile">{wsConnected ? 'Live' : 'Demo'}</span>
+              </motion.div>
 
-            {/* ── Main Content ── */}
-            <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        variants={pageVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                    >
-                        {renderTab()}
-                    </motion.div>
-                </AnimatePresence>
-            </main>
-
-            {/* ── Footer ── */}
-            <footer className="mt-12 sm:mt-20" style={{ borderTop: '1px solid rgba(100, 120, 180, 0.06)' }}>
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs" style={{ color: 'var(--text-dim)' }}>
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }} />
-                            <p>AGENT CAPITAL — Tokenized Intelligence Marketplace</p>
-                        </div>
-                        <p>Powered by <span style={{ color: 'var(--text-muted)' }} className="font-medium">0G Network</span> · <span style={{ color: 'var(--text-muted)' }} className="font-medium">Anthropic Claude</span></p>
-                    </div>
-                </div>
-            </footer>
+              {/* Connect Wallet button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="btn-primary"
+                style={{ padding: '0.5rem 1rem', fontSize: '0.8rem', borderRadius: '10px' }}
+              >
+                Connect Wallet
+              </motion.button>
+            </div>
+          </div>
         </div>
-    )
+      </motion.header>
+
+      {/* ── Navigation Tabs ── */}
+      <div style={{
+        background: 'var(--bg-card)',
+        borderBottom: '1px solid var(--border-default)',
+        position: 'sticky',
+        top: '60px',
+        zIndex: 40,
+      }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 1.5rem' }}>
+          <div className="scrollbar-none" style={{ display: 'flex', overflowX: 'auto', gap: '0.25rem', padding: '0.5rem 0' }}>
+            {tabs.map(({ id, label, icon: Icon, badge }) => (
+              <motion.button
+                key={id}
+                id={`tab-${id}`}
+                onClick={() => setActiveTab(id)}
+                whileTap={{ scale: 0.97 }}
+                className={`nav-tab ${activeTab === id ? 'active' : ''}`}
+              >
+                <Icon size={14} />
+                <span className="hide-mobile">{label}</span>
+                {badge && (
+                  <span style={{
+                    fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.06em',
+                    padding: '0.1rem 0.35rem', borderRadius: '99px',
+                    background: activeTab === id ? 'rgba(37,99,235,0.15)' : 'var(--accent-green-light)',
+                    color: activeTab === id ? 'var(--accent-blue)' : 'var(--accent-green)',
+                  }}>
+                    {badge}
+                  </span>
+                )}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main Content ── */}
+      <main style={{ maxWidth: 1440, margin: '0 auto', padding: '1.5rem', minHeight: 'calc(100vh - 200px)' }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {renderTab()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+
+      {/* ── Footer ── */}
+      <footer style={{ borderTop: '1px solid var(--border-default)', background: 'var(--bg-card)', marginTop: '2rem' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '1.25rem 1.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '6px', background: 'linear-gradient(135deg, #2563eb, #7c3aed)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <TrendingUp size={11} color="#fff" />
+              </div>
+              <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>AGENT CAPITAL 2.0</span>
+              <span>— The Autonomous Asset Manager for the AI Era</span>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+              Powered by <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>0G Network</span> · <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>Anthropic Claude</span> · All trades verified on-chain
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* ── Floating FOMO badge ── */}
+      <AnimatePresence>
+        {showFOMO && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 20, x: 20 }}
+            transition={{ delay: 3, duration: 0.4 }}
+            style={{
+              position: 'fixed', bottom: '1.5rem', right: '1.5rem',
+              background: 'var(--text-primary)',
+              color: '#fff',
+              borderRadius: 'var(--radius-lg)',
+              padding: '0.875rem 1.125rem',
+              boxShadow: 'var(--shadow-xl)',
+              zIndex: 60,
+              maxWidth: '280px',
+              cursor: 'pointer',
+            }}
+            onClick={() => { setActiveTab('marketplace'); setShowFOMO(false); }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem' }}>
+              <span style={{ fontSize: '1.2rem' }}>🎉</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.78rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+                  Join {liveStat.investors.toLocaleString()} investors
+                </p>
+                <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)' }}>
+                  Making 85% avg APY with verified AI agents
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.5rem' }}>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#34d399' }}>Start investing →</span>
+                </div>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowFOMO(false); }}
+                style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '1rem', lineHeight: 1, padding: '0' }}
+              >×</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 export default App
