@@ -1,170 +1,205 @@
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Dna, Sparkles, Loader, RefreshCw } from 'lucide-react'
-import TraitsDisplay from './TraitsDisplay'
-import BreedingModal from './BreedingModal'
-import { DEMO_GALLERY_AGENTS } from '../services/demo-mode'
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Dna, Zap, Trophy, TrendingUp, ArrowUpRight, CheckCircle, Star, Shield, Flame } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-interface AgentProfile {
-    tokenId: number; sessionId: string
-    traits: { reasoning: number; creativity: number; caution: number; speed: number; accuracy: number; adaptability: number }
-    generation: number; score: number; parents: [number, number]; heritage: number[]; createdAt: string; prompt?: string; decision?: string
+const AGENTS = [
+  { id: 1, name: 'Yield Harvester+', gen: 3, apy: 87.3, accuracy: 92, winRate: 71.3, sharpe: 1.94, color: 'var(--accent-maroon)', verified: true },
+  { id: 2, name: 'Volatility Surge', gen: 2, apy: 76.1, accuracy: 84, winRate: 68.5, sharpe: 1.67, color: '#7c3aed', verified: true },
+  { id: 3, name: 'Arbitrage Master', gen: 1, apy: 72.8, accuracy: 88, winRate: 74.2, sharpe: 1.52, color: '#d97706', verified: true },
+  { id: 4, name: 'Stablecoin Pro',   gen: 0, apy: 48.2, accuracy: 94, winRate: 89.1, sharpe: 1.34, color: '#059669', verified: true },
+  { id: 5, name: 'Epsilon Core',     gen: 4, apy: 95.0, accuracy: 95, winRate: 78.4, sharpe: 2.01, color: '#f59e0b', verified: true },
+  { id: 6, name: 'Market Maker Pro', gen: 1, apy: 61.4, accuracy: 78, winRate: 63.2, sharpe: 1.28, color: '#0891b2', verified: false },
+];
+
+const GEN_DATA = [
+  { gen: 'Gen 0', apy: 60 }, { gen: 'Gen 1', apy: 75 }, { gen: 'Gen 2', apy: 85 },
+  { gen: 'Gen 3', apy: 92 }, { gen: 'Gen 4', apy: 97 }, { gen: 'Gen 5', apy: 102 },
+];
+
+function BreedResult({ p1, p2, onClose }: { p1: typeof AGENTS[0]; p2: typeof AGENTS[0]; onClose: () => void }) {
+  const [step, setStep] = useState(0);
+  const steps = ['🔬 Analyzing strategies...', '🧬 Combining genetics...', '⚡ Applying mutation (7%)...', '✅ Child agent created!'];
+
+  React.useEffect(() => {
+    if (step < 3) { const t = setTimeout(() => setStep(s => s + 1), 1200); return () => clearTimeout(t); }
+  }, [step]);
+
+  const childApy = Math.round((p1.apy + p2.apy) / 2 * 1.08);
+  const childSharpe = parseFloat(((p1.sharpe + p2.sharpe) / 2 * 1.05).toFixed(2));
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <motion.div className="modal-box" style={{ padding: '2rem' }} onClick={e => e.stopPropagation()} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', textAlign: 'center' }}>🧬 Breeding in Progress</h3>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+          {[p1, p2].map((p, i) => (
+            <React.Fragment key={p.id}>
+              <div style={{ flex: 1, background: 'var(--bg-elevated)', borderRadius: 'var(--radius-md)', padding: '0.75rem', textAlign: 'center', border: `2px solid ${p.color}` }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: p.color }}>{p.name}</p>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Gen {p.gen} · {p.apy}% APY</p>
+              </div>
+              {i === 0 && <span style={{ fontSize: '1.25rem' }}>✕</span>}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', marginBottom: '1.5rem' }}>
+          {steps.map((s, i) => (
+            <motion.div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.625rem', borderRadius: '8px', background: step > i ? 'var(--accent-green-light)' : 'var(--bg-elevated)', opacity: step >= i ? 1 : 0.4 }} animate={{ opacity: step >= i ? 1 : 0.4 }}>
+              {step > i ? <CheckCircle size={16} style={{ color: 'var(--accent-green)' }} /> : <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid var(--border-strong)' }} />}
+              <span style={{ fontSize: '0.8rem', fontWeight: step > i ? 600 : 400, color: step > i ? 'var(--accent-green)' : 'var(--text-muted)' }}>{s}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {step >= 3 && (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'linear-gradient(135deg, #eff6ff, #f5f3ff)', borderRadius: 'var(--radius-md)', padding: '1.25rem', border: '2px solid #2563eb', textAlign: 'center', marginBottom: '1rem' }}>
+            <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>🚀</p>
+            <p style={{ fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Hybrid Strategy (Gen {Math.max(p1.gen, p2.gen) + 1})</p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>Inherits {p1.name} entry + {p2.name} exit logic + 7% mutation</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+              <div><p style={{ fontSize: '1.5rem', fontWeight: 900, color: '#059669' }}>{childApy}%</p><p style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>APY</p></div>
+              <div><p style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--accent-maroon)' }}>{childSharpe}</p><p style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>Sharpe</p></div>
+            </div>
+          </motion.div>
+        )}
+
+        <button className="btn-primary" style={{ width: '100%' }} onClick={onClose} disabled={step < 3}>
+          {step < 3 ? 'Breeding...' : 'View Child Agent →'}
+        </button>
+      </motion.div>
+    </div>
+  );
 }
 
 export default function Gallery() {
-    const [agents, setAgents] = useState<AgentProfile[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState('')
-    const [selectedParent1, setSelectedParent1] = useState<AgentProfile | null>(null)
-    const [selectedParent2, setSelectedParent2] = useState<AgentProfile | null>(null)
-    const [showBreedingModal, setShowBreedingModal] = useState(false)
-    const [prediction, setPrediction] = useState<any>(null)
-    const [predicting, setPredicting] = useState(false)
-    const apiUrl = import.meta.env.VITE_API_URL || ''
+  const [parent1, setParent1] = useState<typeof AGENTS[0] | null>(null);
+  const [parent2, setParent2] = useState<typeof AGENTS[0] | null>(null);
+  const [breeding, setBreeding] = useState(false);
 
-    const fetchAgents = useCallback(async () => {
-        try {
-            if (!apiUrl) throw new Error('No API URL')
-            const response = await fetch(`${apiUrl}/api/gallery/agents`, { signal: AbortSignal.timeout(3000) })
-            if (!response.ok) throw new Error('Not ok')
-            const data = await response.json()
-            if (data.agents?.length) { setAgents(data.agents); setError('') }
-            else throw new Error('No agents')
-        } catch { setAgents(DEMO_GALLERY_AGENTS as any); setError('') }
-        finally { setLoading(false) }
-    }, [apiUrl])
+  const selectAgent = (a: typeof AGENTS[0]) => {
+    if (!parent1) { setParent1(a); return; }
+    if (!parent2 && a.id !== parent1.id) { setParent2(a); return; }
+    if (a.id === parent1.id) { setParent1(null); return; }
+    if (a.id === parent2?.id) { setParent2(null); return; }
+  };
 
-    useEffect(() => { fetchAgents() }, [fetchAgents])
+  const canBreed = parent1 && parent2 && parent1.accuracy >= 70 && parent2.accuracy >= 70;
 
-    const handleCardClick = (agent: AgentProfile) => {
-        if (!selectedParent1) setSelectedParent1(agent)
-        else if (selectedParent1.tokenId !== agent.tokenId && !selectedParent2) setSelectedParent2(agent)
-        else if (selectedParent1.tokenId === agent.tokenId) { setSelectedParent1(null); setSelectedParent2(null) }
-        else if (selectedParent2?.tokenId === agent.tokenId) setSelectedParent2(null)
-    }
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+        <h1 className="font-display" style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Breeding Lab</h1>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Combine two high-performing agents to create a superior child using genetic algorithms</p>
+      </motion.div>
 
-    const handleBreedPreview = async () => {
-        if (!selectedParent1 || !selectedParent2) return
-        setPredicting(true)
-        try {
-            const response = await fetch(`${apiUrl}/api/breeding/predict/${selectedParent1.tokenId}/${selectedParent2.tokenId}`)
-            if (response.ok) { const data = await response.json(); setPrediction(data); setShowBreedingModal(true) }
-        } catch (err) { console.error('Prediction error:', err) }
-        finally { setPredicting(false) }
-    }
-
-    const handleBreedComplete = () => { setShowBreedingModal(false); setSelectedParent1(null); setSelectedParent2(null); setPrediction(null); fetchAgents() }
-    const clearSelection = () => { setSelectedParent1(null); setSelectedParent2(null) }
-    const isSelected = (agent: AgentProfile) => selectedParent1?.tokenId === agent.tokenId || selectedParent2?.tokenId === agent.tokenId
-
-    const genColors = ['from-blue-500 to-cyan-500', 'from-purple-500 to-pink-500', 'from-amber-500 to-orange-500', 'from-emerald-500 to-teal-500', 'from-red-500 to-rose-500']
-    const genShadows = ['shadow-blue-500/15', 'shadow-purple-500/15', 'shadow-amber-500/15', 'shadow-emerald-500/15', 'shadow-red-500/15']
-
-    if (loading) return <div className="flex flex-col items-center justify-center py-20 gap-4"><Loader className="w-10 h-10 animate-spin text-purple-500" /><p className="text-sm text-slate-600">Loading gallery...</p></div>
-
-    return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="p-2.5 bg-gradient-to-br from-purple-500/15 to-pink-500/15 rounded-xl border border-purple-500/10">
-                        <Dna className="w-5 h-5 text-purple-400 drop-shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
-                    </motion.div>
-                    <div><h2 className="text-xl font-bold text-white tracking-tight">Agent Gallery & Breeding</h2><p className="text-xs text-slate-600 mt-0.5">Select two agents to breed a new generation</p></div>
-                </div>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={fetchAgents} className="btn-ghost !rounded-xl">
-                    <RefreshCw className="w-4 h-4" /><span className="hidden sm:inline">Refresh</span>
-                </motion.button>
-            </div>
-
-            <AnimatePresence>
-                {(selectedParent1 || selectedParent2) && (
-                    <motion.div initial={{ opacity: 0, scale: 0.95, y: -10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className="glass-card p-4 sm:p-5 !border-purple-500/15 neon-border-purple"
-                    >
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <Dna className="w-4 h-4 text-purple-400" />
-                                <div className="flex items-center gap-2">
-                                    <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${selectedParent1 ? 'bg-blue-500/10 text-blue-300 border border-blue-500/15' : 'bg-[#040810] text-slate-600 border border-slate-700/20'}`}>
-                                        {selectedParent1 ? `Parent 1: #${selectedParent1.tokenId}` : 'Select Parent 1'}
-                                    </span>
-                                    <span className="text-slate-700 text-lg">×</span>
-                                    <span className={`px-3 py-1.5 rounded-xl text-sm font-medium ${selectedParent2 ? 'bg-pink-500/10 text-pink-300 border border-pink-500/15' : 'bg-[#040810] text-slate-600 border border-slate-700/20'}`}>
-                                        {selectedParent2 ? `Parent 2: #${selectedParent2.tokenId}` : 'Select Parent 2'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 w-full sm:w-auto">
-                                {selectedParent1 && selectedParent2 && (
-                                    <motion.button whileHover={{ y: -2 }} whileTap={{ y: 0 }} onClick={handleBreedPreview} disabled={predicting}
-                                        className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40 shadow-lg shadow-purple-500/20"
-                                    >
-                                        {predicting ? <Loader className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}Predict & Breed
-                                    </motion.button>
-                                )}
-                                <button onClick={clearSelection} className="btn-ghost !rounded-xl">Clear</button>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {error && <div className="glass-card p-5 text-center border-yellow-500/10"><p className="text-yellow-400 text-sm">{error}</p></div>}
-
-            {agents.length === 0 ? (
-                <div className="glass-card p-16 text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#040810] flex items-center justify-center border border-slate-700/15"><Dna className="w-8 h-8 text-slate-700" /></div>
-                    <p className="text-slate-500 font-medium">No agents yet</p><p className="text-slate-600 text-sm mt-1">Complete a deliberation to create your first agent</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {agents.map((agent, idx) => (
-                        <motion.div key={agent.tokenId} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.06, duration: 0.4, ease: [0.16,1,0.3,1] }}
-                            whileHover={{ y: -6, transition: { duration: 0.2 } }} onClick={() => handleCardClick(agent)}
-                            className={`glass-card p-5 cursor-pointer group ${isSelected(agent) ? '!border-purple-500/30 neon-border-purple' : ''}`}
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">Agent #{agent.tokenId}</h3>
-                                    <p className="text-[9px] text-slate-700 font-mono mt-0.5 truncate max-w-[120px]">{agent.sessionId}</p>
-                                </div>
-                                <motion.span whileHover={{ scale: 1.15 }} className={`px-2.5 py-1 rounded-lg text-[10px] font-bold bg-gradient-to-r ${genColors[agent.generation % 5]} text-white shadow-md ${genShadows[agent.generation % 5]}`}>
-                                    Gen {agent.generation}
-                                </motion.span>
-                            </div>
-                            <TraitsDisplay traits={agent.traits} compact />
-                            <div className="mt-4 pt-3 border-t border-slate-700/15 flex items-center justify-between">
-                                <div><p className="text-[9px] text-slate-600 uppercase tracking-wider font-semibold">Score</p><p className="text-lg font-bold text-blue-400 tabular-nums">{agent.score}%</p></div>
-                                {agent.decision && (
-                                    <span className={`px-2 py-1 rounded-lg text-[10px] font-semibold ${agent.decision === 'APPROVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/10' : agent.decision === 'BRED' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/10' : 'bg-orange-500/10 text-orange-400 border border-orange-500/10'}`}>
-                                        {agent.decision === 'BRED' ? '🧬 Bred' : agent.decision}
-                                    </span>
-                                )}
-                            </div>
-                            {agent.parents[0] !== 0 && <div className="mt-2 text-[10px] text-slate-600 flex items-center gap-1"><Dna className="w-3 h-3" />Parents: #{agent.parents[0]} × #{agent.parents[1]}</div>}
-                            <AnimatePresence>
-                                {isSelected(agent) && (
-                                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                                        className="mt-3 text-center bg-purple-500/8 rounded-lg py-1.5 border border-purple-500/10"
-                                    >
-                                        <span className="text-[10px] text-purple-400 font-semibold">✓ Selected as {selectedParent1?.tokenId === agent.tokenId ? 'Parent 1' : 'Parent 2'}</span>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-                    ))}
-                </div>
-            )}
-
-            {agents.length > 0 && !selectedParent1 && (
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-center text-sm text-slate-600 py-2">
-                    <span className="bg-[#040810] px-3 py-1.5 rounded-full border border-slate-700/15">💡 Click two agents to breed</span>
-                </motion.p>
-            )}
-
-            {showBreedingModal && prediction && selectedParent1 && selectedParent2 && (
-                <BreedingModal parent1={selectedParent1} parent2={selectedParent2} prediction={prediction} onClose={() => setShowBreedingModal(false)} onBreedComplete={handleBreedComplete} />
-            )}
+      {/* Gen improvement chart */}
+      <div className="card" style={{ padding: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <div>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Generational Improvement</h3>
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Natural selection drives performance — no human tuning needed</p>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {[['Gen 0', '60% avg'], ['Gen 5', '102% avg']].map(([g, v]) => (
+              <div key={g} style={{ background: 'var(--bg-elevated)', padding: '0.4rem 0.75rem', borderRadius: '8px', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)' }}>{g}</p>
+                <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>{v}</p>
+              </div>
+            ))}
+          </div>
         </div>
-    )
+        <div style={{ height: 140 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={GEN_DATA}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="gen" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} unit="%" />
+              <Tooltip formatter={(v: any) => [`${v}%`, 'Avg APY']} contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
+              <Bar dataKey="apy" fill="#2563eb" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Breeding selection */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '1rem', alignItems: 'center' }}>
+        <div className="card" style={{ padding: '1rem', minHeight: 100, border: parent1 ? `2px solid ${parent1.color}` : '2px dashed var(--border-default)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {parent1 ? (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontWeight: 800, color: parent1.color }}>{parent1.name}</p>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Gen {parent1.gen} · {parent1.apy}% APY</p>
+            </div>
+          ) : <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center' }}>Select Parent A ↓</p>}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '1.5rem' }}>✕</span>
+          <button
+            disabled={!canBreed}
+            onClick={() => canBreed && setBreeding(true)}
+            className="btn-primary"
+            style={{ opacity: canBreed ? 1 : 0.4, padding: '0.625rem 1rem', fontSize: '0.8rem' }}
+          >
+            <Dna size={14} /> Breed
+          </button>
+          <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textAlign: 'center' }}>0.5 0G fee</p>
+        </div>
+
+        <div className="card" style={{ padding: '1rem', minHeight: 100, border: parent2 ? `2px solid ${parent2.color}` : '2px dashed var(--border-default)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {parent2 ? (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontWeight: 800, color: parent2.color }}>{parent2.name}</p>
+              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Gen {parent2.gen} · {parent2.apy}% APY</p>
+            </div>
+          ) : <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textAlign: 'center' }}>Select Parent B ↓</p>}
+        </div>
+      </div>
+
+      {!canBreed && (parent1 || parent2) && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 'var(--radius-md)', padding: '0.75rem 1rem', fontSize: '0.78rem', color: '#92400e' }}>
+          ⚠️ Both parents need ≥70% accuracy to breed. Select two qualifying agents below.
+        </div>
+      )}
+
+      {/* Agent cards */}
+      <div>
+        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.875rem', color: 'var(--text-primary)' }}>Available Agents (click to select as parent)</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.875rem' }}>
+          {AGENTS.map(a => {
+            const isP1 = parent1?.id === a.id, isP2 = parent2?.id === a.id;
+            const isSelected = isP1 || isP2;
+            return (
+              <motion.div key={a.id} className="card" style={{ padding: '1rem', cursor: 'pointer', border: isSelected ? `2px solid ${a.color}` : '1px solid var(--border-default)', background: isSelected ? `${a.color}08` : '#fff' }}
+                whileHover={{ y: -2 }} onClick={() => selectAgent(a)}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.4rem', borderRadius: '99px', background: a.color, color: '#fff' }}>Gen {a.gen}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.85rem' }}>{a.name}</span>
+                    {a.verified && <CheckCircle size={12} style={{ color: '#059669' }} />}
+                  </div>
+                  {isSelected && <span style={{ fontSize: '0.65rem', fontWeight: 700, color: isP1 ? '#2563eb' : '#7c3aed' }}>{isP1 ? 'Parent A' : 'Parent B'}</span>}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.375rem' }}>
+                  {[['APY', `${a.apy}%`, a.apy >= 70 ? '#059669' : 'var(--text-primary)'], ['Acc', `${a.accuracy}%`, a.accuracy >= 70 ? '#059669' : '#dc2626'], ['Win', `${a.winRate}%`, '#2563eb'], ['Sharpe', `${a.sharpe}`, 'var(--text-primary)']].map(([l, v, c]) => (
+                    <div key={l} style={{ background: 'var(--bg-elevated)', borderRadius: '6px', padding: '0.3rem', textAlign: 'center' }}>
+                      <p style={{ fontSize: '0.55rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>{l}</p>
+                      <p style={{ fontSize: '0.75rem', fontWeight: 800, color: c as string }}>{v}</p>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.625rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                  <span>Royalty: 2.5% of child revenue forever</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {breeding && parent1 && parent2 && <BreedResult p1={parent1} p2={parent2} onClose={() => { setBreeding(false); setParent1(null); setParent2(null); }} />}
+    </div>
+  );
 }
