@@ -1,377 +1,292 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Zap, Shield, Globe, TrendingUp, ArrowRight, Cpu, Activity } from 'lucide-react'
-
-const fadeUp = {
-  initial: { opacity: 0, y: 32 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as any } },
-}
-const stagger = { animate: { transition: { staggerChildren: 0.1 } } }
-
-const TICKERS = [
-  'ALPHA/ETH +12.3%', 'BETA/USDC +8.7%', 'GAMMA/BTC -2.1%',
-  'DELTA/ETH +5.4%', 'EPSILON/SOL +19.2%', '847 PROOFS VERIFIED',
-  '3 CHAINS ACTIVE', 'AVG CONFIDENCE 91%', 'TVL $2.47M',
-  'ALPHA/ETH +12.3%', 'BETA/USDC +8.7%', 'GAMMA/BTC -2.1%',
-  'DELTA/ETH +5.4%', 'EPSILON/SOL +19.2%', '847 PROOFS VERIFIED',
-]
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { TrendingUp, ArrowUpRight, ExternalLink, ChevronRight, Zap, Shield } from 'lucide-react';
 
 const STATS = [
-  { label: 'Agents Deployed', value: '12', icon: Cpu, color: '#4f8fff' },
-  { label: 'Decisions Verified', value: '847', icon: Shield, color: '#00e5a0' },
-  { label: 'Chains Connected', value: '3', icon: Globe, color: '#8b5cf6' },
-  { label: 'Avg Confidence', value: '91%', icon: Activity, color: '#00d4ff' },
-]
+  { label: 'Total Profit Generated', val: '$84.2M', change: '+23% this month', up: true },
+  { label: 'Active Investors',        val: '12,467', change: '+22% this month', up: true },
+  { label: 'Live AI Agents',          val: '500+',   change: '+45 this week',  up: true },
+  { label: 'Average APY',             val: '60.2%',  change: '+3.4% this month', up: true },
+];
 
-const FEATURES = [
-  { icon: Shield, title: '0G TEE Verified', desc: 'Every decision cryptographically proven via Trusted Execution Environment. SHA-256 proofs recorded on-chain.', color: '#00e5a0', glow: 'rgba(0,229,160,0.12)' },
-  { icon: TrendingUp, title: 'Yield-Bearing iNFTs', desc: 'Agents are ERC-7857 tokens. Hold to earn 70% of all trade profits distributed automatically on-chain.', color: '#4f8fff', glow: 'rgba(79,143,255,0.12)' },
-  { icon: Zap, title: 'Genetic Evolution', desc: 'Top-performing agents breed to create superior offspring. Darwin meets DeFi in a fully autonomous ecosystem.', color: '#8b5cf6', glow: 'rgba(139,92,246,0.12)' },
-  { icon: Globe, title: 'Cross-Chain Native', desc: 'Unified intelligence marketplace across Ethereum, Polygon, and 0G Chain with atomic bridge messaging.', color: '#00d4ff', glow: 'rgba(0,212,255,0.12)' },
-]
+const PARTNERS = ['0G', 'Chainlink', 'Polygon', 'Arbitrum', 'Ethereum'];
 
-// Animated topology/network SVG hero
-function NetworkHero() {
-  const svgRef = useRef<SVGSVGElement>(null)
-  const [tick, setTick] = useState(0)
+function NeuralCanvas() {
+  const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const t = setInterval(() => setTick(p => p + 1), 80)
-    return () => clearInterval(t)
-  }, [])
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  const cx = 400, cy = 280, R = 160
-  const nodes = [
-    { id: 'core', x: cx, y: cy, r: 22, color: '#4f8fff', label: 'CORE' },
-    { id: 'planner', x: cx + R * Math.cos(0), y: cy + R * Math.sin(0), r: 14, color: '#8b5cf6', label: 'PLANNER' },
-    { id: 'research', x: cx + R * Math.cos(Math.PI * 0.5), y: cy + R * Math.sin(Math.PI * 0.5), r: 14, color: '#00d4ff', label: 'RESEARCH' },
-    { id: 'critic', x: cx + R * Math.cos(Math.PI), y: cy + R * Math.sin(Math.PI), r: 14, color: '#00e5a0', label: 'CRITIC' },
-    { id: 'executor', x: cx + R * Math.cos(Math.PI * 1.5), y: cy + R * Math.sin(Math.PI * 1.5), r: 14, color: '#f59e0b', label: 'EXECUTOR' },
-    { id: 'eth', x: cx + 270, y: cy - 80, r: 10, color: '#627EEA', label: 'ETH' },
-    { id: 'poly', x: cx + 260, y: cy + 60, r: 10, color: '#8247E5', label: 'MATIC' },
-    { id: 'og', x: cx - 270, y: cy - 60, r: 10, color: '#00e5a0', label: '0G' },
-  ]
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
 
-  const edges = [
-    ['core', 'planner'], ['core', 'research'], ['core', 'critic'], ['core', 'executor'],
-    ['planner', 'research'], ['research', 'critic'], ['critic', 'executor'],
-    ['executor', 'eth'], ['executor', 'poly'], ['core', 'og'],
-  ]
+    const nodes = Array.from({ length: 60 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2.5 + 1,
+      color: Math.random() > 0.5 ? '#3B82F6' : Math.random() > 0.5 ? '#10B981' : '#8B5CF6',
+    }));
 
-  const getNode = (id: string) => nodes.find(n => n.id === id)!
+    let frame = 0;
+    let raf: number;
 
-  const packetOffset = (tick * 2) % 100
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      frame++;
 
-  return (
-    <svg ref={svgRef} viewBox="0 0 800 560" className="w-full h-full" style={{ overflow: 'visible' }}>
-      <defs>
-        {nodes.map(n => (
-          <radialGradient key={n.id} id={`ng-${n.id}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={n.color} stopOpacity="0.9" />
-            <stop offset="100%" stopColor={n.color} stopOpacity="0.1" />
-          </radialGradient>
-        ))}
-        <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#4f8fff" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#4f8fff" stopOpacity="0" />
-        </radialGradient>
-        <filter id="glow-filter">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-      </defs>
+      nodes.forEach(n => {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+      });
 
-      {/* Radial background glow */}
-      <circle cx={cx} cy={cy} r="220" fill="url(#core-glow)" />
+      // Connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            const alpha = (1 - dist / 140) * 0.25;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(59,130,246,${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
 
-      {/* Topology grid rings */}
-      {[80, 130, 180, 240].map(r => (
-        <circle key={r} cx={cx} cy={cy} r={r}
-          fill="none" stroke="rgba(79,143,255,0.05)" strokeWidth="1"
-          strokeDasharray="4 8" />
-      ))}
+      // Nodes
+      nodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = n.color;
+        ctx.globalAlpha = 0.7;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
 
-      {/* Edges */}
-      {edges.map(([a, b], i) => {
-        const n1 = getNode(a), n2 = getNode(b)
-        if (!n1 || !n2) return null
-        const len = Math.sqrt((n2.x - n1.x) ** 2 + (n2.y - n1.y) ** 2)
-        return (
-          <g key={`${a}-${b}`}>
-            <line x1={n1.x} y1={n1.y} x2={n2.x} y2={n2.y}
-              stroke="rgba(79,143,255,0.15)" strokeWidth="1" />
-            {/* animated packet */}
-            <circle r="3" fill={n1.color} filter="url(#glow-filter)" opacity="0.9">
-              <animateMotion dur={`${1.8 + i * 0.3}s`} repeatCount="indefinite">
-                <mpath href={`#path-${a}-${b}`} />
-              </animateMotion>
-            </circle>
-            <path id={`path-${a}-${b}`} d={`M${n1.x},${n1.y} L${n2.x},${n2.y}`} fill="none" />
-          </g>
-        )
-      })}
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
 
-      {/* Nodes */}
-      {nodes.map((n, i) => {
-        const pulseR = n.r + Math.sin((tick * 0.06) + i * 0.8) * 3
-        return (
-          <g key={n.id} filter="url(#glow-filter)">
-            {/* outer glow ring */}
-            <circle cx={n.x} cy={n.y} r={pulseR * 2.8} fill={n.color} opacity="0.06" />
-            <circle cx={n.x} cy={n.y} r={pulseR * 1.8} fill={n.color} opacity="0.1" />
-            {/* node body */}
-            <circle cx={n.x} cy={n.y} r={pulseR} fill={`url(#ng-${n.id})`} stroke={n.color} strokeWidth="1.5" strokeOpacity="0.7" />
-            {/* label */}
-            <text x={n.x} y={n.y + pulseR + 14} textAnchor="middle"
-              fill={n.color} fontSize="9" fontWeight="700" fontFamily="'JetBrains Mono',monospace"
-              opacity="0.85">{n.label}</text>
-          </g>
-        )
-      })}
+    const resize = () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+  }, []);
 
-      {/* Central holographic overlay */}
-      <circle cx={cx} cy={cy} r="28" fill="none" stroke="#4f8fff" strokeWidth="1" strokeDasharray="3 6"
-        opacity="0.5">
-        <animateTransform attributeName="transform" type="rotate" from={`0 ${cx} ${cy}`} to={`360 ${cx} ${cy}`} dur="12s" repeatCount="indefinite" />
-      </circle>
-    </svg>
-  )
+  return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, opacity: 0.45, pointerEvents: 'none' }} />;
 }
 
-export default function LandingPage({ onNavigate }: { onNavigate?: (tab: string) => void }) {
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { setTimeout(() => setMounted(true), 100) }, [])
+export default function LandingPage({ onLaunchApp }: { onLaunchApp: () => void }) {
+  const [counters, setCounters] = useState({ profit: 0, investors: 0, agents: 0, apy: 0 });
+
+  useEffect(() => {
+    const targets = { profit: 84.2, investors: 12467, agents: 500, apy: 60.2 };
+    const duration = 2000;
+    const steps = 60;
+    const interval = duration / steps;
+    let step = 0;
+
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      const ease = 1 - Math.pow(1 - progress, 3);
+      setCounters({
+        profit: parseFloat((targets.profit * ease).toFixed(1)),
+        investors: Math.round(targets.investors * ease),
+        agents: Math.round(targets.agents * ease),
+        apy: parseFloat((targets.apy * ease).toFixed(1)),
+      });
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="relative space-y-0 -mt-2">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-void)', position: 'relative', overflow: 'hidden' }}>
+      <NeuralCanvas />
 
-      {/* ── HERO ────────────────────────────────────────────────── */}
-      <section className="relative min-h-[88vh] flex flex-col items-center justify-center overflow-hidden pb-16">
+      {/* Ambient orbs */}
+      <div style={{ position: 'absolute', top: -200, left: -200, width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: -200, right: -100, width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: '30%', left: '50%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(80px)', pointerEvents: 'none' }} />
 
-        {/* Radial glow center */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(79,143,255,0.07) 0%, rgba(139,92,246,0.04) 40%, transparent 70%)' }} />
-          <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 70%)', animation: 'float-slow 14s ease-in-out infinite' }} />
-          <div className="absolute bottom-1/4 left-1/4 w-[250px] h-[250px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.05) 0%, transparent 70%)', animation: 'float-slow 18s ease-in-out infinite reverse' }} />
+      {/* Grid overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+        backgroundImage: `
+          linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)
+        `,
+        backgroundSize: '60px 60px',
+      }} />
+
+      {/* Navbar */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        padding: '0 2rem', height: 64,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'rgba(6,7,10,0.6)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 16px rgba(59,130,246,0.4)' }}>
+            <TrendingUp size={16} color="#fff" />
+          </div>
+          <span style={{ fontSize: '1rem', fontWeight: 800, color: '#F8FAFC', fontFamily: 'Outfit, sans-serif' }}>
+            AGENT <span className="gradient-text-blue">CAPITAL</span>
+          </span>
         </div>
 
-        {/* Content grid: text left, network right */}
-        <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left: Text */}
-          <motion.div variants={stagger} initial="initial" animate={mounted ? 'animate' : 'initial'}>
-            <motion.div variants={fadeUp} className="mb-6">
-              <span className="tag tag-blue">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 status-pulse inline-block" />
-                BUILT ON 0G NETWORK · GALILEO TESTNET
-              </span>
-            </motion.div>
-
-            <motion.h1 variants={fadeUp}
-              className="text-4xl sm:text-5xl xl:text-6xl font-black text-white tracking-tight leading-[1.08] mb-6">
-              Autonomous AI Agents as{' '}
-              <span className="gradient-text text-glow-blue">
-                Tradeable, Yielding Assets
-              </span>
-            </motion.h1>
-
-            <motion.p variants={fadeUp}
-              className="text-base sm:text-lg leading-relaxed mb-8"
-              style={{ color: 'var(--text-secondary)', maxWidth: '520px' }}>
-              AGENT CAPITAL is the first tokenized intelligence marketplace — AI trading agents
-              generate verified yield through 0G Compute TEE, distributed to iNFT holders.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3 mb-10">
-              <motion.button
-                whileHover={{ y: -3, boxShadow: '0 16px 50px rgba(79,143,255,0.45)' }}
-                whileTap={{ y: 0 }}
-                onClick={() => onNavigate?.('deliberate')}
-                className="btn-primary px-7 py-3.5 text-sm"
-                style={{ borderRadius: '14px' }}>
-                <Zap className="w-4 h-4" /> Try Live Demo
-                <ArrowRight className="w-3.5 h-3.5" />
-              </motion.button>
-              <motion.button
-                whileHover={{ y: -2 }}
-                onClick={() => onNavigate?.('pitch')}
-                className="btn-ghost px-6 py-3.5 text-sm"
-                style={{ borderRadius: '14px' }}>
-                View Pitch Deck
-              </motion.button>
-            </motion.div>
-
-            {/* Inline stats */}
-            <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {STATS.map(s => {
-                const Icon = s.icon
-                return (
-                  <motion.div key={s.label} whileHover={{ y: -3 }}
-                    className="glass-card p-3.5 holo-panel text-center"
-                    style={{ boxShadow: `0 0 20px ${s.color}10` }}>
-                    <Icon className="w-4 h-4 mx-auto mb-1.5" style={{ color: s.color }} />
-                    <p className="text-lg font-black text-white tabular-nums">{s.value}</p>
-                    <p className="text-[9px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
-                  </motion.div>
-                )
-              })}
-            </motion.div>
-          </motion.div>
-
-          {/* Right: animated network */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative hidden lg:block"
-            style={{ height: '520px' }}>
-            {/* Holographic frame */}
-            <div className="absolute inset-0 rounded-2xl holo-border glass-card-elevated holo-panel" style={{ overflow: 'hidden' }}>
-              <div className="absolute top-3 left-4 flex items-center gap-2">
-                <span className="text-[9px] font-mono font-bold tracking-widest" style={{ color: 'var(--text-muted)' }}>NEURAL TOPOLOGY</span>
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse" />
-              </div>
-              <div className="absolute top-3 right-4">
-                <span className="text-[9px] font-mono" style={{ color: 'var(--text-dim)' }}>0G:16602</span>
-              </div>
-              <div className="w-full h-full pt-6">
-                <NetworkHero />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── TELEMETRY TICKER ────────────────────────────────────── */}
-      <div className="relative overflow-hidden py-3 border-y"
-        style={{ borderColor: 'rgba(79,143,255,0.06)', background: 'rgba(4,6,8,0.7)', backdropFilter: 'blur(16px)' }}>
-        <div className="flex ticker-track whitespace-nowrap gap-8">
-          {TICKERS.map((t, i) => (
-            <span key={i} className="text-[11px] font-mono font-semibold flex items-center gap-2"
-              style={{ color: t.includes('+') ? '#00e5a0' : t.includes('-') ? '#f87171' : 'var(--text-muted)' }}>
-              <span className="w-1 h-1 rounded-full inline-block"
-                style={{ background: t.includes('+') ? '#00e5a0' : t.includes('-') ? '#f87171' : '#4f8fff' }} />
-              {t}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          {['Products', 'Marketplace', 'Resources', 'Company'].map(item => (
+            <span key={item} style={{ fontSize: '0.875rem', color: 'var(--text-muted)', cursor: 'pointer', transition: 'color 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#F8FAFC')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+              {item}
             </span>
           ))}
         </div>
-      </div>
 
-      {/* ── FEATURES ────────────────────────────────────────────── */}
-      <section className="py-20 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }} viewport={{ once: true }}
-          className="text-center mb-14">
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
-            The Full Stack of{' '}
-            <span className="gradient-text">Verifiable Intelligence</span>
-          </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            Four pillars that make AGENT CAPITAL the definitive platform for autonomous AI finance.
-          </p>
-        </motion.div>
+        <button className="btn-primary" onClick={onLaunchApp} style={{ height: 38 }}>
+          Connect Wallet
+        </button>
+      </nav>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {FEATURES.map((f, i) => {
-            const Icon = f.icon
-            return (
-              <motion.div key={f.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                viewport={{ once: true }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="glass-card p-6 holo-panel group relative overflow-hidden"
-                style={{ boxShadow: `0 0 30px ${f.glow}` }}>
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 -translate-y-8 translate-x-8"
-                  style={{ background: `radial-gradient(circle, ${f.color}, transparent)` }} />
-                <motion.div whileHover={{ scale: 1.15, rotate: 8 }}
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                  style={{ background: `${f.color}15`, border: `1px solid ${f.color}25`, boxShadow: `0 0 20px ${f.color}20` }}>
-                  <Icon className="w-5 h-5" style={{ color: f.color }} />
-                </motion.div>
-                <h3 className="text-sm font-bold text-white mb-2">{f.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{f.desc}</p>
-              </motion.div>
-            )
-          })}
-        </div>
-      </section>
+      {/* Hero */}
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: 64, position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', padding: '80px 3rem 3rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center', width: '100%' }}>
 
-      {/* ── PIPELINE VISUALIZATION ──────────────────────────────── */}
-      <section className="py-16 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }} viewport={{ once: true }}
-          className="glass-card-elevated holo-panel p-8 sm:p-12 relative overflow-hidden"
-          style={{ borderRadius: '24px' }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 30% 50%, rgba(79,143,255,0.05) 0%, transparent 60%)' }} />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <span className="tag tag-blue">4-STAGE PIPELINE</span>
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 status-pulse" />
-              <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>LIVE</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Every Decision is Verified</h2>
-            <p className="mb-10 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              From prompt to cryptographic proof — every trade is transparent, auditable, and immutable.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-0">
+          {/* Left */}
+          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, ease: 'easeOut' }}>
+            {/* Live badge */}
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.35rem 0.875rem', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 99, marginBottom: '1.75rem' }}>
+              <div className="live-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)' }} />
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--green-l)', letterSpacing: '0.03em' }}>Live on 0G Galileo Testnet</span>
+            </motion.div>
+
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
+              style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, fontFamily: 'Outfit, sans-serif', lineHeight: 1.05, letterSpacing: '-0.03em', marginBottom: '1.25rem' }}>
+              <span style={{ color: '#F8FAFC' }}>Autonomous Asset</span><br />
+              <span style={{ color: '#F8FAFC' }}>Management for the</span><br />
+              <span className="gradient-hero">AI Era</span>
+            </motion.h1>
+
+            <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+              style={{ fontSize: '1.05rem', color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '2rem', maxWidth: 480 }}>
+              AI agents generating real on-chain yield with verified execution powered by decentralized compute. 45–150% APY. Cryptographic proof on every trade.
+            </motion.p>
+
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
+              style={{ display: 'flex', gap: '0.875rem', marginBottom: '3rem' }}>
+              <button className="btn-primary" onClick={onLaunchApp}
+                style={{ height: 48, padding: '0 1.75rem', fontSize: '0.95rem', borderRadius: 'var(--r-lg)' }}>
+                <Zap size={16} /> Launch App <ChevronRight size={15} />
+              </button>
+              <button className="btn-ghost" style={{ height: 48, padding: '0 1.5rem', fontSize: '0.95rem', borderRadius: 'var(--r-lg)' }}>
+                Explore Agents <ExternalLink size={14} />
+              </button>
+            </motion.div>
+
+            {/* Stat row */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+              style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
               {[
-                { n: '01', label: 'Strategy', desc: 'Identifies opportunities across markets', color: '#4f8fff' },
-                { n: '02', label: 'Research', desc: 'Validates historical accuracy & liquidity', color: '#8b5cf6' },
-                { n: '03', label: 'Risk', desc: 'Calculates drawdown, approves execution', color: '#00d4ff' },
-                { n: '04', label: '0G Verify', desc: 'TEE proof · SHA-256 hash on-chain', color: '#00e5a0' },
-              ].map((step, i) => (
-                <div key={step.n} className="flex sm:flex-col items-start sm:items-center gap-4 sm:gap-0 relative">
-                  {i < 3 && (
-                    <div className="hidden sm:block absolute top-6 left-1/2 w-full h-px"
-                      style={{ background: `linear-gradient(90deg, ${step.color}40, transparent)` }} />
-                  )}
-                  <motion.div
-                    initial={{ scale: 0 }} whileInView={{ scale: 1 }}
-                    transition={{ delay: i * 0.15, type: 'spring', stiffness: 200 }}
-                    viewport={{ once: true }}
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 sm:mx-auto sm:mb-4 z-10"
-                    style={{ background: `${step.color}15`, border: `1px solid ${step.color}30`, boxShadow: `0 0 24px ${step.color}20` }}>
-                    <span className="text-xs font-black font-mono" style={{ color: step.color }}>{step.n}</span>
-                  </motion.div>
-                  <div className="sm:text-center sm:px-4">
-                    <p className="text-sm font-bold text-white">{step.label}</p>
-                    <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>{step.desc}</p>
-                  </div>
+                { label: 'Total Profit Generated', val: `$${counters.profit}M`, color: 'var(--green)', change: '+23% this month' },
+                { label: 'Active Investors', val: counters.investors.toLocaleString(), color: 'var(--blue-l)', change: '+22% this month' },
+                { label: 'Live AI Agents', val: `${counters.agents}+`, color: 'var(--purple-l)', change: '+45 this week' },
+                { label: 'Average APY', val: `${counters.apy}%`, color: 'var(--gold-l)', change: '+3.4% this month' },
+              ].map(s => (
+                <div key={s.label} style={{ padding: '0.875rem', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--r-lg)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: s.color, lineHeight: 1 }}>{s.val}</div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{s.label}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--green)', marginTop: '0.15rem' }}>↑ {s.change}</div>
                 </div>
               ))}
-            </div>
-          </div>
-        </motion.div>
-      </section>
+            </motion.div>
 
-      {/* ── CTA ─────────────────────────────────────────────────── */}
-      <section className="py-16 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }} viewport={{ once: true }}
-          className="text-center glass-card p-12 relative overflow-hidden holo-border"
-          style={{ borderRadius: '24px' }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(79,143,255,0.08) 0%, transparent 60%)' }} />
-          <h2 className="text-3xl sm:text-4xl font-black text-white mb-4 relative z-10">
-            Ready to Deploy Your First Agent?
-          </h2>
-          <p className="mb-8 text-base relative z-10 max-w-md mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            Submit a prompt. Watch 4 AI agents analyze it in real time. Get a cryptographic proof on 0G.
-          </p>
-          <motion.button whileHover={{ y: -3, boxShadow: '0 20px 60px rgba(79,143,255,0.5)' }}
-            whileTap={{ y: 0 }}
-            onClick={() => onNavigate?.('deliberate')}
-            className="btn-primary px-10 py-4 text-sm relative z-10">
-            <Zap className="w-4 h-4" /> Start Deliberation
-            <ArrowRight className="w-4 h-4" />
-          </motion.button>
-        </motion.div>
-      </section>
+            {/* Backed by */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}
+              style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <p style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>Powered by</p>
+              <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                {PARTNERS.map(p => (
+                  <span key={p} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.05em' }}>{p}</span>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Right — animated AI visualization */}
+          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
+            style={{ position: 'relative', height: 560 }}>
+            {/* Central hub */}
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                style={{ width: 160, height: 160, borderRadius: '50%', border: '1px dashed rgba(59,130,246,0.3)' }} />
+              <div style={{ position: 'absolute', textAlign: 'center' }}>
+                <div style={{ fontSize: '2rem', fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--green-l)' }}>60.2%</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>AVERAGE APY</div>
+              </div>
+            </div>
+
+            {/* Orbiting nodes */}
+            {[
+              { label: 'Yield Harvester+', val: '+87.3%', color: '#3B82F6', angle: 0 },
+              { label: 'Volatility Surge', val: '+76.1%', color: '#10B981', angle: 60 },
+              { label: 'Arbitrage Bot', val: '+72.8%', color: '#8B5CF6', angle: 120 },
+              { label: 'Epsilon Core', val: '+95%', color: '#F59E0B', angle: 180 },
+              { label: 'Market Maker', val: '+61.4%', color: '#06B6D4', angle: 240 },
+              { label: 'Stable Pro', val: '+48.2%', color: '#10B981', angle: 300 },
+            ].map((node, i) => {
+              const rad = (node.angle * Math.PI) / 180;
+              const r = 220;
+              const x = Math.cos(rad) * r;
+              const y = Math.sin(rad) * r;
+              return (
+                <motion.div key={i}
+                  animate={{ x: [x, x + 6, x], y: [y, y - 4, y] }}
+                  transition={{ duration: 4 + i, repeat: Infinity, ease: 'easeInOut', delay: i * 0.5 }}
+                  style={{ position: 'absolute', top: '50%', left: '50%',
+                    transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                    background: 'rgba(13,17,23,0.95)', border: `1px solid ${node.color}40`,
+                    borderRadius: 'var(--r-lg)', padding: '0.5rem 0.75rem', whiteSpace: 'nowrap',
+                    boxShadow: `0 0 16px ${node.color}20`,
+                  }}>
+                  <div style={{ fontSize: '0.58rem', color: 'rgba(255,255,255,0.4)', marginBottom: '0.1rem' }}>{node.label}</div>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 800, color: node.color, fontFamily: 'Outfit, sans-serif' }}>{node.val}</div>
+                </motion.div>
+              );
+            })}
+
+            {/* Profit counter floating */}
+            <motion.div
+              animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+              style={{ position: 'absolute', bottom: 30, right: 20, padding: '0.875rem 1.25rem', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 'var(--r-xl)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Today's Profit</div>
+              <div style={{ fontSize: '1.375rem', fontWeight: 900, color: 'var(--green)', fontFamily: 'Outfit, sans-serif' }}>+$54,720</div>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, 6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              style={{ position: 'absolute', top: 40, right: 30, padding: '0.875rem 1.25rem', background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: 'var(--r-xl)' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Total Profit</div>
+              <div style={{ fontSize: '1.375rem', fontWeight: 900, color: 'var(--blue-l)', fontFamily: 'Outfit, sans-serif' }}>$84.2M</div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
