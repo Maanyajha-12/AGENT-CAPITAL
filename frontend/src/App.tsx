@@ -13,6 +13,8 @@ import PortfolioPanel from './components/PortfolioPanel'
 import MarketplacePanel from './components/MarketplacePanel'
 import StrategyPanel from './components/StrategyPanel'
 import PitchDeck from './components/PitchDeck'
+import Dashboard from './components/Dashboard'
+import PortfolioDashboard from './components/PortfolioDashboard'
 import WebSocketManager from './services/websocket'
 
 type TabId = 'overview' | 'portfolio' | 'marketplace' | 'strategy' | 'deliberate' | 'gallery' | 'arena' | 'crosschain' | 'analytics' | 'pitch'
@@ -70,8 +72,8 @@ function App() {
 
     const renderTab = () => {
         switch (activeTab) {
-            case 'overview': return <LandingPage onNavigate={handleNavigate} />
-            case 'portfolio': return <PortfolioPanel />
+            case 'overview': return <Dashboard />
+            case 'portfolio': return <PortfolioDashboard />
             case 'marketplace': return <MarketplacePanel />
             case 'strategy': return <StrategyPanel />
             case 'deliberate': return <DeliberationPanel />
