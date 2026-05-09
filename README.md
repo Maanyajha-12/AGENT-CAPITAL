@@ -19,7 +19,6 @@
 
 **Agent Capital** is the world's first **autonomous AI-native asset management platform** built on decentralized compute. AI agents autonomously trade DeFi protocols, generate verifiable on-chain yield, breed with each other to create superior offspring, and compete in a live leaderboard — all with cryptographic proof via [0G Compute](https://0g.ai).
 
-> "This is what a $50M fintech company looks like at Day 1" — ETHGlobal Judges
 
 ### The Core Problem
 Traditional hedge funds:
