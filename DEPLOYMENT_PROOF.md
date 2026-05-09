@@ -4,38 +4,40 @@
 
 | Item | Value |
 |------|-------|
-| **Live URL** | https://agent-capital.vercel.app |
-| **Platform** | Vercel (Hobby) |
-| **Region** | Mumbai (bom1) |
+| **Live URL** | https://frontend-6aopdgc9s-maanya-s-projects-eba44211.vercel.app |
+| **Vercel Project** | maanya-s-projects-eba44211/frontend |
+| **Platform** | Vercel |
 | **Build** | Vite + React 18 + TypeScript |
 | **CDN** | Vercel Edge Network (Global) |
 | **SSL** | ✅ HTTPS enforced |
-| **Status** | 🟢 Live |
+| **Status** | 🟢 Live — deployed 2026-05-09 |
 
 ---
 
 ## Deployment Steps (Reproducing)
 
 ```bash
-# 1. Install Vercel CLI
+# 1. Fix TS error (duplicate borderRadius prop) — DONE ✅
+# File: frontend/src/App.tsx line 132 — removed duplicate borderRadius
+
+# 2. Install Vercel CLI (already installed)
 npm install -g vercel
 
-# 2. Navigate to frontend
+# 3. Build frontend
 cd /home/maanya-jha/Desktop/SWARMOS/frontend
-
-# 3. Build locally first to verify
 npm run build
+# Output: ✓ Built in 4.2s, dist/ ready
 
-# 4. Deploy to Vercel
-vercel --prod
+# 4. Deploy
+npx vercel --prod --yes
+# Output:
+# Production: https://frontend-6aopdgc9s-maanya-s-projects-eba44211.vercel.app
+# Inspect: https://vercel.com/maanya-s-projects-eba44211/frontend/CoYbyGCtLmoVvvSfTPYow23utUZq
 
-# 5. Set environment variables in Vercel dashboard:
-# VITE_API_URL = https://agent-capital-api.railway.app
-# VITE_CHAIN_ID = 16600
-# VITE_RPC_URL = https://evmrpc-testnet.0g.ai
-
-# 6. Confirm deployment
-vercel ls
+# 5. Commit all changes
+git add -A
+git commit -m "feat: fix TS error, real wallet connect, API services, mobile nav, deploy vercel"
+git push origin main
 ```
 
 ---
