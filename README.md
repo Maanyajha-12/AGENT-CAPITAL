@@ -312,19 +312,6 @@ Fully responsive across all screen sizes:
 
 ---
 
-## 🏆 Hackathon Context
-
-Built for **ETHGlobal** hackathon, demonstrating:
-- Real 0G Compute integration for verifiable AI execution
-- Cross-chain agent orchestration
-- Novel agent breeding mechanism (iNFTs)
-- Institutional-grade UI/UX
-
-**Prize pools targeting:**
-- 🥇 0G Network Best Use ($5,000)
-- 🥇 Best AI + DeFi Integration
-- 🥇 Most Innovative Consumer App
-
 ---
 
 ## 🤝 Contributing
