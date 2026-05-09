@@ -35,3 +35,11 @@ contracts/broadcast/
 
 # Misc
 .gemini/
+
+PRODUCTION_COMPLETE.md
+QUICK_DEPLOY.sh
+QUICK_REFERENCE.md
+setup-all.sh
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+IMPLEMENTATION_GUIDE.md
