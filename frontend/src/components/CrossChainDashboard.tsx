@@ -1,131 +1,141 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, ArrowUpRight, CheckCircle, Zap, RefreshCw, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { Globe, Zap, Activity, ArrowUpRight, ArrowDownRight, ExternalLink } from 'lucide-react';
 
 const CHAINS = [
-  { name: 'Ethereum',  color: '#627eea', bg: '#eef0ff', tvl: 2.8, apy: 62.4, agents: 124, latency: 12, txCost: 4.20, icon: '⟠' },
-  { name: 'Polygon',   color: '#8247e5', bg: '#f0ebff', tvl: 1.4, apy: 71.2, agents: 98,  latency: 2,  txCost: 0.02, icon: '⬡' },
-  { name: 'Arbitrum',  color: '#28a0f0', bg: '#eaf6ff', tvl: 1.9, apy: 68.8, agents: 87,  latency: 1,  txCost: 0.15, icon: '◆' },
-  { name: '0G Chain',  color: 'var(--accent-maroon)', bg: '#eff6ff', tvl: 0.8, apy: 84.2, agents: 191, latency: 0,  txCost: 0.001,icon: '∅' },
+  { name:'Ethereum',  symbol:'ETH', color:'#627EEA', tvl:'$29.4M', apy:'48.2%', agents:127, latency:'12ms',  gas:'$2.40',  status:'optimal' },
+  { name:'Arbitrum',  symbol:'ARB', color:'#12AAFF', tvl:'$18.7M', apy:'62.8%', agents:98,  latency:'380ms', gas:'$0.04',  status:'optimal' },
+  { name:'Polygon',   symbol:'POL', color:'#8247E5', tvl:'$12.1M', apy:'55.4%', agents:76,  latency:'2.1s',  gas:'$0.01',  status:'optimal' },
+  { name:'Base',      symbol:'BASE',color:'#0052FF', tvl:'$8.3M',  apy:'71.2%', agents:54,  latency:'2s',    gas:'$0.005', status:'optimal' },
+  { name:'0G Chain',  symbol:'0G',  color:'#10B981', tvl:'$15.8M', apy:'87.3%', agents:145, latency:'0.8s',  gas:'$0.001', status:'active' },
 ];
 
-const ARB_OPS = [
-  { pair: 'ETH/USDC', buyOn: 'Polygon', sellOn: 'Ethereum', spread: 0.32, profit: 1840, status: 'LIVE' },
-  { pair: 'BTC/USDC', buyOn: 'Arbitrum', sellOn: 'Ethereum', spread: 0.18, profit: 980, status: 'LIVE' },
-  { pair: 'USDC/USDT',buyOn: '0G Chain', sellOn: 'Polygon', spread: 0.07, profit: 420, status: 'EXECUTING' },
-  { pair: 'ETH/BTC',  buyOn: '0G Chain', sellOn: 'Arbitrum', spread: 0.12, profit: 670, status: 'PENDING' },
+const ARBS = [
+  { pair:'ETH → ARB', profit:'+$1,840/hr', size:'$24.2K', spread:'2.34%', chain:'ETH/ARB', color:'#3B82F6' },
+  { pair:'USDC → Polygon', profit:'+$620/hr',  size:'$8.1K',  spread:'1.12%', chain:'ETH/POL', color:'#8247E5' },
+  { pair:'BTC → 0G',  profit:'+$3,120/hr', size:'$41.7K', spread:'3.81%', chain:'ETH/0G',  color:'#10B981' },
+  { pair:'ETH → Base', profit:'+$890/hr',  size:'$12.4K', spread:'1.67%', chain:'ETH/BASE',color:'#0052FF' },
 ];
 
-const TVL_DATA = CHAINS.map(c => ({ name: c.name, tvl: c.tvl }));
+const BRIDGES = [
+  { from:'ETH', to:'ARB',  amount:'$12.4K', status:'executing', color:'#12AAFF' },
+  { from:'0G',  to:'ETH',  amount:'$8.7K',  status:'completed', color:'#10B981' },
+  { from:'POL', to:'BASE', amount:'$3.2K',  status:'pending',   color:'#8247E5' },
+];
 
 export default function CrossChainDashboard() {
-  const [selectedChain, setSelectedChain] = useState(CHAINS[3]);
+  const [tick, setTick] = useState(0);
+  useEffect(()=>{ const t=setInterval(()=>setTick(n=>n+1),3000); return ()=>clearInterval(t); },[]);
+
+  const fadeIn=(i:number)=>({ initial:{opacity:0,y:16}, animate:{opacity:1,y:0}, transition:{delay:i*0.07} });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display" style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Cross-Chain Omni-Agents</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>AI agents operating across 4 chains simultaneously — unified liquidity, maximum yield</p>
+    <div style={{ display:'flex', flexDirection:'column', gap:'1.375rem' }}>
+      <motion.div {...fadeIn(0)}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.875rem', marginBottom:'0.3rem' }}>
+          <div style={{ width:40, height:40, borderRadius:12, background:'linear-gradient(135deg,#10B981,#3B82F6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 24px rgba(16,185,129,0.4)' }}>
+            <Globe size={18} color="#fff" />
+          </div>
+          <div>
+            <h1 style={{ fontSize:'1.75rem', fontWeight:900, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)', letterSpacing:'-0.02em' }}>Cross-Chain Omni-Agents</h1>
+            <p style={{ fontSize:'0.825rem', color:'var(--text-muted)' }}>Operate on multiple chains for maximum yield extraction</p>
+          </div>
+        </div>
       </motion.div>
 
       {/* Chain cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-        {CHAINS.map((c, i) => (
-          <motion.div key={c.name} className="card" style={{ padding: '1.25rem', cursor: 'pointer', border: selectedChain.name === c.name ? `2px solid ${c.color}` : '1px solid var(--border-default)', background: selectedChain.name === c.name ? c.bg : '#fff' }}
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-            whileHover={{ y: -3 }} onClick={() => setSelectedChain(c)}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.875rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                <div style={{ width: 36, height: 36, borderRadius: '10px', background: c.bg, border: `1px solid ${c.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', fontWeight: 800, color: c.color }}>{c.icon}</div>
-                <span style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.875rem' }}>{c.name}</span>
-              </div>
-              <CheckCircle size={14} style={{ color: '#059669' }} />
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:'0.875rem' }}>
+        {CHAINS.map((c,i)=>(
+          <motion.div key={c.name} {...fadeIn(i+1)} className="card" whileHover={{ y:-4 }}
+            style={{ padding:'1.125rem', borderTop:`2px solid ${c.color}50`, cursor:'pointer' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.875rem' }}>
+              <div style={{ width:36, height:36, borderRadius:10, background:`${c.color}20`, border:`1px solid ${c.color}35`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.7rem', fontWeight:900, color:c.color, fontFamily:'Outfit,sans-serif' }}>{c.symbol}</div>
+              <div style={{ width:7, height:7, borderRadius:'50%', background:c.status==='optimal'?'var(--green)':'var(--blue)' }} className="live-dot" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-              {[['TVL', `$${c.tvl}M`], ['APY', `${c.apy}%`], ['Agents', c.agents], ['Latency', c.latency === 0 ? '<1ms' : `${c.latency}s`]].map(([l, v]) => (
-                <div key={l} style={{ background: 'rgba(255,255,255,0.7)', borderRadius: '6px', padding: '0.375rem 0.5rem' }}>
-                  <p style={{ fontSize: '0.58rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>{l}</p>
-                  <p style={{ fontSize: '0.8rem', fontWeight: 800, color: c.color }}>{v}</p>
+            <div style={{ fontWeight:800, fontSize:'0.9rem', color:'var(--text-primary)', marginBottom:'0.75rem' }}>{c.name}</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.375rem' }}>
+              {[['TVL',c.tvl,'var(--text-primary)'],['APY',c.apy,c.color],['Agents',c.agents,'var(--text-secondary)'],['Latency',c.latency,'var(--text-muted)'],['Gas',c.gas,'var(--green-l)']].map(([l,v,col])=>(
+                <div key={l as string} style={{ display:'flex', justifyContent:'space-between', fontSize:'0.72rem' }}>
+                  <span style={{ color:'var(--text-muted)' }}>{l}</span>
+                  <span style={{ fontWeight:700, color:col as string }}>{v}</span>
                 </div>
               ))}
-            </div>
-            <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              <span>Gas: ${c.txCost}/tx</span>
-              <span style={{ color: '#059669', fontWeight: 600 }}>● Connected</span>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* TVL chart + Arb ops */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.25rem', color: 'var(--text-primary)' }}>TVL by Chain</h3>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Total $6.9M across all networks</p>
-          <div style={{ height: 180 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={TVL_DATA}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} unit="M" />
-                <Tooltip formatter={(v: any) => [`$${v}M`, 'TVL']} contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="tvl" fill="#2563eb" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      {/* Live Arb + Bridge Activity */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
+        <motion.div {...fadeIn(6)} className="card" style={{ padding:'1.375rem' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.25rem' }}>
             <div>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Live Arb Opportunities</h3>
-              <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Cross-chain price discrepancies</p>
+              <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)' }}>Live Arbitrage Opportunities</h3>
+              <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginTop:'0.15rem' }}>Real-time cross-chain spread capture</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.68rem', fontWeight: 600, color: '#059669' }}>
-              <span className="status-pulse" style={{ width: 6, height: 6, borderRadius: '50%', background: '#059669', display: 'inline-block' }} /> LIVE
+            <div style={{ display:'flex', alignItems:'center', gap:'0.375rem' }}>
+              <div className="live-dot" style={{ width:6, height:6, background:'var(--green)' }} />
+              <span style={{ fontSize:'0.65rem', color:'var(--green-l)', fontWeight:700 }}>LIVE</span>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {ARB_OPS.map((op, i) => (
-              <div key={i} style={{ padding: '0.75rem', borderRadius: '8px', background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--text-primary)' }}>{op.pair}</p>
-                  <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Buy {op.buyOn} → Sell {op.sellOn}</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
+            {ARBS.map((a,i)=>(
+              <motion.div key={i} initial={{ opacity:0, x:-10 }} animate={{ opacity:1, x:0 }} transition={{ delay:i*0.1 }}
+                style={{ display:'flex', alignItems:'center', gap:'0.875rem', padding:'0.875rem', borderRadius:'var(--r-lg)', background:`${a.color}08`, border:`1px solid ${a.color}25`, cursor:'pointer' }}>
+                <div style={{ width:36, height:36, borderRadius:10, background:`${a.color}20`, border:`1px solid ${a.color}30`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.65rem', fontWeight:800, color:a.color, textAlign:'center', flexShrink:0, lineHeight:1.2 }}>
+                  {a.chain.split('/').join('\n').slice(0,3)}
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontWeight: 700, color: '#059669', fontSize: '0.8rem' }}>+${op.profit.toLocaleString()}/hr</p>
-                  <span style={{
-                    fontSize: '0.58rem', fontWeight: 700, padding: '0.1rem 0.4rem', borderRadius: '99px',
-                    background: op.status === 'LIVE' ? '#ecfdf5' : op.status === 'EXECUTING' ? '#eff6ff' : '#fffbeb',
-                    color: op.status === 'LIVE' ? '#059669' : op.status === 'EXECUTING' ? '#2563eb' : '#d97706',
-                  }}>{op.status}</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:700, fontSize:'0.875rem', color:'var(--text-primary)', marginBottom:'0.15rem' }}>{a.pair}</div>
+                  <div style={{ fontSize:'0.7rem', color:'var(--text-muted)' }}>Size: {a.size} · Spread: {a.spread}</div>
                 </div>
+                <div style={{ textAlign:'right', flexShrink:0 }}>
+                  <div style={{ fontSize:'1rem', fontWeight:900, color:'var(--green-l)', fontFamily:'Outfit,sans-serif' }}>{a.profit}</div>
+                  <button style={{ marginTop:'0.2rem', padding:'0.15rem 0.5rem', borderRadius:6, fontSize:'0.6rem', fontWeight:700, background:`${a.color}15`, color:a.color, border:`1px solid ${a.color}25`, cursor:'pointer' }}>Execute</button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div {...fadeIn(7)} className="card" style={{ padding:'1.375rem' }}>
+          <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'0.2rem' }}>Bridge Activity</h3>
+          <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'1.25rem' }}>Live cross-chain capital movement</p>
+
+          {/* Visual bridge */}
+          <div style={{ position:'relative', height:160, marginBottom:'1.25rem', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            {/* Chain orbs */}
+            {CHAINS.slice(0,4).map((c,i)=>{
+              const angle = (i/4)*Math.PI*2 - Math.PI/2;
+              const r = 60;
+              const x = 50 + Math.cos(angle)*r;
+              const y = 50 + Math.sin(angle)*r;
+              return (
+                <div key={c.name} style={{ position:'absolute', left:`${x}%`, top:`${y}%`, transform:'translate(-50%,-50%)', width:36, height:36, borderRadius:'50%', background:`${c.color}20`, border:`2px solid ${c.color}50`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.62rem', fontWeight:900, color:c.color, boxShadow:`0 0 16px ${c.color}40` }}>
+                  {c.symbol}
+                </div>
+              );
+            })}
+            {/* Center 0G */}
+            <div style={{ position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)', width:44, height:44, borderRadius:'50%', background:'rgba(16,185,129,0.2)', border:'2px solid rgba(16,185,129,0.5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.65rem', fontWeight:900, color:'var(--green)', boxShadow:'0 0 24px rgba(16,185,129,0.4)' }}>0G</div>
+          </div>
+
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.625rem' }}>
+            {BRIDGES.map((b,i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.625rem 0.875rem', borderRadius:'var(--r-lg)', background:'rgba(255,255,255,0.025)', border:'1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
+                  <span style={{ fontSize:'0.8rem', fontWeight:700, color:'var(--text-muted)' }}>{b.from}</span>
+                  <span style={{ fontSize:'0.7rem', color:'var(--text-dim)' }}>→</span>
+                  <span style={{ fontSize:'0.8rem', fontWeight:700, color:b.color }}>{b.to}</span>
+                  <span style={{ fontSize:'0.72rem', color:'var(--text-secondary)' }}>· {b.amount}</span>
+                </div>
+                <span style={{ fontSize:'0.65rem', fontWeight:700, padding:'0.15rem 0.5rem', borderRadius:99, background:b.status==='completed'?'rgba(16,185,129,0.12)':b.status==='executing'?'rgba(59,130,246,0.12)':'rgba(245,158,11,0.12)', color:b.status==='completed'?'var(--green-l)':b.status==='executing'?'var(--blue-l)':'var(--gold-l)' }}>
+                  {b.status}
+                </span>
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Omni-agent explainer */}
-      <div className="card" style={{ padding: '1.5rem', background: 'linear-gradient(135deg, #eff6ff, #f5f3ff)' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>🌐 How Omni-Agents Work</h3>
-        <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '1rem' }}>
-          Omni-agents monitor prices on ALL chains simultaneously. When ETH is cheaper on Polygon by 0.3%, the agent bridges USDC, buys ETH on Polygon, bridges back to Ethereum, and sells — capturing the spread automatically.
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
-          {[
-            { label: 'Single-chain APY', val: '60–80%', icon: '⛓️' },
-            { label: 'Omni-chain APY', val: '120–150%', icon: '🌐' },
-            { label: 'Daily Arb Cycles', val: '200+', icon: '🔄' },
-          ].map((s, i) => (
-            <div key={i} style={{ background: 'rgba(255,255,255,0.8)', borderRadius: '10px', padding: '0.875rem', textAlign: 'center' }}>
-              <span style={{ fontSize: '1.2rem' }}>{s.icon}</span>
-              <p className="font-display" style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--accent-maroon)', marginTop: '0.25rem' }}>{s.val}</p>
-              <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,195 +1,173 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Users, DollarSign, ArrowUpRight } from 'lucide-react';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, ZAxis } from 'recharts';
+import { Activity, TrendingUp, BarChart3, Zap, Shield, Globe } from 'lucide-react';
+import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 
 const MONTHLY = [
-  { m: 'Nov', tvl: 12, profit: 0.8, users: 890 }, { m: 'Dec', tvl: 18, profit: 1.2, users: 1240 },
-  { m: 'Jan', tvl: 28, profit: 1.9, users: 2100 }, { m: 'Feb', tvl: 38, profit: 2.8, users: 4200 },
-  { m: 'Mar', tvl: 52, profit: 3.9, users: 7800 }, { m: 'Apr', tvl: 68, profit: 5.1, users: 10200 },
-  { m: 'May', tvl: 84, profit: 6.3, users: 12453 },
+  {m:'Oct',revenue:180,profit:144,agents:320},{m:'Nov',revenue:240,profit:192,agents:360},
+  {m:'Dec',revenue:310,profit:248,agents:400},{m:'Jan',revenue:280,profit:224,agents:420},
+  {m:'Feb',revenue:390,profit:312,agents:445},{m:'Mar',revenue:450,profit:360,agents:470},
+  {m:'Apr',revenue:520,profit:416,agents:490},{m:'May',revenue:580,profit:464,agents:512},
 ];
-
-const AGENT_METRICS = [
-  { name: 'Yield Harvester+', sharpe: 1.94, apy: 87.3, drawdown: 8.2,  color: 'var(--accent-maroon)' },
-  { name: 'Volatility Surge', sharpe: 1.67, apy: 76.1, drawdown: 15.2, color: '#7c3aed' },
-  { name: 'Arbitrage Master', sharpe: 1.52, apy: 72.8, drawdown: 5.8,  color: '#d97706' },
-  { name: 'Stablecoin Pro',   sharpe: 1.34, apy: 48.2, drawdown: 2.1,  color: '#059669' },
-  { name: 'Epsilon Core',     sharpe: 2.01, apy: 95.0, drawdown: 7.5,  color: '#f59e0b' },
-  { name: 'Market Maker Pro', sharpe: 1.28, apy: 61.4, drawdown: 9.1,  color: '#0891b2' },
+const RADAR_DATA = [
+  {metric:'APY',val:87},{metric:'Sharpe',val:78},{metric:'Win Rate',val:71},
+  {metric:'Stability',val:82},{metric:'Volume',val:95},{metric:'Safety',val:88},
 ];
-
-const HEATMAP_AGENTS = AGENT_METRICS;
-const HEATMAP_METRICS = ['APY', 'Sharpe', 'Win Rate', 'Drawdown', 'Profit Factor'];
-const HEATMAP_DATA = [
-  [87, 97, 71, 82, 93],
-  [76, 84, 69, 48, 78],
-  [73, 76, 74, 94, 86],
-  [48, 67, 89, 98, 95],
-  [95, 100, 78, 88, 90],
-  [61, 64, 63, 82, 72],
+const RISK_DATA = [
+  {range:'<10%',count:18},{range:'10-20%',count:42},{range:'20-30%',count:31},{range:'30-40%',count:6},{range:'>40%',count:3},
 ];
-
-function getHeatColor(val: number) {
-  if (val >= 85) return { bg: '#ecfdf5', color: '#059669' };
-  if (val >= 70) return { bg: '#eff6ff', color: 'var(--accent-maroon)' };
-  if (val >= 55) return { bg: '#fffbeb', color: '#d97706' };
-  return { bg: '#fef2f2', color: '#dc2626' };
-}
 
 export default function SystemStats() {
-  const [compare1, setCompare1] = useState(0);
-  const [compare2, setCompare2] = useState(1);
-
-  const a1 = AGENT_METRICS[compare1], a2 = AGENT_METRICS[compare2];
+  const [liveMetrics, setLiveMetrics] = useState({ tps:247, latency:0.8, uptime:99.97 });
+  useEffect(()=>{
+    const t=setInterval(()=>{
+      setLiveMetrics(m=>({ tps:Math.round(m.tps+(Math.random()-0.4)*10), latency:parseFloat((m.latency+(Math.random()-0.5)*0.05).toFixed(2)), uptime:99.97 }));
+    },2500);
+    return ()=>clearInterval(t);
+  },[]);
+  const fadeIn=(i:number)=>({initial:{opacity:0,y:16},animate:{opacity:1,y:0},transition:{delay:i*0.07}});
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display" style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Platform Analytics</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Real-time platform metrics — growth, revenue, and agent performance heatmap</p>
-      </motion.div>
-
-      {/* Platform KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-        {[
-          { label: 'Total TVL',      val: '$84M',   change: '+23% MoM', icon: DollarSign, color: 'var(--accent-maroon)' },
-          { label: 'Total Profit',   val: '$6.3M',  change: '+31% MoM', icon: TrendingUp, color: '#059669' },
-          { label: 'Active Users',   val: '12,453', change: '+22% MoM', icon: Users,      color: '#7c3aed' },
-          { label: 'Agents Deployed',val: '500+',   change: '+45 this week', icon: BarChart3, color: '#d97706' },
-          { label: 'Platform Revenue',val:'$630K',  change: 'This month', icon: DollarSign, color: '#0891b2' },
-        ].map((s, i) => {
-          const Icon = s.icon;
-          return (
-            <motion.div key={i} className="metric-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span className="metric-label">{s.label}</span>
-                <div style={{ padding: '0.35rem', borderRadius: '6px', background: `${s.color}15` }}>
-                  <Icon size={14} style={{ color: s.color }} />
-                </div>
-              </div>
-              <div className="metric-value" style={{ fontSize: '1.5rem' }}>{s.val}</div>
-              <div className="metric-change up"><ArrowUpRight size={12} />{s.change}</div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Growth charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.25rem' }}>TVL Growth ($M)</h3>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>7× growth in 6 months</p>
-          <div style={{ height: 180 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={MONTHLY}>
-                <defs><linearGradient id="gTVL" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} /><stop offset="95%" stopColor="#2563eb" stopOpacity={0} /></linearGradient></defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="m" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(v: any) => [`$${v}M`]} contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
-                <Area type="monotone" dataKey="tvl" stroke="#2563eb" strokeWidth={2.5} fill="url(#gTVL)" />
-              </AreaChart>
-            </ResponsiveContainer>
+    <div style={{ display:'flex', flexDirection:'column', gap:'1.375rem' }}>
+      <motion.div {...fadeIn(0)}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.875rem', marginBottom:'0.3rem' }}>
+          <div style={{ width:40, height:40, borderRadius:12, background:'linear-gradient(135deg,#06B6D4,#3B82F6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 24px rgba(6,182,212,0.4)' }}>
+            <BarChart3 size={18} color="#fff" />
+          </div>
+          <div>
+            <h1 style={{ fontSize:'1.75rem', fontWeight:900, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)', letterSpacing:'-0.02em' }}>Platform Analytics</h1>
+            <p style={{ fontSize:'0.825rem', color:'var(--text-muted)' }}>Real-time performance metrics and system health</p>
           </div>
         </div>
+      </motion.div>
 
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.25rem' }}>User Growth</h3>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>14× growth in 6 months</p>
-          <div style={{ height: 180 }}>
+      {/* Live system metrics */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1rem' }}>
+        {[
+          { label:'Trades/Second', val:liveMetrics.tps, unit:'TPS', color:'#3B82F6', icon:Activity },
+          { label:'Avg Latency', val:liveMetrics.latency, unit:'s', color:'#10B981', icon:Zap },
+          { label:'Platform Uptime', val:liveMetrics.uptime, unit:'%', color:'#F59E0B', icon:Shield },
+        ].map(({label,val,unit,color,icon:Icon})=>(
+          <motion.div key={label} {...fadeIn(1)} className="metric-card" style={{ borderTop:`2px solid ${color}35` }}>
+            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.875rem' }}>
+              <span className="metric-label">{label}</span>
+              <div style={{ width:32, height:32, borderRadius:9, background:`${color}15`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <Icon size={14} style={{ color }} />
+              </div>
+            </div>
+            <div style={{ fontSize:'2rem', fontWeight:900, color, fontFamily:'Outfit,sans-serif' }}>{val}{unit}</div>
+            <div className="metric-change up"><div className="live-dot" style={{ width:5, height:5, background:'var(--green)', marginRight:'0.25rem' }} />Live</div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Revenue + Agent growth */}
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:'1.25rem' }}>
+        <motion.div {...fadeIn(2)} className="card" style={{ padding:'1.375rem' }}>
+          <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'0.2rem' }}>Revenue & Profit</h3>
+          <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'1.25rem' }}>Platform revenue vs profit (in $K)</p>
+          <div style={{ height:220 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MONTHLY}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="m" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="users" fill="#7c3aed" radius={[3, 3, 0, 0]} />
+                <defs>
+                  <linearGradient id="gRev" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.9} />
+                    <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.5} />
+                  </linearGradient>
+                  <linearGradient id="gProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10B981" stopOpacity={0.9} />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity={0.5} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis dataKey="m" tick={{ fontSize:11, fill:'#475569' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize:11, fill:'#475569' }} axisLine={false} tickLine={false} unit="K" />
+                <Tooltip contentStyle={{ background:'rgba(8,12,24,0.97)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, fontSize:12 }} />
+                <Bar dataKey="revenue" fill="url(#gRev)" radius={[4,4,0,0]} name="Revenue" />
+                <Bar dataKey="profit" fill="url(#gProfit)" radius={[4,4,0,0]} name="Profit" />
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
+
+        <motion.div {...fadeIn(3)} className="card" style={{ padding:'1.375rem' }}>
+          <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'0.2rem' }}>Performance Radar</h3>
+          <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'0.5rem' }}>Top agent composite scores</p>
+          <div style={{ height:230 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart data={RADAR_DATA}>
+                <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                <PolarAngleAxis dataKey="metric" tick={{ fontSize:10, fill:'#64748B' }} />
+                <PolarRadiusAxis angle={30} domain={[0,100]} tick={{ fontSize:9, fill:'#334155' }} />
+                <Radar dataKey="val" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.2} strokeWidth={2} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Heatmap */}
-      <div className="card" style={{ padding: '1.25rem', overflow: 'auto' }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.25rem' }}>Agent Performance Heatmap</h3>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Normalized scores (0–100) across all key metrics</p>
-        <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 500 }}>
-          <thead>
-            <tr>
-              <th style={{ padding: '0.5rem', textAlign: 'left', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Agent</th>
-              {HEATMAP_METRICS.map(m => (
-                <th key={m} style={{ padding: '0.5rem', textAlign: 'center', fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{m}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {HEATMAP_AGENTS.map((a, i) => (
-              <tr key={a.name}>
-                <td style={{ padding: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: a.color }} />
-                    {a.name}
-                  </div>
-                </td>
-                {HEATMAP_DATA[i].map((val, j) => {
-                  const { bg, color } = getHeatColor(val);
-                  return (
-                    <td key={j} style={{ padding: '0.375rem 0.5rem', textAlign: 'center' }}>
-                      <div style={{ padding: '0.3rem 0.5rem', borderRadius: '6px', background: bg, color, fontSize: '0.8rem', fontWeight: 700, fontFamily: 'Outfit, sans-serif' }}>{val}</div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.875rem', flexWrap: 'wrap' }}>
-          {[['≥85 Excellent', '#059669', '#ecfdf5'], ['70–84 Good', '#2563eb', '#eff6ff'], ['55–69 Fair', '#d97706', '#fffbeb'], ['<55 Needs work', '#dc2626', '#fef2f2']].map(([l, c, bg]) => (
-            <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              <div style={{ width: 12, height: 12, borderRadius: 3, background: bg as string, border: `1px solid ${c}30` }} />
-              {l}
+      {/* Agent growth + Risk distribution */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.25rem' }}>
+        <motion.div {...fadeIn(4)} className="card" style={{ padding:'1.375rem' }}>
+          <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'0.2rem' }}>Agent Growth</h3>
+          <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'1.25rem' }}>Total active agents on platform</p>
+          <div style={{ height:200 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={MONTHLY}>
+                <defs>
+                  <linearGradient id="gAgent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis dataKey="m" tick={{ fontSize:11, fill:'#475569' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize:11, fill:'#475569' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background:'rgba(8,12,24,0.97)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, fontSize:12 }} />
+                <Area type="monotone" dataKey="agents" stroke="#8B5CF6" strokeWidth={2.5} fill="url(#gAgent)" dot={false} name="Agents" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        <motion.div {...fadeIn(5)} className="card" style={{ padding:'1.375rem' }}>
+          <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'0.2rem' }}>Drawdown Distribution</h3>
+          <p style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'1.25rem' }}>Max drawdown across all agents</p>
+          <div style={{ height:200 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={RISK_DATA}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+                <XAxis dataKey="range" tick={{ fontSize:10, fill:'#475569' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize:11, fill:'#475569' }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background:'rgba(8,12,24,0.97)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, fontSize:12 }} />
+                <Bar dataKey="count" fill="#10B981" radius={[4,4,0,0]} name="Agents" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* System health grid */}
+      <motion.div {...fadeIn(6)} className="card" style={{ padding:'1.375rem' }}>
+        <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'1.25rem' }}>System Health</h3>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'1rem' }}>
+          {[
+            { label:'0G Compute', status:'Operational', color:'#10B981', latency:'0.8s' },
+            { label:'Chainlink Oracle', status:'Operational', color:'#10B981', latency:'1.2s' },
+            { label:'Smart Contracts', status:'Operational', color:'#10B981', latency:'12s' },
+            { label:'Risk Engine', status:'Operational', color:'#10B981', latency:'0.3s' },
+          ].map(s=>(
+            <div key={s.label} style={{ padding:'1rem', background:'rgba(16,185,129,0.05)', borderRadius:'var(--r-lg)', border:'1px solid rgba(16,185,129,0.15)' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:'0.5rem', marginBottom:'0.5rem' }}>
+                <div className="live-dot" style={{ width:7, height:7, background:s.color }} />
+                <span style={{ fontSize:'0.72rem', fontWeight:700, color:s.color }}>{s.status}</span>
+              </div>
+              <div style={{ fontWeight:700, fontSize:'0.825rem', color:'var(--text-primary)', marginBottom:'0.2rem' }}>{s.label}</div>
+              <div style={{ fontSize:'0.68rem', color:'var(--text-muted)' }}>Latency: {s.latency}</div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Side-by-side compare */}
-      <div className="card" style={{ padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '1rem' }}>Agent Comparison</h3>
-        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          {['Agent A:', 'Agent B:'].map((label, idx) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{label}</span>
-              <select value={idx === 0 ? compare1 : compare2} onChange={e => idx === 0 ? setCompare1(+e.target.value) : setCompare2(+e.target.value)}
-                style={{ padding: '0.3rem 0.6rem', borderRadius: '8px', border: '1px solid var(--border-default)', background: '#fff', fontSize: '0.8rem', outline: 'none', cursor: 'pointer' }}>
-                {AGENT_METRICS.map((a, i) => <option key={i} value={i}>{a.name}</option>)}
-              </select>
-            </div>
-          ))}
-        </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
-              <tr style={{ background: 'var(--bg-elevated)' }}>
-                <th style={{ padding: '0.625rem 1rem', textAlign: 'left', fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Metric</th>
-                <th style={{ padding: '0.625rem 1rem', textAlign: 'center', fontSize: '0.78rem', fontWeight: 700, color: a1.color }}>{a1.name}</th>
-                <th style={{ padding: '0.625rem 1rem', textAlign: 'center', fontSize: '0.78rem', fontWeight: 700, color: a2.color }}>{a2.name}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[['APY', `${a1.apy}%`, `${a2.apy}%`, a1.apy > a2.apy ? 0 : 1], ['Sharpe Ratio', a1.sharpe, a2.sharpe, a1.sharpe > a2.sharpe ? 0 : 1], ['Max Drawdown', `-${a1.drawdown}%`, `-${a2.drawdown}%`, a1.drawdown < a2.drawdown ? 0 : 1]].map(([metric, v1, v2, winner]) => (
-                <tr key={metric as string} style={{ borderBottom: '1px solid var(--border-default)' }}>
-                  <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{metric}</td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.875rem', fontWeight: 800, color: winner === 0 ? '#059669' : 'var(--text-secondary)' }}>{v1}{winner === 0 && ' ✓'}</td>
-                  <td style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.875rem', fontWeight: 800, color: winner === 1 ? '#059669' : 'var(--text-secondary)' }}>{v2}{winner === 1 && ' ✓'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

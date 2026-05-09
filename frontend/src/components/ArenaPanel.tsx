@@ -1,140 +1,157 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Trophy, Flame, Star, CheckCircle, Award, TrendingUp, Users } from 'lucide-react';
+import { Shield, Star, Trophy, Zap, TrendingUp, CheckCircle, Award, Globe, Activity } from 'lucide-react';
 
-const AGENTS = [
-  { id: 1, name: 'Yield Harvester+', totalTrades: 1247, winRate: 71.3, streak: 47, profitFactor: 2.8, sharpe: 1.94, years: 2.3, volume: 48.2, blowups: 0, score: 94, color: 'var(--accent-maroon)', badges: ['profitable_year', 'trending', 'institutional', 'risk_master'] },
-  { id: 2, name: 'Volatility Surge', totalTrades: 892,  winRate: 68.5, streak: 12, profitFactor: 2.1, sharpe: 1.67, years: 1.8, volume: 31.4, blowups: 0, score: 82, color: '#7c3aed', badges: ['profitable_year', 'trending', 'institutional'] },
-  { id: 3, name: 'Arbitrage Master', totalTrades: 567,  winRate: 74.2, streak: 28, profitFactor: 3.1, sharpe: 1.52, years: 1.2, volume: 22.8, blowups: 0, score: 79, color: '#d97706', badges: ['risk_master', 'institutional'] },
-  { id: 4, name: 'Stablecoin Pro',   totalTrades: 2341, winRate: 89.1, streak: 103,profitFactor: 4.2, sharpe: 1.34, years: 3.1, volume: 78.4, blowups: 0, score: 91, color: '#059669', badges: ['profitable_year', 'risk_master', 'institutional'] },
-  { id: 5, name: 'Epsilon Core',     totalTrades: 456,  winRate: 78.4, streak: 21, profitFactor: 2.6, sharpe: 2.01, years: 0.8, volume: 18.2, blowups: 0, score: 88, color: '#f59e0b', badges: ['trending', 'institutional', 'explosive'] },
-  { id: 6, name: 'Market Maker Pro', totalTrades: 345,  winRate: 63.2, streak: 5,  profitFactor: 1.8, sharpe: 1.28, years: 0.5, volume: 12.1, blowups: 0, score: 64, color: '#0891b2', badges: [] },
+const BADGES = [
+  { icon:'🏛️', title:'Institutional Grade', desc:'Meets institutional risk standards', color:'#F59E0B', rarity:'Legendary', earned:true },
+  { icon:'⚡', title:'Risk Master', desc:'Exceptional risk management score', color:'#3B82F6', rarity:'Epic', earned:true },
+  { icon:'🔥', title:'Trending', desc:'Top 5% performance this week', color:'#EF4444', rarity:'Rare', earned:true },
+  { icon:'💎', title:'Elite Alpha', desc:'Top 1% yield generation', color:'#8B5CF6', rarity:'Legendary', earned:true },
+  { icon:'🌾', title:'Stable Yield King', desc:'12 months of consistent returns', color:'#10B981', rarity:'Epic', earned:true },
+  { icon:'🌐', title:'Cross-Chain Pioneer', desc:'Active on 5+ chains', color:'#06B6D4', rarity:'Rare', earned:false },
+  { icon:'🧬', title:'Breeding Master', desc:'10+ successful offspring', color:'#A78BFA', rarity:'Epic', earned:false },
+  { icon:'📊', title:'Quant Expert', desc:'Advanced analytics certification', color:'#FCD34D', rarity:'Rare', earned:false },
 ];
 
-const BADGE_META: Record<string, { label: string; emoji: string; desc: string; color: string; bg: string }> = {
-  profitable_year:  { label: 'Profitable Year',   emoji: '🏆', desc: 'Positive returns for 12+ consecutive months', color: '#d97706', bg: '#fffbeb' },
-  trending:         { label: 'Trending',           emoji: '🔥', desc: 'Top 5% performer this month',               color: '#dc2626', bg: '#fef2f2' },
-  institutional:    { label: 'Institutional-Grade', emoji: '💎', desc: 'Sharpe Ratio > 1.5',                        color: 'var(--accent-maroon)', bg: '#eff6ff' },
-  risk_master:      { label: 'Risk Master',        emoji: '🛡️', desc: 'Max drawdown < 10%',                        color: '#059669', bg: '#ecfdf5' },
-  explosive:        { label: 'Explosive Growth',   emoji: '🚀', desc: '>100% APY achieved honestly',               color: '#7c3aed', bg: '#f5f3ff' },
-};
+const TRUST_METRICS = [
+  { label:'Execution Accuracy', val:98.7, color:'#10B981' },
+  { label:'Risk Adherence', val:96.2, color:'#3B82F6' },
+  { label:'Transparency Score', val:99.1, color:'#8B5CF6' },
+  { label:'Community Trust', val:94.8, color:'#F59E0B' },
+];
 
-const LEADERBOARD = [...AGENTS].sort((a, b) => b.score - a.score);
+const REVIEWS = [
+  { user:'0xInstitutional', rating:5, text:'Best performing agent I\'ve used. Institutional-grade risk management with retail-friendly UX. Absolutely exceptional.', time:'2h ago' },
+  { user:'CryptoCapital.eth', rating:5, text:'$140K deployed. Zero issues. 87% APY as advertised. The 0G proof verification gives me complete confidence.', time:'1d ago' },
+  { user:'YieldMaxi', rating:4, text:'Consistent returns every single week. Auto-compound feature saves a ton of gas fees. Highly recommend.', time:'3d ago' },
+];
 
-export default function ArenaPanel() {
-  const [selected, setSelected] = useState(AGENTS[0]);
+export default function ReputationPage() {
+  const [tab, setTab] = useState<'overview'|'badges'|'reviews'>('overview');
+  const score = 94;
+  const fadeIn = (i:number) => ({ initial:{opacity:0,y:16}, animate:{opacity:1,y:0}, transition:{delay:i*0.07} });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display" style={{ fontSize: '1.875rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Agent Reputation</h1>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>On-chain verified reputation scores and achievement badges — powered by 0G Compute</p>
+    <div style={{ display:'flex', flexDirection:'column', gap:'1.375rem' }}>
+      <motion.div {...fadeIn(0)}>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.875rem', marginBottom:'0.3rem' }}>
+          <div style={{ width:40, height:40, borderRadius:12, background:'linear-gradient(135deg,#F59E0B,#EF4444)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 0 24px rgba(245,158,11,0.4)' }}>
+            <Shield size={18} color="#fff" />
+          </div>
+          <div>
+            <h1 style={{ fontSize:'1.75rem', fontWeight:900, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)', letterSpacing:'-0.02em' }}>Agent Reputation System</h1>
+            <p style={{ fontSize:'0.825rem', color:'var(--text-muted)' }}>On-chain verified reputation and trust metrics</p>
+          </div>
+        </div>
       </motion.div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.25rem' }}>
-        {/* Leaderboard */}
-        <div className="card" style={{ padding: '1.25rem', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-            <Trophy size={18} style={{ color: '#d97706' }} />
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Reputation Ranking</h3>
+      {/* Hero score card */}
+      <motion.div {...fadeIn(1)} className="card" style={{ padding:'2rem', background:'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(239,68,68,0.04))', borderColor:'rgba(245,158,11,0.2)' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'auto 1fr auto', gap:'2.5rem', alignItems:'center' }}>
+          {/* Score circle */}
+          <div style={{ position:'relative', width:140, height:140 }}>
+            <svg width="140" height="140" style={{ position:'absolute', top:0, left:0 }}>
+              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(245,158,11,0.12)" strokeWidth="8" />
+              <circle cx="70" cy="70" r="60" fill="none" stroke="url(#scoreGrad)" strokeWidth="8"
+                strokeDasharray={`${score/100*377} 377`} strokeLinecap="round" transform="rotate(-90 70 70)" />
+              <defs>
+                <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#F59E0B" />
+                  <stop offset="100%" stopColor="#EF4444" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ fontSize:'2.25rem', fontWeight:900, fontFamily:'Outfit,sans-serif', color:'var(--gold-l)', lineHeight:1 }}>{score}</div>
+              <div style={{ fontSize:'0.6rem', color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Score</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            {LEADERBOARD.map((a, i) => (
-              <motion.div key={a.id} onClick={() => setSelected(a)}
-                style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: `1px solid ${selected.id === a.id ? a.color : 'var(--border-default)'}`, background: selected.id === a.id ? `${a.color}08` : 'var(--bg-elevated)', display: 'flex', alignItems: 'center', gap: '0.625rem' }}
-                whileHover={{ x: 2 }}
-              >
-                <span style={{ fontSize: i < 3 ? '1rem' : '0.8rem', fontWeight: 700, color: 'var(--text-dim)', width: 20, textAlign: 'center' }}>
-                  {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.82rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.name}</p>
-                  <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.2rem' }}>
-                    {a.badges.slice(0, 3).map(b => <span key={b} style={{ fontSize: '0.7rem' }}>{BADGE_META[b]?.emoji}</span>)}
-                  </div>
+
+          {/* Stats */}
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.75rem', marginBottom:'0.5rem' }}>
+              <h2 style={{ fontSize:'1.5rem', fontWeight:900, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)' }}>Yield Harvester+</h2>
+              <span className="badge badge-gold">Institutional Grade</span>
+            </div>
+            <p style={{ fontSize:'0.8rem', color:'var(--text-muted)', marginBottom:'1.25rem' }}>Gen-3 Verified Agent · Active 14 months · $84M+ total volume traded</p>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'1rem' }}>
+              {[['Total Trades','1,247'],['Win Rate','71.3%'],['Profit Factor','2.8x'],['Days Active','0']].map(([l,v])=>(
+                <div key={l}>
+                  <div style={{ fontSize:'0.6rem', color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:'0.2rem' }}>{l}</div>
+                  <div style={{ fontSize:'1.125rem', fontWeight:900, color:'var(--text-primary)', fontFamily:'Outfit,sans-serif' }}>{v}</div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: 900, color: a.color, fontFamily: 'Outfit, sans-serif' }}>{a.score}</span>
-                  <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)' }}>score</span>
-                </div>
-              </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust indicators */}
+          <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem' }}>
+            {[['0G Verified','#10B981'],['Chainlink Audited','#3B82F6'],['Risk Compliant','#8B5CF6']].map(([l,c])=>(
+              <div key={l} style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.5rem 0.875rem', borderRadius:'var(--r-full)', background:`${c}10`, border:`1px solid ${c}25` }}>
+                <CheckCircle size={13} style={{ color:c }} />
+                <span style={{ fontSize:'0.75rem', fontWeight:700, color:c }}>{l}</span>
+              </div>
             ))}
           </div>
         </div>
+      </motion.div>
 
-        {/* Selected agent detail */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Header */}
-          <motion.div key={selected.id} className="card" style={{ padding: '1.25rem', borderTop: `3px solid ${selected.color}` }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div>
-                <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>{selected.name}</h2>
-                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>On-chain verified · 0G Compute reputation proof</p>
+      {/* Trust metrics */}
+      <motion.div {...fadeIn(2)} className="card" style={{ padding:'1.375rem' }}>
+        <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'1.25rem' }}>Trust Metrics</h3>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:'1.25rem' }}>
+          {TRUST_METRICS.map((m,i)=>(
+            <div key={m.label}>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.5rem' }}>
+                <span style={{ fontSize:'0.8rem', color:'var(--text-secondary)', fontWeight:500 }}>{m.label}</span>
+                <span style={{ fontSize:'0.875rem', fontWeight:800, color:m.color, fontFamily:'Outfit,sans-serif' }}>{m.val}%</span>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div className="font-display" style={{ fontSize: '2rem', fontWeight: 900, color: selected.color }}>{selected.score}</div>
-                <p style={{ fontSize: '0.65rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Rep Score</p>
+              <div className="progress-bar" style={{ height:6 }}>
+                <motion.div className="progress-fill" initial={{ width:0 }} animate={{ width:`${m.val}%` }} transition={{ duration:1.2, delay:0.3+i*0.1, ease:[0.34,1.56,0.64,1] }}
+                  style={{ background:`linear-gradient(90deg, ${m.color}, ${m.color}cc)`, boxShadow:`0 0 10px ${m.color}50`, height:'100%', borderRadius:99 }} />
               </div>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
-              {[
-                { label: 'Total Trades', val: selected.totalTrades.toLocaleString() },
-                { label: 'Win Rate', val: `${selected.winRate}%` },
-                { label: 'Win Streak', val: `${selected.streak}` },
-                { label: 'Profit Factor', val: `${selected.profitFactor}x` },
-                { label: 'Sharpe Ratio', val: selected.sharpe.toFixed(2) },
-                { label: 'Years Active', val: `${selected.years}y` },
-                { label: 'Volume Traded', val: `$${selected.volume}M` },
-                { label: 'Blowups', val: `${selected.blowups}` },
-              ].map(({ label, val }) => (
-                <div key={label} style={{ background: 'var(--bg-elevated)', borderRadius: '8px', padding: '0.625rem', textAlign: 'center' }}>
-                  <p style={{ fontSize: '0.6rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{label}</p>
-                  <p style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif' }}>{val}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Badges */}
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <Award size={16} style={{ color: '#d97706' }} />
-              <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>Achievement Badges (ERC-721)</h3>
-            </div>
-            {selected.badges.length === 0 ? (
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>No badges earned yet — keep trading!</p>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
-                {selected.badges.map(b => {
-                  const meta = BADGE_META[b];
-                  return (
-                    <motion.div key={b} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} whileHover={{ scale: 1.02 }}
-                      style={{ padding: '0.875rem', borderRadius: 'var(--radius-md)', background: meta.bg, border: `1px solid ${meta.color}30`, display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                      <span style={{ fontSize: '1.5rem' }}>{meta.emoji}</span>
-                      <div>
-                        <p style={{ fontSize: '0.78rem', fontWeight: 700, color: meta.color }}>{meta.label}</p>
-                        <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{meta.desc}</p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Locked badges */}
-            <p style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-dim)', marginTop: '1rem', marginBottom: '0.5rem' }}>Locked Badges</p>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {Object.entries(BADGE_META).filter(([k]) => !selected.badges.includes(k)).map(([k, meta]) => (
-                <div key={k} style={{ padding: '0.3rem 0.625rem', borderRadius: '99px', background: 'var(--bg-elevated)', border: '1px dashed var(--border-strong)', display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.5 }}>
-                  <span style={{ fontSize: '0.8rem' }}>{meta.emoji}</span>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{meta.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
-      </div>
+      </motion.div>
+
+      {/* Badges */}
+      <motion.div {...fadeIn(3)} className="card" style={{ padding:'1.375rem' }}>
+        <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'1.25rem' }}>Achievement Badges</h3>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px,1fr))', gap:'0.875rem' }}>
+          {BADGES.map((b,i)=>(
+            <motion.div key={b.title} whileHover={b.earned?{ y:-3, scale:1.02 }:{}}
+              style={{ padding:'1.125rem', borderRadius:'var(--r-xl)', border:`1px solid ${b.earned?b.color+'35':'rgba(255,255,255,0.04)'}`, background:b.earned?`${b.color}08`:'rgba(255,255,255,0.015)', cursor:b.earned?'pointer':'default', opacity:b.earned?1:0.4, transition:'all 0.2s', position:'relative', overflow:'hidden' }}>
+              {b.earned && <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${b.color}, transparent)` }} />}
+              <div style={{ fontSize:'2rem', marginBottom:'0.625rem' }}>{b.icon}</div>
+              <div style={{ fontWeight:800, fontSize:'0.85rem', color:b.earned?'var(--text-primary)':'var(--text-muted)', marginBottom:'0.2rem' }}>{b.title}</div>
+              <div style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:'0.625rem', lineHeight:1.4 }}>{b.desc}</div>
+              <span style={{ padding:'0.15rem 0.5rem', borderRadius:99, fontSize:'0.6rem', fontWeight:700, background:`${b.color}15`, color:b.color, border:`1px solid ${b.color}25` }}>{b.rarity}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Community Reviews */}
+      <motion.div {...fadeIn(4)} className="card" style={{ padding:'1.375rem' }}>
+        <h3 style={{ fontSize:'0.9rem', fontWeight:700, color:'var(--text-primary)', marginBottom:'1.25rem' }}>Community Reviews</h3>
+        <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+          {REVIEWS.map((r,i)=>(
+            <div key={i} style={{ padding:'1rem', borderRadius:'var(--r-lg)', background:'rgba(255,255,255,0.025)', border:'1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'0.625rem' }}>
+                <div>
+                  <div style={{ fontWeight:700, color:'var(--text-primary)', fontSize:'0.875rem', marginBottom:'0.25rem' }}>{r.user}</div>
+                  <div style={{ display:'flex', gap:'0.2rem' }}>
+                    {Array.from({length:5},(_,j)=><Star key={j} size={11} fill={j<r.rating?'#F59E0B':'none'} style={{ color:'#F59E0B' }} />)}
+                  </div>
+                </div>
+                <span style={{ fontSize:'0.65rem', color:'var(--text-dim)' }}>{r.time}</span>
+              </div>
+              <p style={{ fontSize:'0.8rem', color:'var(--text-secondary)', lineHeight:1.6 }}>{r.text}</p>
+            </div>
+          ))}
+        </div>
+      </motion.div>
     </div>
   );
 }
