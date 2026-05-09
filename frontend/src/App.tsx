@@ -6,6 +6,7 @@ import {
   Search, User, Menu, X
 } from 'lucide-react';
 import { useToast } from './components/Toast';
+import { connectMetaMask, truncateAddress, liveFeed } from './services/api';
 
 import Dashboard from './components/Dashboard';
 import Leaderboard from './components/Leaderboard';
@@ -61,24 +62,36 @@ export default function App() {
   const { toast } = useToast();
   const [page, setPage] = useState('overview');
   const [showLanding, setShowLanding] = useState(true);
-  const [walletConnected, setWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string|null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications] = useState(3);
   const [investors, setInvestors] = useState(12467);
   const [showNotif, setShowNotif] = useState(false);
+  const walletConnected = !!walletAddress;
 
   useEffect(() => {
     const t = setInterval(() => setInvestors(v => v + Math.floor(Math.random()*3)), 8000);
-    return () => clearInterval(t);
+    // Connect live feed
+    liveFeed.connect();
+    return () => { clearInterval(t); liveFeed.disconnect(); };
   }, []);
 
-  const handleWalletConnect = () => {
-    if (!walletConnected) {
-      setWalletConnected(true);
-      toast('success', 'Wallet Connected', '0x7a3f...d4c2 connected successfully');
+  const handleWalletConnect = async () => {
+    if (walletConnected) {
+      setWalletAddress(null);
+      toast('info', 'Wallet Disconnected', 'Session ended');
+      return;
+    }
+    // Try MetaMask first
+    const addr = await connectMetaMask();
+    if (addr) {
+      setWalletAddress(addr);
+      toast('success', 'Wallet Connected', `${truncateAddress(addr)} ready`);
     } else {
-      setWalletConnected(false);
-      toast('info', 'Wallet Disconnected', 'Your wallet has been disconnected');
+      // Demo mode — simulate connect
+      const demoAddr = '0x7a3f8B9d2c1E4F5a6D7e8F9a0B1c2D3e4F5a6D7e';
+      setWalletAddress(demoAddr);
+      toast('success', 'Demo Wallet Connected', `${truncateAddress(demoAddr)} (demo mode)`);
     }
   };
 
@@ -245,7 +258,7 @@ export default function App() {
               className={walletConnected ? 'btn-ghost' : 'btn-primary'}
               style={{ height:34, fontSize:'0.78rem', padding:'0 1rem', gap:'0.375rem', borderRadius:'var(--r-md)' }}>
               <Wallet size={13} />
-              {walletConnected ? '0x7a3f...d4c2' : 'Connect Wallet'}
+              {walletConnected ? truncateAddress(walletAddress!) : 'Connect Wallet'}
             </button>
 
             {/* Avatar */}
