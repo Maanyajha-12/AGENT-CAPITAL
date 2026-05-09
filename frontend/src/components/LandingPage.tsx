@@ -90,10 +90,44 @@ const NODES = [
   { label:'Stablecoin Pro',    val:'+48.2%', color:'#10B981', angle:300 },
 ];
 
-const NAV = ['Products','Marketplace','Resources','Company'];
+const NAV_MENUS = [
+  {
+    label: 'Products',
+    items: [
+      { label: 'AI Dashboard', desc: 'Bloomberg-grade overview', page: 'overview', icon: '📊' },
+      { label: 'Agent Marketplace', desc: 'Browse 500+ AI hedge funds', page: 'marketplace', icon: '🛒' },
+      { label: 'Strategy Hub', desc: 'Yield, arb, volatility & more', page: 'strategies', icon: '⚡' },
+      { label: 'Breeding Lab', desc: 'Create superior AI offspring', page: 'breeding', icon: '🧬' },
+    ],
+  },
+  {
+    label: 'Marketplace',
+    items: [
+      { label: 'Browse Agents', desc: 'Explore all AI agents', page: 'marketplace', icon: '🤖' },
+      { label: 'Leaderboard', desc: 'Top performing agents', page: 'leaderboard', icon: '🏆' },
+      { label: 'Portfolio', desc: 'Your investments', page: 'portfolio', icon: '💼' },
+    ],
+  },
+  {
+    label: 'Resources',
+    items: [
+      { label: 'Analytics', desc: 'Platform performance data', page: 'analytics', icon: '📈' },
+      { label: 'Cross-Chain', desc: 'Multi-chain operations', page: 'crosschain', icon: '🌐' },
+      { label: 'Reputation', desc: 'Agent trust scores', page: 'reputation', icon: '🛡️' },
+    ],
+  },
+  {
+    label: 'Company',
+    items: [
+      { label: 'About', desc: 'Built on 0G Network', page: null as string|null, icon: '🏛️', href: 'https://0g.ai' },
+      { label: 'GitHub', desc: 'Open source code', page: null as string|null, icon: '💻', href: 'https://github.com/Maanyajha-12/AGENT-CAPITAL' },
+      { label: 'Documentation', desc: 'Integration guides', page: null as string|null, icon: '📖', href: '#' },
+    ],
+  },
+];
 
-export default function LandingPage({ onLaunchApp }: { onLaunchApp: ()=>void }) {
-  const [hovered, setHovered] = useState<string|null>(null);
+export default function LandingPage({ onLaunchApp }: { onLaunchApp: (page?:string)=>void }) {
+  const [openMenu, setOpenMenu] = useState<string|null>(null);
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg-void)', position:'relative', overflow:'hidden' }}>
@@ -116,17 +150,50 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: ()=>void }) 
           </span>
         </div>
 
-        <div style={{ display:'flex', alignItems:'center', gap:'2.5rem' }}>
-          {NAV.map(item => (
-            <span key={item} onMouseEnter={()=>setHovered(item)} onMouseLeave={()=>setHovered(null)}
-              style={{ fontSize:'0.875rem', fontWeight:500, cursor:'pointer', transition:'color 0.2s',
-                color: hovered===item ? '#F8FAFC' : 'var(--text-muted)' }}>
-              {item}
-            </span>
+        <div style={{ display:'flex', alignItems:'center', gap:'0.25rem' }} onMouseLeave={()=>setOpenMenu(null)}>
+          {NAV_MENUS.map(menu => (
+            <div key={menu.label} style={{ position:'relative' }}>
+              <button
+                onMouseEnter={()=>setOpenMenu(menu.label)}
+                onClick={()=>setOpenMenu(openMenu===menu.label ? null : menu.label)}
+                style={{ fontSize:'0.875rem', fontWeight:500, cursor:'pointer', background:'none', border:'none',
+                  color: openMenu===menu.label ? '#F8FAFC' : 'var(--text-muted)',
+                  padding:'0.5rem 0.875rem', borderRadius:8, transition:'all 0.15s',
+                  display:'flex', alignItems:'center', gap:'0.3rem' }}>
+                {menu.label}
+                <svg width="10" height="10" viewBox="0 0 10 10" style={{ transition:'transform 0.2s', transform: openMenu===menu.label ? 'rotate(180deg)':'rotate(0)' }}>
+                  <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                </svg>
+              </button>
+              <AnimatePresence>
+                {openMenu===menu.label && (
+                  <motion.div initial={{ opacity:0, y:8, scale:0.97 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:4 }}
+                    transition={{ duration:0.14 }}
+                    style={{ position:'absolute', top:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)',
+                      background:'rgba(8,12,24,0.98)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:16,
+                      padding:'0.5rem', minWidth:240, boxShadow:'0 24px 48px rgba(0,0,0,0.6)', backdropFilter:'blur(24px)', zIndex:200 }}>
+                    {menu.items.map(item => (
+                      <button key={item.label}
+                        onClick={() => { setOpenMenu(null); if ((item as any).href) { window.open((item as any).href,'_blank'); return; } if (item.page) onLaunchApp(item.page); }}
+                        style={{ width:'100%', display:'flex', alignItems:'center', gap:'0.75rem', padding:'0.7rem 0.875rem',
+                          borderRadius:10, background:'none', border:'none', cursor:'pointer', textAlign:'left' }}
+                        onMouseEnter={e=>(e.currentTarget.style.background='rgba(255,255,255,0.06)')}
+                        onMouseLeave={e=>(e.currentTarget.style.background='none')}>
+                        <span style={{ fontSize:'1.2rem' }}>{item.icon}</span>
+                        <div>
+                          <div style={{ fontSize:'0.84rem', fontWeight:700, color:'#F8FAFC' }}>{item.label}</div>
+                          <div style={{ fontSize:'0.68rem', color:'#64748B' }}>{item.desc}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
         </div>
 
-        <button className="btn-primary" onClick={onLaunchApp} style={{ height:40, borderRadius:'var(--r-md)' }}>
+        <button className="btn-primary" onClick={()=>onLaunchApp()} style={{ height:40, borderRadius:'var(--r-md)' }}>
           <Zap size={14} /> Connect Wallet
         </button>
       </nav>
@@ -157,11 +224,11 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: ()=>void }) 
 
             <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.55 }}
               style={{ display:'flex', gap:'1rem', marginBottom:'3.5rem' }}>
-              <button className="btn-primary" onClick={onLaunchApp}
+              <button className="btn-primary" onClick={()=>onLaunchApp()}
                 style={{ height:52, padding:'0 2rem', fontSize:'0.975rem', borderRadius:'var(--r-lg)', letterSpacing:'0.01em' }}>
                 <Zap size={16} /> Launch App <ChevronRight size={15} />
               </button>
-              <button className="btn-ghost" style={{ height:52, padding:'0 1.75rem', fontSize:'0.975rem', borderRadius:'var(--r-lg)' }}>
+              <button className="btn-ghost" onClick={()=>onLaunchApp('marketplace')} style={{ height:52, padding:'0 1.75rem', fontSize:'0.975rem', borderRadius:'var(--r-lg)' }}>
                 Explore Agents <ExternalLink size={14} />
               </button>
             </motion.div>

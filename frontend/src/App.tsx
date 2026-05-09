@@ -95,7 +95,7 @@ export default function App() {
     }
   };
 
-  if (showLanding) return <LandingPage onLaunchApp={() => setShowLanding(false)} />;
+  if (showLanding) return <LandingPage onLaunchApp={(page?:string) => { setShowLanding(false); if(page) setPage(page); }} />;
 
   const Page = PAGES[page] || Dashboard;
 
