@@ -129,7 +129,7 @@ export default function App() {
         {/* Live status */}
         <div style={{ padding:'0.625rem 0.875rem' }}>
           <motion.div animate={{ boxShadow:['0 0 0 0 rgba(16,185,129,0.3)','0 0 0 6px rgba(16,185,129,0)','0 0 0 0 rgba(16,185,129,0)'] }} transition={{ duration:2.5, repeat:Infinity }}
-            style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.5rem 0.75rem', background:'rgba(16,185,129,0.07)', borderRadius:'var(--r-md)', border:'1px solid rgba(16,185,129,0.15)', borderRadius:10 }}>
+            style={{ display:'flex', alignItems:'center', gap:'0.5rem', padding:'0.5rem 0.75rem', background:'rgba(16,185,129,0.07)', borderRadius:10, border:'1px solid rgba(16,185,129,0.15)' }}>
             <div className="live-dot" style={{ width:6, height:6, background:'var(--green)', flexShrink:0 }} />
             <span style={{ fontSize:'0.68rem', fontWeight:700, color:'var(--green-l)' }}>{investors.toLocaleString()} online now</span>
           </motion.div>
