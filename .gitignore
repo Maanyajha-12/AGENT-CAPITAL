@@ -40,30 +40,29 @@ contracts/broadcast/
 QUICK_DEPLOY.sh/
 QUICK_REFERENCE.md/
 setup-all.sh/
-CHANGELOG.md/
-CODE_OF_CONDUCT.md/
-# Demo / internal docs
-3_MINUTE_VIDEO_SCRIPT.md
-3_MINUTE_VIDEO_VISUAL_GUIDE.md
-CHANGELOG.md
-CODE_OF_CONDUCT.md
-IMPLEMENTATION_GUIDE.md
-JUDGES_REALITY_CHECK_GUIDE.md
-JUDGE_SELF_TEST_KIT.md
-JUDGE_VERIFICATION_GUIDE.md
-LIVE_JUDGE_DEMO.md
-OPTION_A_IMPLEMENTATION.md
-PRE_DEMO_CHECKLIST.md
-PRODUCTION_COMPLETE.md
-QUICK_REFERENCE.md
-READY_FOR_DEMO.md
-REALITY_CHECK_ENTRY.md
-REALITY_CHECK_IMPLEMENTATION_SUMMARY.md
-SIMULATION_EXPLANATION.md
 
-# Deployment / scripts
-Procfile
-QUICK_DEPLOY.sh
-setup-all.sh
-railway.json
+docs/architecture/EXECUTIVE_SUMMARY.md
+
+docs/demo/3_MINUTE_VIDEO_SCRIPT.md
+docs/demo/3_MINUTE_VIDEO_VISUAL_GUIDE.md
+docs/demo/LIVE_JUDGE_DEMO.md
+docs/demo/PRE_DEMO_CHECKLIST.md
+
+# implementation internals
+docs/implementation/DELIVERY_SUMMARY.md
+docs/implementation/IMPLEMENTATION_FIXES.md
+docs/implementation/OPTION_A_IMPLEMENTATION.md
+docs/implementation/PRODUCTION_COMPLETE.md
+
+# reality-check internals
+docs/reality-check/JUDGE_SELF_TEST_KIT.md
+docs/reality-check/JUDGE_VERIFICATION_GUIDE.md
+docs/reality-check/JUDGES_REALITY_CHECK_GUIDE.md
+docs/reality-check/README_REALITY_CHECK.md
+docs/reality-check/REALITY_CHECK_ANALYSIS.md
+docs/reality-check/REALITY_CHECK_ENTRY.md
+docs/reality-check/REALITY_CHECK_IMPLEMENTATION_SUMMARY.md
+docs/reality-check/SIMULATION_EXPLANATION.md
+docs/reality-check/THE_REALITY_CHECK.md
+
 
