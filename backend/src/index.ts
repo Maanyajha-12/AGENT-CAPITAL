@@ -13,6 +13,8 @@ import { getComputeVerifier } from "./compute-verifier";
 import { CrossChainBridge } from "./cross-chain/bridge";
 import { GlobalLeaderboard } from "./cross-chain/leaderboard";
 import { ProofOfIntelligence } from "./consensus/proof-of-intelligence";
+import { createTransparencyRoutes } from "./routes/transparency-api";
+import { createTradesRoutes } from "./routes/trades-api";
 
 dotenv.config();
 
@@ -26,6 +28,16 @@ const wss = new WebSocketServer({ server: httpServer });
 
 app.use(cors());
 app.use(express.json());
+
+// ========================================================================
+// TRANSPARENCY API - For Judge Verification
+// ========================================================================
+app.use('/api/transparency', createTransparencyRoutes());
+
+// ========================================================================
+// TRADES API - Real DEX Execution with Proof
+// ========================================================================
+app.use('/api/trades', createTradesRoutes());
 
 // Initialize services
 const ogStorage = new OGStorage(
@@ -585,7 +597,7 @@ app.post("/api/arena/tournament", async (req: Request, res: Response) => {
 
         const mockAgents = [
             { id: 1001, name: "Alpha", baseScore: 87, generation: 0 },
-            { id: 1002, name: "Beta",  baseScore: 84, generation: 0 },
+            { id: 1002, name: "Beta", baseScore: 84, generation: 0 },
             { id: 1003, name: "Gamma", baseScore: 81, generation: 0 },
             { id: 1004, name: "Delta", baseScore: 78, generation: 0 },
         ];
@@ -608,8 +620,8 @@ app.post("/api/arena/tournament", async (req: Request, res: Response) => {
                         roundScore >= 85
                             ? "Excellent performance with strong reasoning"
                             : roundScore >= 75
-                            ? "Good execution with minor issues"
-                            : "Adequate but needs improvement",
+                                ? "Good execution with minor issues"
+                                : "Adequate but needs improvement",
                     timestamp: new Date().toISOString(),
                 };
             });
@@ -667,10 +679,10 @@ app.get("/api/arena/leaderboard", async (_req: Request, res: Response) => {
     try {
         res.json({
             leaderboard: [
-                { rank: 1, agent_id: 1001, agent_name: "Alpha", generation: 8,  wins: 23, losses: 2,  win_rate: 92, avg_score: 87.3, best_score: 98, total_earnings: 1250, breeding_count: 12 },
-                { rank: 2, agent_id: 1002, agent_name: "Beta",  generation: 6,  wins: 18, losses: 7,  win_rate: 72, avg_score: 84.2, best_score: 96, total_earnings: 980,  breeding_count: 8  },
-                { rank: 3, agent_id: 1003, agent_name: "Gamma", generation: 4,  wins: 12, losses: 13, win_rate: 48, avg_score: 81.1, best_score: 92, total_earnings: 650,  breeding_count: 5  },
-                { rank: 4, agent_id: 1004, agent_name: "Delta", generation: 2,  wins: 5,  losses: 20, win_rate: 20, avg_score: 78.4, best_score: 88, total_earnings: 320,  breeding_count: 2  },
+                { rank: 1, agent_id: 1001, agent_name: "Alpha", generation: 8, wins: 23, losses: 2, win_rate: 92, avg_score: 87.3, best_score: 98, total_earnings: 1250, breeding_count: 12 },
+                { rank: 2, agent_id: 1002, agent_name: "Beta", generation: 6, wins: 18, losses: 7, win_rate: 72, avg_score: 84.2, best_score: 96, total_earnings: 980, breeding_count: 8 },
+                { rank: 3, agent_id: 1003, agent_name: "Gamma", generation: 4, wins: 12, losses: 13, win_rate: 48, avg_score: 81.1, best_score: 92, total_earnings: 650, breeding_count: 5 },
+                { rank: 4, agent_id: 1004, agent_name: "Delta", generation: 2, wins: 5, losses: 20, win_rate: 20, avg_score: 78.4, best_score: 88, total_earnings: 320, breeding_count: 2 },
             ],
             last_updated: new Date().toISOString(),
             total_tournaments: 25,
@@ -688,7 +700,7 @@ app.get("/api/arena/history", async (req: Request, res: Response) => {
         const history = [
             { tournament_id: "arena_1714150800000", round: 25, winner: "Alpha", avg_score: 87.3, participation: 4, timestamp: "2024-04-26T14:00:00Z" },
             { tournament_id: "arena_1714147200000", round: 24, winner: "Alpha", avg_score: 86.1, participation: 4, timestamp: "2024-04-26T13:00:00Z" },
-            { tournament_id: "arena_1714143600000", round: 23, winner: "Beta",  avg_score: 84.5, participation: 4, timestamp: "2024-04-26T12:00:00Z" },
+            { tournament_id: "arena_1714143600000", round: 23, winner: "Beta", avg_score: 84.5, participation: 4, timestamp: "2024-04-26T12:00:00Z" },
             { tournament_id: "arena_1714140000000", round: 22, winner: "Alpha", avg_score: 85.2, participation: 4, timestamp: "2024-04-26T11:00:00Z" },
             { tournament_id: "arena_1714136400000", round: 21, winner: "Gamma", avg_score: 82.8, participation: 4, timestamp: "2024-04-26T10:00:00Z" },
         ];

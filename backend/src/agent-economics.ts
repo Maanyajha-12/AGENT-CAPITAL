@@ -15,6 +15,8 @@ export interface AgentMetrics {
     maxDrawdown: number;
     sharpeRatio: number;
     apy: number;
+    apySource?: string; // e.g. 'calculated_from_trades' | 'external_api' | 'simulated'
+    apyDetails?: string; // human readable formula / source info
     lastTradeTime: number;
 }
 
@@ -53,10 +55,9 @@ export class AgentEconomicsTracker {
         await this.storage.setKV(listKey, JSON.stringify(existingTrades));
 
         // Log to audit trail
-        await this.storage.logEvent(
-            `trade:${trade.agentId}:${trade.tradeId}`,
-            JSON.stringify(trade),
-            "trade_executed"
+        await this.storage.appendLog(
+            `trades:${trade.agentId}`,
+            { ...trade, eventType: 'trade_executed', timestamp: Date.now() }
         );
     }
 
@@ -121,14 +122,19 @@ export class AgentEconomicsTracker {
         // Simplified Sharpe Ratio (0.5 * avg_return / daily_volatility)
         const sharpeRatio = avgProfit > 0 ? avgProfit / Math.max(1, maxDrawdown / 10) : 0;
 
-        // APY: assume 250 trading days per year
-        const apy = avgProfit * 250 > 0 ? ((avgProfit * 250) / 100) * 100 : 0;
+        // APY: annualize average trade profit assuming 250 trading days per year
+        // APY (%) = (avgProfit * trading_days_per_year / totalCapital) * 100
+        const tradingDaysPerYear = 250;
+        const totalCapital = 100000; // default capital used for normalization
+        const apy = totalCapital > 0 ? (avgProfit * tradingDaysPerYear / totalCapital) * 100 : 0;
+        const apySource = 'calculated_from_trades';
+        const apyDetails = `APY = (avgTradeProfit * ${tradingDaysPerYear} / totalCapital) * 100; avgTradeProfit=${avgProfit.toFixed(6)}, totalCapital=${totalCapital}`;
 
         return {
             agentId,
             strategyType: "auto",
             generation: 0,
-            totalCapital: 100000, // Default
+            totalCapital: totalCapital, // Default
             totalRevenue: totalProfit,
             accuracy: Math.min(100, accuracy),
             winRate,
@@ -137,6 +143,8 @@ export class AgentEconomicsTracker {
             maxDrawdown,
             sharpeRatio,
             apy,
+            apySource,
+            apyDetails,
             lastTradeTime: trades.length > 0 ? trades[trades.length - 1].timestamp : 0,
         };
     }
@@ -225,10 +233,9 @@ export class AgentEconomicsTracker {
         await this.storage.setKV(key2, JSON.stringify(history2));
 
         // Log to audit trail
-        await this.storage.logEvent(
-            `breeding:${parent1}:${parent2}:${childId}`,
-            JSON.stringify(breedingEvent),
-            "agent_bred"
+        await this.storage.appendLog(
+            `breeding:events`,
+            { ...breedingEvent, eventType: 'agent_bred', timestamp: Date.now() }
         );
     }
 

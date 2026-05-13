@@ -68,10 +68,9 @@ export class PortfolioManager {
         await this.storage.setKV(key, JSON.stringify(serialized));
 
         // Also log to audit trail
-        await this.storage.logEvent(
-            `portfolio:update:${portfolio.userId}`,
-            JSON.stringify(serialized),
-            "portfolio_updated"
+        await this.storage.appendLog(
+            `portfolio:${portfolio.userId}`,
+            { ...serialized, eventType: 'portfolio_updated', timestamp: Date.now() }
         );
     }
 
@@ -185,16 +184,17 @@ export class PortfolioManager {
 
         // In production, fetch actual holders from iNFT contract
         // For now, log the distribution
-        await this.storage.logEvent(
-            `dividend:${agentId}:${Date.now()}`,
-            JSON.stringify({
+        await this.storage.appendLog(
+            `dividends:${agentId}`,
+            {
                 agentId,
                 profit,
                 holderShare,
                 breedingFund,
                 platformFee,
-            }),
-            "dividend_distributed"
+                eventType: 'dividend_distributed',
+                timestamp: Date.now()
+            }
         );
 
         distributions.set("platform", platformFee);
