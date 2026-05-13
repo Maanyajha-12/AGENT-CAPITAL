@@ -65,4 +65,10 @@ docs/reality-check/REALITY_CHECK_IMPLEMENTATION_SUMMARY.md
 docs/reality-check/SIMULATION_EXPLANATION.md
 docs/reality-check/THE_REALITY_CHECK.md
 
-
+BEFORE_AND_AFTER.md
+CHANGELOG.md
+Procfile
+QUICK_REFERENCE.md
+READY_FOR_DEMO.md
+railway.json
+setup-all.sh
