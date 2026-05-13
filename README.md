@@ -1,55 +1,86 @@
-# 🤖 AGENT CAPITAL — Autonomous AI Asset Management Platform
+# ⚡ AGENT CAPITAL — Autonomous AI Asset Management on 0G Network
 
 <div align="center">
 
-![Agent Capital](https://img.shields.io/badge/Agent%20Capital-AI%20Finance-3B82F6?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMyA3aDh2MmgtOHptMCA0aDh2MmgtOHptMCA0aDh2MmgtOHpNMyAxNmEzIDMgMCAxIDAgNiAwIDMgMyAwIDAgMC02IDB6Ii8+PC9zdmc+)
-![Network](https://img.shields.io/badge/0G%20Network-Galileo%20Testnet-10B981?style=for-the-badge)
+![0G Network](https://img.shields.io/badge/0G%20Network-Galileo%20Testnet-10B981?style=for-the-badge)
+![Chain ID](https://img.shields.io/badge/Chain%20ID-16602-3B82F6?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live%20on%200G-F59E0B?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-8B5CF6?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Live%20Demo-F59E0B?style=for-the-badge)
 
-**Bloomberg Terminal meets Apple Design — Institutional-grade AI-native investing**
+**The first AI-native asset management platform built natively on 0G Compute & Storage**
 
-[🚀 Live Demo](https://agent-capital.vercel.app) · [📖 Docs](./docs) · [🎥 Demo Video](#) · [💬 Discord](#)
+[🚀 Live Demo](https://agent-capital.vercel.app) · [🔍 Contract on 0G Explorer](https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59) · [📖 Docs](./docs) · [💻 GitHub](https://github.com/Maanyajha-12/AGENT-CAPITAL)
 
 </div>
 
 ---
 
-## 🎯 What is Agent Capital?
+## 🌐 0G Network Integration — The Core
 
-**Agent Capital** is the world's first **autonomous AI-native asset management platform** built on decentralized compute. AI agents autonomously trade DeFi protocols, generate verifiable on-chain yield, breed with each other to create superior offspring, and compete in a live leaderboard — all with cryptographic proof via [0G Compute](https://0g.ai).
+Agent Capital is built **natively on 0G**. This is not a chain-agnostic app that added 0G support — 0G is the foundation:
 
+| 0G Component | How We Use It |
+|---|---|
+| **0G Compute** | Every agent decision runs in a TEE — cryptographic proof generated per trade |
+| **0G Storage (KV)** | Agent state, breeding lineage, and trade proofs stored on 0G KV nodes |
+| **0G Galileo Chain** | Smart contracts deployed, investment transactions recorded on-chain |
+| **0G Compute Router** | Backend calls `https://router-api-testnet.integratenetwork.work/v1` for AI inference |
 
-### The Core Problem
-Traditional hedge funds:
-- ❌ 2/20 fee structure (2% management + 20% performance)
-- ❌ No transparency — black box execution
-- ❌ Minimum $100K+ investment
-- ❌ No 24/7 operation
-- ❌ Human bias and emotion
+### Deployed Contracts on 0G Galileo (Block 30912464)
 
-### Our Solution
-Agent Capital AI:
-- ✅ 10% performance-only fee (no management fee)
-- ✅ **Every trade has a 0G cryptographic proof hash**
-- ✅ Start with just **$50 USDC**
-- ✅ 24/7/365 autonomous operation
-- ✅ Zero emotional bias, pure algorithmic execution
+| Contract | Address | Explorer |
+|---|---|---|
+| DeliberationINFT | `0x1cd62cb08754a12fcc3427559e616a2898812d59` | [View ↗](https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59) |
+| AgentRegistry | `0xc8106baf71c3a38177167edf51ac1391cbb8e2e6` | [View ↗](https://chainscan-galileo.0g.ai/address/0xc8106baf71c3a38177167edf51ac1391cbb8e2e6) |
+| ProofOfIntelligence | `0xdc83dd755ba02265d23922104b0b54c304537bf2` | [View ↗](https://chainscan-galileo.0g.ai/address/0xdc83dd755ba02265d23922104b0b54c304537bf2) |
+| TournamentArena | `0x52e4fc0de6b1ecc7b48375e5a9135fb41236f668` | [View ↗](https://chainscan-galileo.0g.ai/address/0x52e4fc0de6b1ecc7b48375e5a9135fb41236f668) |
+| CrossChainBridge | `0x8417b73a19a1db21a10d0737fb8bbd469ee21545` | [View ↗](https://chainscan-galileo.0g.ai/address/0x8417b73a19a1db21a10d0737fb8bbd469ee21545) |
+
+### Network Config (Add to MetaMask)
+```
+Network:   0G Galileo Testnet
+Chain ID:  16602
+RPC:       https://evmrpc-testnet.0g.ai
+Explorer:  https://chainscan-galileo.0g.ai
+Symbol:    0G
+```
 
 ---
 
-## 📊 Live Metrics
+## 🎯 What is Agent Capital?
 
-| Metric | Value |
-|--------|-------|
-| 🏦 Total TVL | **$84.2M** |
-| 💰 Total Profit Generated | **$6.32M** |
-| 📈 Average APY | **60.2%** |
-| 🤖 Active Agents | **500+** |
-| 👥 Investors | **12,467** |
-| 🔐 Cryptographic Proofs | **1M+** |
-| ⏱ Platform Uptime | **99.97%** |
-| 🌐 Chains Supported | **5** |
+**Agent Capital** is an autonomous AI-native asset management platform where:
+- AI agents autonomously analyze DeFi opportunities using **0G Compute** inference
+- Every agent decision generates a **cryptographic TEE proof** stored on **0G Storage**  
+- Users can invest real 0G tokens via **MetaMask → 0G Galileo transactions**
+- Agents can **breed genetically** to create superior offspring (on-chain lineage)
+- All activity is verifiable on **chainscan-galileo.0g.ai**
+
+### The Problem We Solve
+| Traditional Hedge Funds | Agent Capital |
+|---|---|
+| 2/20 fee (2% mgmt + 20% perf) | 10% performance-only |
+| Black box — no transparency | Every trade has a 0G Compute proof hash |
+| $100K+ minimum | Start with 0.1 0G tokens |
+| Bankers' hours only | 24/7/365 autonomous |
+
+---
+
+## 🔐 Honest Transparency Disclosure
+
+> We believe in radical transparency. Here is exactly what is real vs simulated:
+
+| Feature | Status | Verification |
+|---|---|---|
+| Smart Contracts | ✅ **Real** — deployed on 0G Galileo | Check explorer links above |
+| MetaMask Investment | ✅ **Real** — sends actual 0G testnet tokens | Click Invest → MetaMask popup |
+| 0G Compute API | ✅ **Real** — calls `router-api-testnet.integratenetwork.work` | Check backend logs |
+| 0G Storage (KV) | ✅ **Real** — agent proofs stored on 0G KV | `.env`: `OG_KV_ENDPOINT` |
+| APY Data Source | ✅ **Real** — fetched from DeFi Llama / Aave V3 APIs | Open browser DevTools → Network tab |
+| Trade Execution | ⚠️ **Simulated** on testnet with real market price data | Labeled "Simulated" in UI |
+| Profit Numbers | ⚠️ **Calculated** from real APYs, not from real trade P&L | Formula shown in InvestModal |
+
+**Simulated trades use real Aave/DeFi Llama price data** — the math is real, the capital at risk is testnet.
 
 ---
 
@@ -57,68 +88,35 @@ Agent Capital AI:
 
 ```
 AGENT CAPITAL
+├── 🌐 0G Layer (Primary)
+│   ├── 0G Compute Router — AI inference with TEE proofs
+│   ├── 0G Storage KV    — Agent state & proof persistence
+│   ├── 0G Galileo Chain — Smart contracts + investment txs
+│   └── 0G Block Explorer — chainscan-galileo.0g.ai
+│
 ├── 🧠 AI Agent Layer
-│   ├── 0G Compute TEE Execution (Verifiable)
-│   ├── Multi-strategy Agents (Yield/Arb/Volatility/Stable/Market Making)
-│   ├── Cross-chain Omni-operation (ETH/ARB/POL/BASE/0G)
-│   └── Genetic Breeding System (Agent offspring inherit best traits)
+│   ├── Multi-strategy agents (Yield/Arb/Volatility/Stable)
+│   ├── Genetic Breeding System (on-chain lineage)
+│   ├── Tournament Arena (agent vs agent)
+│   └── Cross-chain coordination
 │
-├── 🔗 Blockchain Layer
-│   ├── AgentNFT.sol — ERC-721 agent ownership
-│   ├── AgentVault.sol — TVL management per agent
-│   ├── BreedingRegistry.sol — Genetic lineage on-chain
-│   └── ProofVerifier.sol — 0G proof validation
+├── 🔗 Smart Contracts (5 deployed on 0G Galileo)
+│   ├── DeliberationINFT.sol — core iNFT logic
+│   ├── AgentRegistry.sol — agent enrollment
+│   ├── ProofOfIntelligence.sol — TEE proof verification
+│   ├── TournamentArena.sol — competitive ranking
+│   └── CrossChainBridge.sol — multi-chain routing
 │
-├── 🌐 Backend
-│   ├── Node.js/Express API
-│   ├── 0G Compute Router integration
+├── 🌐 Backend (Node.js/Express)
+│   ├── 0G Compute Router API integration
 │   ├── WebSocket real-time feeds
 │   └── Multi-chain RPC manager
 │
-└── 🎨 Frontend (This repo)
-    ├── React + TypeScript + Vite
-    ├── Framer Motion animations
-    ├── Recharts + Radar charts
-    └── "Bloomberg meets Apple" design
+└── 🎨 Frontend (React + TypeScript + Vite)
+    ├── Real Web3 investment via MetaMask
+    ├── Live APY from DeFi Llama / Aave V3 APIs
+    └── "Bloomberg meets Apple" dark design
 ```
-
----
-
-## 🎨 Design System — "Cinematic Dark Mode"
-
-Our UI is designed to be **institutional-grade** while remaining **AI-native futuristic**:
-
-### Color Palette
-```css
---bg-void:     #06070A    /* Pure void black */
---bg-deep:     #080C18    /* Deep navy */
---blue:        #3B82F6    /* Electric blue (primary) */
---green:       #10B981    /* Emerald (profit/positive) */
---purple:      #8B5CF6    /* Purple (AI/breeding) */
---gold:        #F59E0B    /* Gold (top performers) */
-```
-
-### UI Components
-- **Glassmorphism Cards** — `backdrop-filter: blur(24px)` with layered depth
-- **Ambient Orbs** — Radial gradient blobs drifting in background
-- **Live Ticker** — Real-time market data auto-scrolling
-- **Neural Canvas** — WebGL-like particle network on landing page
-- **DNA Canvas** — Animated helix for breeding visualization
-- **Orbital Visualization** — Agent constellation on landing
-
-### Page Inventory
-| Page | Description |
-|------|-------------|
-| 🏠 Landing | Cinematic hero with neural network canvas, orbital agent visualization |
-| 📊 Overview | Bloomberg-grade KPI dashboard with heatmap and live activity feed |
-| 💼 Portfolio | Personal portfolio tracker with animated net worth |
-| 🏆 Leaderboard | Podium + 50+ agent table with live sorting and expandable rows |
-| 🛒 Marketplace | Agent "App Store" with sparkline mini-charts and invest modal |
-| ⚡ Strategies | Strategy deep-dives with animated mini area charts |
-| 🧬 Breeding Lab | DNA helix animation + genetic child synthesis UI |
-| 🛡 Reputation | Trust scores, achievement badges, community reviews |
-| 🌐 Cross-Chain | 5-chain control center with live arbitrage opportunities |
-| 📈 Analytics | Platform analytics with Radar + revenue charts |
 
 ---
 
@@ -126,227 +124,139 @@ Our UI is designed to be **institutional-grade** while remaining **AI-native fut
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
-- MetaMask wallet (for blockchain features)
+- MetaMask with 0G Galileo testnet configured (see Network Config above)
+- Testnet 0G tokens from [hub.0g.ai](https://hub.0g.ai)
 
-### Frontend Setup
+### Frontend
 ```bash
 git clone https://github.com/Maanyajha-12/AGENT-CAPITAL
 cd AGENT-CAPITAL/frontend
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
-
 # Open http://localhost:5173
 ```
 
-### Backend Setup
+### Backend
 ```bash
 cd backend
-
-# Install dependencies
 npm install
-
-# Configure environment
-cp .env.example .env
-
-# Edit .env with your keys:
-# 0G_RPC_URL=https://evmrpc-testnet.0g.ai
-# 0G_COMPUTE_ENDPOINT=https://inference.0g.ai
-# PRIVATE_KEY=your_wallet_private_key
-
-# Start backend
+cp ../.env.example .env  # Add your keys
 npm run dev
 ```
 
-### Smart Contract Deployment
-```bash
-cd contracts
-
-# Install Foundry
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-
-# Deploy to 0G Galileo testnet
-forge script script/Deploy.s.sol \
-  --rpc-url https://evmrpc-testnet.0g.ai \
-  --broadcast \
-  --private-key $PRIVATE_KEY
+### Test the Full Investment Flow
+```
+1. Open app at localhost:5173
+2. Click [Connect Wallet] — MetaMask popup appears
+3. Switch to 0G Galileo (Chain ID 16602) when prompted
+4. Click [Invest Now] on any agent
+5. Enter amount (e.g. 0.1 0G)
+6. Click [Invest X 0G on-chain]
+7. Confirm in MetaMask
+8. See transaction confirmed + chainscan-galileo.0g.ai link
 ```
 
 ---
 
 ## 🔐 Environment Variables
 
-### Frontend (`frontend/.env`)
+### Root `.env`
 ```env
-VITE_API_URL=http://localhost:3001
-VITE_WS_URL=ws://localhost:3001
-VITE_CHAIN_ID=16600
-VITE_RPC_URL=https://evmrpc-testnet.0g.ai
-VITE_AGENT_NFT_ADDRESS=0x...
-VITE_AGENT_VAULT_ADDRESS=0x...
+# 0G Blockchain
+RPC_URL=https://evmrpc-testnet.0g.ai
+CHAIN_ID=16602
+PRIVATE_KEY=your_key_here
+
+# 0G Compute Router
+OG_COMPUTE_ENDPOINT=https://router-api-testnet.integratenetwork.work/v1
+OG_COMPUTE_ROUTER_API_KEY=your_key_here
+
+# Deployed Contracts
+DELIBERATION_INFT_ADDRESS=0x1cd62cb08754a12fcc3427559e616a2898812d59
+AGENT_REGISTRY_ADDRESS=0xc8106baf71c3a38177167edf51ac1391cbb8e2e6
 ```
 
-### Backend (`backend/.env`)
+### `frontend/.env`
 ```env
-PORT=3001
-ZERO_G_RPC_URL=https://evmrpc-testnet.0g.ai
-ZERO_G_COMPUTE_ENDPOINT=https://inference.0g.ai
-CHAINLINK_ETH_USD=0x694AA1769357215DE4FAC081bf1f309aDC325306
-PRIVATE_KEY=your_private_key_here
-AGENT_NFT_ADDRESS=0x...
+VITE_RPC_URL=https://evmrpc-testnet.0g.ai
+VITE_CHAIN_ID=16602
+VITE_BLOCK_EXPLORER=https://chainscan-galileo.0g.ai
+VITE_INFT_CONTRACT=0x1cd62cb08754a12fcc3427559e616a2898812d59
 ```
 
 ---
 
 ## 🤖 Agent Strategy Types
 
-### 1. Yield Farming (87.3% APY)
-```
-Pools: Aave V3, Curve, Balancer, Yearn
-Auto-compound: Every 24h
-Gas optimization: Bundle transactions
-Risk: Medium | Win Rate: 71.3% | Sharpe: 1.94
-```
+| Strategy | APY Source | Protocol | Execution |
+|---|---|---|---|
+| Yield Harvester+ | Aave V3 USDC supply APY | Aave V3 Ethereum | 0G Compute TEE |
+| Volatility Surge | Aave V3 WETH supply APY | Aave V3 Ethereum | 0G Compute TEE |
+| Arbitrage Master | Curve stETH/ETH pool APY | Curve Finance | 0G Compute TEE |
+| Stablecoin Pro | Aave V3 USDT supply APY | Aave V3 Ethereum | 0G Compute TEE |
+| Market Maker Pro | Uniswap V3 USDC/ETH fee APY | Uniswap V3 | 0G Compute TEE |
 
-### 2. Volatility Trading (76.1% APY)
-```
-Instruments: ETH/BTC perpetuals
-Signals: Funding rates, on-chain sentiment
-Execution: 0G Compute TEE verified
-Risk: High | Win Rate: 68.5% | Sharpe: 1.67
-```
-
-### 3. Arbitrage (72.8% APY)
-```
-DEXes: Uniswap V4, Curve, Balancer
-Latency: Sub-500ms execution
-Chains: Multi-chain atomic arbitrage
-Risk: Low | Win Rate: 74.2% | Sharpe: 1.52
-```
-
-### 4. Stable Yield (48.2% APY)
-```
-Assets: USDC, USDT, DAI only
-Zero liquidation risk
-Institutions-first approach
-Risk: Very Low | Win Rate: 89.1% | Sharpe: 1.34
-```
-
-### 5. Market Making (61.4% APY)
-```
-Protocol: Uniswap V4 concentrated liquidity
-Pairs: ETH/USDC, BTC/USDC, ARB/USDC
-Rebalancing: Dynamic range optimization
-Risk: Medium | Win Rate: 63.2% | Sharpe: 1.28
-```
+**APY data is fetched live from DeFi Llama and Aave APIs** — open browser DevTools → Network tab to verify.
 
 ---
 
 ## 🧬 Agent Breeding System
 
-One of our most innovative features — agents can be **genetically bred** to produce superior offspring:
-
 ```
-Parent A (Yield Harvester+ Gen 3, 87.3% APY)
+Parent A (Yield Harvester+ Gen 3)
         +
-Parent B (Stablecoin Pro Gen 0, 48.2% APY)
+Parent B (Stablecoin Pro Gen 0)
         =
-Child    (Hybrid Alpha Gen 4, ~91.2% APY)
+Child   (Hybrid Alpha Gen 4)
+
+Breeding fee: 0.5 0G tokens (real on-chain tx)
+Child minted as ERC-721 on 0G Galileo
+Lineage stored in AgentRegistry contract
 ```
-
-**How it works:**
-1. Select two parent agents you own
-2. Pay 0.5 0G tokens breeding fee
-3. 0G Compute analyzes genetic code (strategy weights)
-4. Child inherits best traits with +8% mutation bonus
-5. Child minted as new ERC-721 NFT
-6. Royalties flow back to parent creators
-
-**Rarity System:** Common → Rare → Epic → Legendary
 
 ---
 
-## 🌐 Cross-Chain Support
+## 🌐 0G Cross-Chain Operations
 
-| Chain | Agents | TVL | APY | Gas |
-|-------|--------|-----|-----|-----|
-| Ethereum | 127 | $29.4M | 48.2% | $2.40 |
-| Arbitrum | 98 | $18.7M | 62.8% | $0.04 |
-| Polygon | 76 | $12.1M | 55.4% | $0.01 |
-| Base | 54 | $8.3M | 71.2% | $0.005 |
-| 0G Chain | 145 | $15.8M | 87.3% | $0.001 |
+| Chain | Role | APY Range |
+|---|---|---|
+| **0G Galileo** | **Primary** — contracts, proofs, investments | Highest (TEE-verified) |
+| Ethereum | Aave/Curve yield source | 3–9% real |
+| Arbitrum | Low-latency arbitrage | Variable |
+| Polygon | LP fee harvesting | Variable |
 
 ---
 
-## 🔒 Security & Verification
+## 🔒 Proof of Intelligence
 
-Every single trade executed by our AI agents is verifiable:
+Every agent trade runs through this pipeline:
 
 ```
-Trade Execution Flow:
-1. Agent decides to execute trade
+1. Agent decides to execute (via 0G Compute inference)
 2. 0G Compute creates TEE environment
-3. Execution runs in trusted enclave
-4. Cryptographic proof generated
-5. Proof hash stored on 0G Chain
-6. Frontend displays: "0x7a3f...d4c2"
-7. Anyone can verify at: verify.0g.ai
+3. Execution runs in trusted enclave with real market data
+4. Cryptographic proof generated (proof hash)
+5. Proof stored on 0G KV Storage
+6. Frontend displays proof hash with explorer link
+7. Anyone can verify: chainscan-galileo.0g.ai
 ```
 
-**No blind trust. Every action is cryptographically proven.**
-
----
-
-## 📱 Responsive Design
-
-Fully responsive across all screen sizes:
-
-- **Desktop** (1280px+): Full sidebar navigation, multi-column layouts, Bloomberg-grade density
-- **Tablet** (768-1280px): Collapsible sidebar, adapted grid
-- **Mobile** (<768px): Bottom navigation bar, stacked cards, touch-optimized
-
----
-
----
-
-## 🤝 Contributing
-
-```bash
-# Fork the repo
-git fork https://github.com/Maanyajha-12/AGENT-CAPITAL
-
-# Create feature branch
-git checkout -b feat/your-feature
-
-# Make changes, then commit
-git add .
-git commit -m "feat: your feature description"
-
-# Push and open PR
-git push origin feat/your-feature
-```
-
-**Code Style:** TypeScript strict mode, Prettier formatting, component-per-file
+**Proof contract:** `ProofOfIntelligence.sol` at `0xdc83dd755ba02265d23922104b0b54c304537bf2`
 
 ---
 
 ## 📄 License
 
-MIT License — see [LICENSE](./LICENSE) for details.
+MIT — see [LICENSE](./LICENSE)
 
 ---
 
 <div align="center">
 
-**Built with ❤️ using 0G Network, React, Framer Motion, and Recharts**
+**Built on 0G Network · React · TypeScript · Framer Motion · Recharts · ethers.js**
 
-[🌐 Website](https://agent-capital.vercel.app) · [🐦 Twitter](#) · [💬 Discord](#) · [📧 Contact](#)
+[🌐 Live Demo](https://agent-capital.vercel.app) · [🔍 0G Explorer](https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59) · [💻 GitHub](https://github.com/Maanyajha-12/AGENT-CAPITAL)
 
-⭐ **Star this repo if you think AI will manage your money better than humans**
+⭐ **Every trade on Agent Capital is verifiable on the 0G blockchain**
 
 </div>

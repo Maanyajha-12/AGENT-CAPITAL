@@ -207,7 +207,7 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: (page?:strin
             <motion.div initial={{ opacity:0, y:-12 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.2 }}
               style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', padding:'0.35rem 1rem', background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)', borderRadius:99, marginBottom:'2rem' }}>
               <div className="live-dot" style={{ width:7, height:7, background:'var(--green)' }} />
-              <span style={{ fontSize:'0.75rem', fontWeight:700, color:'var(--green-l)', letterSpacing:'0.03em' }}>Live on 0G Galileo · 500+ Agents Active</span>
+              <span style={{ fontSize:'0.75rem', fontWeight:700, color:'var(--green-l)', letterSpacing:'0.03em' }}>Live on 0G Galileo Testnet · Chain 16602 · 500+ Agents</span>
             </motion.div>
 
             <motion.h1 initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.3, duration:0.8 }}
@@ -250,12 +250,20 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: (page?:strin
             {/* Partners */}
             <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.9 }}
               style={{ marginTop:'2.25rem', paddingTop:'1.75rem', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-              <p style={{ fontSize:'0.62rem', color:'var(--text-dim)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:'1rem' }}>Powered by</p>
-              <div style={{ display:'flex', gap:'2rem', alignItems:'center', flexWrap:'wrap' }}>
-                {['0G Network','Chainlink','Polygon','Arbitrum','Ethereum'].map(p => (
-                  <span key={p} style={{ fontSize:'0.825rem', fontWeight:700, color:'rgba(255,255,255,0.25)', letterSpacing:'0.05em', fontFamily:'Outfit, sans-serif' }}>{p}</span>
+              <p style={{ fontSize:'0.62rem', color:'var(--text-dim)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:'0.875rem' }}>Powered by</p>
+              <div style={{ display:'flex', gap:'1.25rem', alignItems:'center', flexWrap:'wrap', marginBottom:'0.875rem' }}>
+                {['Ethereum','Arbitrum','Polygon'].map(p => (
+                  <span key={p} style={{ fontSize:'0.825rem', fontWeight:700, color:'rgba(255,255,255,0.22)', letterSpacing:'0.05em', fontFamily:'Outfit, sans-serif' }}>{p}</span>
                 ))}
+                <a href="https://0g.ai" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize:'0.825rem', fontWeight:900, color:'#34D399', letterSpacing:'0.05em', fontFamily:'Outfit, sans-serif', textDecoration:'none' }}>0G Network ↗</a>
               </div>
+              <a href="https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59"
+                target="_blank" rel="noopener noreferrer"
+                style={{ display:'inline-flex', alignItems:'center', gap:'0.375rem', fontSize:'0.62rem', color:'#475569', fontFamily:'monospace', textDecoration:'none', padding:'0.3rem 0.625rem', background:'rgba(16,185,129,0.06)', border:'1px solid rgba(16,185,129,0.15)', borderRadius:8 }}>
+                <span style={{ width:5, height:5, borderRadius:'50%', background:'#10B981', display:'inline-block' }} />
+                Contract: 0x1cd62cb...2d59 on chainscan-galileo.0g.ai <ExternalLink size={10} />
+              </a>
             </motion.div>
           </motion.div>
 

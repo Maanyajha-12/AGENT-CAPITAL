@@ -168,15 +168,27 @@ export default function App() {
           <button className="nav-item" onClick={() => setShowLanding(true)}><LogOut size={15} /><span>Home</span></button>
         </nav>
 
-        {/* Bottom stats card */}
-        <div style={{ margin: '0.625rem', padding: '0.875rem 1rem', background: 'linear-gradient(135deg, rgba(59,130,246,0.07), rgba(139,92,246,0.05))', borderRadius: 'var(--r-lg)', border: '1px solid rgba(59,130,246,0.12)' }}>
-          <p style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Platform</p>
-          {[['TVL', '$84.2M'], ['Avg APY', '60.2%'], ['Agents', '500+'], ['Hacks', '0']].map(([l, v]) => (
-            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1rem 0', fontSize: '0.7rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>{l}</span>
-              <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{v}</span>
+        {/* Bottom stats + 0G proof */}
+        <div style={{ margin: '0.625rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ padding: '0.875rem 1rem', background: 'linear-gradient(135deg, rgba(59,130,246,0.07), rgba(139,92,246,0.05))', borderRadius: 'var(--r-lg)', border: '1px solid rgba(59,130,246,0.12)' }}>
+            <p style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Platform</p>
+            {[['TVL', '$84.2M'], ['Avg APY', 'Live ↗'], ['Agents', '500+'], ['Hacks', '0']].map(([l, v]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1rem 0', fontSize: '0.7rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>{l}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{v}</span>
+              </div>
+            ))}
+          </div>
+          {/* 0G Chain proof */}
+          <a href="https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59"
+            target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.625rem 0.875rem', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.18)', borderRadius: 'var(--r-lg)', textDecoration: 'none', cursor: 'pointer' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981', flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#34D399' }}>Live on 0G Galileo</div>
+              <div style={{ fontSize: '0.55rem', color: '#475569', fontFamily: 'monospace' }}>0x1cd6...2d59 ↗</div>
             </div>
-          ))}
+          </a>
         </div>
       </aside>
 

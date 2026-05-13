@@ -1,28 +1,19 @@
 /**
  * frontend/src/components/InvestModal.tsx
- * 
- * Real Web3 Investment Modal
- * Handles actual investment transactions on 0G Galileo testnet
+ *
+ * Real Web3 Investment Modal — 0G Galileo Testnet
+ * Sends actual transactions to deployed contracts. Shows real tx on chainscan-galileo.0g.ai
  */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-    X,
-    Wallet,
-    CheckCircle,
-    AlertCircle,
-    ArrowUpRight,
-    ExternalLink,
-    Loader,
+    X, Wallet, CheckCircle, AlertCircle, ArrowUpRight,
+    ExternalLink, Loader, Info, Zap,
 } from 'lucide-react'
 import {
-    investInAgent,
-    getWalletBalance,
-    connectWallet,
-    getExplorerUrl,
+    investInAgent, getWalletBalance, connectWallet, DEPLOYED_CONTRACTS, BLOCK_EXPLORER,
 } from '../services/web3-investment'
-import { getDemoInvestmentSimulation } from '../services/web3-investment'
 
 interface InvestModalProps {
     isOpen: boolean
@@ -34,24 +25,38 @@ interface InvestModalProps {
         tvl: number
         winRate: number
         color: string
+        apySource?: string
     }
 }
 
+const FAUCET_URL = 'https://hub.0g.ai'
+const EXPLORER_URL = BLOCK_EXPLORER
+
 export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps) {
-    const [amount, setAmount] = useState<string>('10')
-    const [demoMode, setDemoMode] = useState(false)
-    const [status, setStatus] = useState<
-        'idle' | 'connecting' | 'approving' | 'confirmed' | 'error'
-    >('idle')
+    const [amount, setAmount] = useState<string>('1')
+    const [status, setStatus] = useState<'idle' | 'connecting' | 'approving' | 'pending' | 'confirmed' | 'error'>('idle')
     const [error, setError] = useState<string>('')
     const [txHash, setTxHash] = useState<string>('')
+    const [blockNum, setBlockNum] = useState<number | undefined>()
     const [walletAddress, setWalletAddress] = useState<string>('')
     const [balance, setBalance] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (!isOpen) return
+        // Auto-check if already connected
+        import('../services/web3-investment').then(m => {
+            m.getConnectedAccount().then(addr => {
+                if (addr) {
+                    setWalletAddress(addr)
+                    m.getWalletBalance(addr).then(b => setBalance(b))
+                }
+            })
+        })
+    }, [isOpen])
 
     const handleConnect = async () => {
         setStatus('connecting')
         setError('')
-
         try {
             const address = await connectWallet()
             if (address) {
@@ -60,11 +65,10 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                 setBalance(bal)
                 setStatus('idle')
             } else {
-                setError('Failed to connect wallet. Using demo mode.')
-                setDemoMode(true)
-                setStatus('idle')
+                setError('MetaMask not found. Install it at metamask.io')
+                setStatus('error')
             }
-        } catch (err) {
+        } catch {
             setError('Failed to connect wallet')
             setStatus('error')
         }
@@ -73,28 +77,18 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
     const handleInvest = async () => {
         setStatus('approving')
         setError('')
-
+        const amountNum = parseFloat(amount)
+        if (isNaN(amountNum) || amountNum <= 0) {
+            setError('Enter a valid amount')
+            setStatus('error')
+            return
+        }
         try {
-            const amountNum = parseFloat(amount)
-            if (isNaN(amountNum) || amountNum <= 0) {
-                setError('Enter a valid amount')
-                setStatus('error')
-                return
-            }
-
-            let result
-
-            // Use demo mode if wallet not connected
-            if (!walletAddress || demoMode) {
-                result = getDemoInvestmentSimulation(agent.id, amountNum)
-                setDemoMode(true)
-            } else {
-                // Real Web3 transaction
-                result = await investInAgent(agent.id, amountNum)
-            }
-
+            setStatus('pending')
+            const result = await investInAgent(agent.id, amountNum)
             if (result.success) {
                 setTxHash(result.txHash || '')
+                setBlockNum(result.blockNumber)
                 setStatus('confirmed')
             } else {
                 setError(result.error || 'Investment failed')
@@ -107,465 +101,218 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
     }
 
     const handleClose = () => {
-        setAmount('10')
+        setAmount('1')
         setStatus('idle')
         setError('')
         setTxHash('')
-        setDemoMode(false)
         onClose()
     }
 
-    const projectedReturn = (parseFloat(amount) || 0) * (agent.apy / 100 / 12)
+    const projectedMonthly = (parseFloat(amount) || 0) * (agent.apy / 100 / 12)
     const projectedAnnual = (parseFloat(amount) || 0) * (agent.apy / 100)
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <div
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.8)',
-                        backdropFilter: 'blur(8px)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 9999,
-                    }}
+                    style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}
                     onClick={handleClose}
                 >
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 8 }}
+                        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                        onClick={e => e.stopPropagation()}
                         style={{
-                            background: 'linear-gradient(135deg, rgba(8,12,24,0.98), rgba(15,20,35,0.95))',
-                            border: '1px solid rgba(59,130,246,0.15)',
+                            background: 'linear-gradient(160deg, rgba(8,12,24,0.99) 0%, rgba(12,18,36,0.97) 100%)',
+                            border: '1px solid rgba(59,130,246,0.18)',
                             borderRadius: '20px',
-                            padding: '2rem',
+                            padding: '1.875rem',
                             width: '90%',
-                            maxWidth: '480px',
-                            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                            maxWidth: '500px',
+                            boxShadow: '0 30px 60px -12px rgba(0,0,0,0.7), 0 0 80px rgba(59,130,246,0.08)',
                         }}
                     >
-                        {/* Header */}
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '1.5rem',
-                            }}
-                        >
-                            <h2
-                                style={{
-                                    fontSize: '1.25rem',
-                                    fontWeight: 800,
-                                    color: '#F8FAFC',
-                                    fontFamily: 'Outfit,sans-serif',
-                                }}
-                            >
-                                Invest in {agent.name}
-                            </h2>
-                            <button
-                                onClick={handleClose}
-                                style={{
-                                    padding: '0.5rem',
-                                    background: 'rgba(255,255,255,0.05)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    cursor: 'pointer',
-                                    color: '#94A3B8',
-                                }}
-                            >
-                                <X size={20} />
+                        {/* ── Header ─────────────────────────────── */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                            <div>
+                                <h2 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#F8FAFC', fontFamily: 'Outfit,sans-serif', marginBottom: '0.1rem' }}>
+                                    Invest in {agent.name}
+                                </h2>
+                                <p style={{ fontSize: '0.72rem', color: '#64748B' }}>
+                                    Real transaction on 0G Galileo Testnet
+                                </p>
+                            </div>
+                            <button onClick={handleClose} style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', cursor: 'pointer', color: '#94A3B8', display: 'flex' }}>
+                                <X size={18} />
                             </button>
                         </div>
 
-                        {/* Agent Info Card */}
-                        <div
-                            style={{
-                                background: `linear-gradient(135deg, ${agent.color}10, rgba(59,130,246,0.05))`,
-                                border: `1px solid ${agent.color}20`,
-                                borderRadius: '16px',
-                                padding: '1.25rem',
-                                marginBottom: '1.5rem',
-                            }}
-                        >
-                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                                <div
-                                    style={{
-                                        width: '48px',
-                                        height: '48px',
-                                        borderRadius: '12px',
-                                        background: `linear-gradient(135deg, ${agent.color}30, ${agent.color}10)`,
-                                        border: `1px solid ${agent.color}40`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontSize: '1.5rem',
-                                        fontWeight: 900,
-                                    }}
-                                >
-                                    🤖
-                                </div>
+                        {/* ── 0G Chain Banner ─────────────────────── */}
+                        <div style={{ background: 'linear-gradient(90deg, rgba(59,130,246,0.1), rgba(139,92,246,0.08))', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '12px', padding: '0.75rem 1rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981' }} />
                                 <div>
-                                    <p
-                                        style={{
-                                            fontSize: '0.875rem',
-                                            color: '#94A3B8',
-                                            marginBottom: '0.25rem',
-                                        }}
-                                    >
-                                        Strategy Info
-                                    </p>
-                                    <p
-                                        style={{
-                                            fontSize: '0.9rem',
-                                            color: '#F8FAFC',
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        TVL: ${(agent.tvl / 1000000).toFixed(1)}M • APY: {agent.apy}%
-                                    </p>
-                                    <p
-                                        style={{
-                                            fontSize: '0.8rem',
-                                            color: '#10B981',
-                                            marginTop: '0.25rem',
-                                        }}
-                                    >
-                                        Win Rate: {agent.winRate}%
-                                    </p>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F8FAFC' }}>0G Galileo Testnet · Chain ID 16602</div>
+                                    <div style={{ fontSize: '0.62rem', color: '#64748B', fontFamily: 'monospace' }}>
+                                        {DEPLOYED_CONTRACTS.inft.slice(0, 10)}...{DEPLOYED_CONTRACTS.inft.slice(-6)}
+                                    </div>
+                                </div>
+                            </div>
+                            <a href={`${EXPLORER_URL}/address/${DEPLOYED_CONTRACTS.inft}`} target="_blank" rel="noopener noreferrer"
+                                style={{ fontSize: '0.62rem', color: '#60A5FA', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none' }}>
+                                View contract <ExternalLink size={10} />
+                            </a>
+                        </div>
+
+                        {/* ── Agent Info ──────────────────────────── */}
+                        <div style={{ background: `linear-gradient(135deg, ${agent.color}10, rgba(59,130,246,0.04))`, border: `1px solid ${agent.color}20`, borderRadius: '14px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Strategy Yield (APY)</div>
+                                    <div style={{ fontSize: '1.75rem', fontWeight: 900, color: agent.color, fontFamily: 'Outfit,sans-serif' }}>
+                                        {agent.apy.toFixed(2)}%
+                                    </div>
+                                    {agent.apySource && (
+                                        <div style={{ fontSize: '0.6rem', color: '#475569', marginTop: '0.2rem' }}>
+                                            📡 {agent.apySource}
+                                        </div>
+                                    )}
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ fontSize: '0.7rem', color: '#94A3B8', marginBottom: '0.2rem' }}>Win Rate</div>
+                                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10B981' }}>{agent.winRate}%</div>
+                                    <div style={{ fontSize: '0.62rem', color: '#64748B' }}>TVL ${(agent.tvl / 1e6).toFixed(1)}M</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Wallet Connection */}
-                        {!walletAddress && !demoMode && (
-                            <button
-                                onClick={handleConnect}
-                                disabled={status === 'connecting'}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.875rem',
-                                    background: 'linear-gradient(135deg, #3B82F6, #2563EB)',
-                                    border: 'none',
-                                    borderRadius: '12px',
-                                    color: '#F8FAFC',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    marginBottom: '1rem',
-                                    opacity: status === 'connecting' ? 0.7 : 1,
-                                }}
-                            >
-                                {status === 'connecting' ? (
-                                    <>
-                                        <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                                        Connecting...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Wallet size={16} />
-                                        Connect MetaMask Wallet
-                                    </>
+                        {/* ── Wallet Connection ───────────────────── */}
+                        {!walletAddress ? (
+                            <div style={{ marginBottom: '1.25rem' }}>
+                                <button onClick={handleConnect} disabled={status === 'connecting'}
+                                    style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.9rem', fontWeight: 700, cursor: status === 'connecting' ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: status === 'connecting' ? 0.7 : 1 }}>
+                                    {status === 'connecting' ? <><Loader size={16} style={{ animation: 'spin 1s linear infinite' }} /> Connecting...</> : <><Wallet size={16} /> Connect MetaMask</>}
+                                </button>
+                                <div style={{ textAlign: 'center', marginTop: '0.625rem', fontSize: '0.68rem', color: '#475569' }}>
+                                    Need testnet 0G?{' '}
+                                    <a href={FAUCET_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#60A5FA', textDecoration: 'none' }}>
+                                        Get from faucet →
+                                    </a>
+                                </div>
+                            </div>
+                        ) : (
+                            <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '10px', padding: '0.625rem 0.875rem', marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.65rem', color: '#64748B', marginBottom: '0.1rem' }}>Connected Wallet</div>
+                                    <div style={{ fontSize: '0.8rem', color: '#10B981', fontFamily: 'monospace', fontWeight: 700 }}>
+                                        {walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}
+                                    </div>
+                                </div>
+                                {balance && (
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '0.65rem', color: '#64748B' }}>Balance</div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#F8FAFC' }}>
+                                            {Number(balance).toFixed(4)} 0G
+                                        </div>
+                                    </div>
                                 )}
-                            </button>
-                        )}
-
-                        {walletAddress && (
-                            <div
-                                style={{
-                                    background: 'rgba(16,185,129,0.08)',
-                                    border: '1px solid rgba(16,185,129,0.2)',
-                                    borderRadius: '12px',
-                                    padding: '0.75rem',
-                                    marginBottom: '1rem',
-                                    fontSize: '0.8rem',
-                                    color: '#10B981',
-                                    fontFamily: 'monospace',
-                                }}
-                            >
-                                ✓ Connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
-                                {balance && <div>Balance: {Number(balance).toFixed(2)} 0G</div>}
                             </div>
                         )}
 
-                        {demoMode && (
-                            <div
-                                style={{
-                                    background: 'rgba(245,158,11,0.08)',
-                                    border: '1px solid rgba(245,158,11,0.2)',
-                                    borderRadius: '12px',
-                                    padding: '0.75rem',
-                                    marginBottom: '1rem',
-                                    fontSize: '0.8rem',
-                                    color: '#FCD34D',
-                                }}
-                            >
-                                ⚠️ Demo mode - No real transaction
-                            </div>
-                        )}
-
-                        {/* Amount Input */}
+                        {/* ── Confirmed State ─────────────────────── */}
                         {status === 'confirmed' ? (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{
-                                    background: 'rgba(16,185,129,0.08)',
-                                    border: '1px solid rgba(16,185,129,0.3)',
-                                    borderRadius: '16px',
-                                    padding: '1.5rem',
-                                    textAlign: 'center',
-                                }}
-                            >
-                                <CheckCircle
-                                    size={48}
-                                    style={{
-                                        color: '#10B981',
-                                        marginBottom: '1rem',
-                                        margin: '0 auto 1rem',
-                                    }}
-                                />
-                                <h3
-                                    style={{
-                                        fontSize: '1.125rem',
-                                        fontWeight: 700,
-                                        color: '#10B981',
-                                        marginBottom: '0.5rem',
-                                    }}
-                                >
-                                    Investment Confirmed!
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                                style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '16px', padding: '1.5rem', textAlign: 'center' }}>
+                                <CheckCircle size={44} style={{ color: '#10B981', margin: '0 auto 1rem' }} />
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10B981', marginBottom: '0.5rem' }}>
+                                    Investment Confirmed on 0G Chain!
                                 </h3>
-                                <p
-                                    style={{
-                                        color: '#94A3B8',
-                                        fontSize: '0.875rem',
-                                        marginBottom: '1rem',
-                                    }}
-                                >
+                                <p style={{ color: '#94A3B8', fontSize: '0.825rem', marginBottom: '0.5rem' }}>
                                     {amount} 0G invested in {agent.name}
                                 </p>
-                                {txHash && !demoMode && (
-                                    <a
-                                        href={getExplorerUrl(txHash)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem',
-                                            color: '#3B82F6',
-                                            fontSize: '0.8rem',
-                                            marginTop: '1rem',
-                                            textDecoration: 'none',
-                                            padding: '0.5rem 0.75rem',
-                                            background: 'rgba(59,130,246,0.1)',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        View on Explorer
-                                        <ExternalLink size={14} />
+                                {blockNum && (
+                                    <p style={{ fontSize: '0.7rem', color: '#64748B', marginBottom: '1rem' }}>
+                                        Confirmed at block #{blockNum.toLocaleString()}
+                                    </p>
+                                )}
+                                {txHash && (
+                                    <a href={`${EXPLORER_URL}/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 1rem', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '8px', color: '#60A5FA', fontSize: '0.75rem', textDecoration: 'none', marginBottom: '1rem' }}>
+                                        <Zap size={12} />
+                                        View on chainscan-galileo.0g.ai
+                                        <ExternalLink size={11} />
                                     </a>
                                 )}
-                                <button
-                                    onClick={handleClose}
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.875rem',
-                                        background: 'linear-gradient(135deg, #10B981, #059669)',
-                                        border: 'none',
-                                        borderRadius: '10px',
-                                        color: '#F8FAFC',
-                                        fontWeight: 600,
-                                        cursor: 'pointer',
-                                        marginTop: '1rem',
-                                    }}
-                                >
+                                <div style={{ fontSize: '0.68rem', color: '#475569', fontFamily: 'monospace', marginBottom: '1rem', wordBreak: 'break-all' }}>
+                                    Tx: {txHash.slice(0, 20)}...{txHash.slice(-8)}
+                                </div>
+                                <button onClick={handleClose} style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>
                                     Done
                                 </button>
                             </motion.div>
                         ) : (
                             <>
-                                <div style={{ marginBottom: '1.5rem' }}>
-                                    <label
-                                        style={{
-                                            display: 'block',
-                                            fontSize: '0.875rem',
-                                            color: '#94A3B8',
-                                            marginBottom: '0.5rem',
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        Investment Amount (0G)
+                                {/* Amount */}
+                                <div style={{ marginBottom: '1.25rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.8rem', color: '#94A3B8', marginBottom: '0.5rem', fontWeight: 600 }}>
+                                        Investment Amount (0G tokens)
                                     </label>
                                     <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        disabled={status !== 'idle' && status !== 'error'}
-                                        step="0.1"
-                                        min="0.1"
-                                        placeholder="10"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.875rem',
-                                            background: 'rgba(255,255,255,0.03)',
-                                            border: '1px solid rgba(255,255,255,0.08)',
-                                            borderRadius: '10px',
-                                            color: '#F8FAFC',
-                                            fontSize: '1rem',
-                                            fontWeight: 600,
-                                            boxSizing: 'border-box',
-                                        }}
+                                        type="number" value={amount}
+                                        onChange={e => setAmount(e.target.value)}
+                                        disabled={status === 'approving' || status === 'pending'}
+                                        min="0.01" step="0.1"
+                                        style={{ width: '100%', padding: '0.875rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: '#F8FAFC', fontSize: '1.1rem', fontWeight: 700, boxSizing: 'border-box' }}
                                     />
                                 </div>
 
                                 {/* Projections */}
-                                <div
-                                    style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: '1fr 1fr',
-                                        gap: '1rem',
-                                        marginBottom: '1.5rem',
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            background: 'rgba(59,130,246,0.08)',
-                                            padding: '1rem',
-                                            borderRadius: '12px',
-                                        }}
-                                    >
-                                        <p
-                                            style={{
-                                                fontSize: '0.75rem',
-                                                color: '#94A3B8',
-                                                marginBottom: '0.25rem',
-                                                textTransform: 'uppercase',
-                                                fontWeight: 700,
-                                            }}
-                                        >
-                                            Monthly Projection
-                                        </p>
-                                        <p
-                                            style={{
-                                                fontSize: '1.25rem',
-                                                fontWeight: 800,
-                                                color: '#3B82F6',
-                                            }}
-                                        >
-                                            +${projectedReturn.toFixed(2)}
-                                        </p>
-                                    </div>
-                                    <div
-                                        style={{
-                                            background: 'rgba(16,185,129,0.08)',
-                                            padding: '1rem',
-                                            borderRadius: '12px',
-                                        }}
-                                    >
-                                        <p
-                                            style={{
-                                                fontSize: '0.75rem',
-                                                color: '#94A3B8',
-                                                marginBottom: '0.25rem',
-                                                textTransform: 'uppercase',
-                                                fontWeight: 700,
-                                            }}
-                                        >
-                                            Annual Projection (APY)
-                                        </p>
-                                        <p
-                                            style={{
-                                                fontSize: '1.25rem',
-                                                fontWeight: 800,
-                                                color: '#10B981',
-                                            }}
-                                        >
-                                            +${projectedAnnual.toFixed(2)}
-                                        </p>
-                                    </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                                    {[
+                                        { label: 'Monthly Projection', val: `+${projectedMonthly.toFixed(4)} 0G`, color: '#3B82F6', bg: 'rgba(59,130,246,0.08)' },
+                                        { label: `Annual (${agent.apy.toFixed(1)}% APY)`, val: `+${projectedAnnual.toFixed(4)} 0G`, color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
+                                    ].map(p => (
+                                        <div key={p.label} style={{ background: p.bg, padding: '0.875rem', borderRadius: '10px' }}>
+                                            <div style={{ fontSize: '0.65rem', color: '#94A3B8', marginBottom: '0.25rem', fontWeight: 600, textTransform: 'uppercase' }}>{p.label}</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 900, color: p.color, fontFamily: 'Outfit,sans-serif' }}>{p.val}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Source disclosure */}
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.75rem', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '10px', marginBottom: '1.25rem' }}>
+                                    <Info size={14} style={{ color: '#F59E0B', flexShrink: 0, marginTop: '0.1rem' }} />
+                                    <p style={{ fontSize: '0.68rem', color: '#78716C', lineHeight: 1.5 }}>
+                                        APY projections are calculated from real DeFi protocol rates ({agent.apySource || 'DeFi Llama'}). Returns are simulated on 0G testnet — not financial advice.
+                                    </p>
                                 </div>
 
                                 {/* Error */}
                                 {error && (
-                                    <div
-                                        style={{
-                                            background: 'rgba(239,68,68,0.08)',
-                                            border: '1px solid rgba(239,68,68,0.2)',
-                                            borderRadius: '10px',
-                                            padding: '0.875rem',
-                                            marginBottom: '1rem',
-                                            display: 'flex',
-                                            gap: '0.75rem',
-                                            fontSize: '0.875rem',
-                                            color: '#FCA5A5',
-                                        }}
-                                    >
-                                        <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '0.75rem', marginBottom: '1rem', display: 'flex', gap: '0.625rem', fontSize: '0.8rem', color: '#FCA5A5' }}>
+                                        <AlertCircle size={16} style={{ flexShrink: 0 }} />
                                         <span>{error}</span>
                                     </div>
                                 )}
 
-                                {/* Submit Button */}
+                                {/* Submit */}
                                 <button
-                                    onClick={handleInvest}
-                                    disabled={status === 'approving' || !amount}
-                                    style={{
-                                        width: '100%',
-                                        padding: '1rem',
-                                        background:
-                                            status === 'approving'
-                                                ? 'rgba(59,130,246,0.3)'
-                                                : 'linear-gradient(135deg, #3B82F6, #2563EB)',
-                                        border: 'none',
-                                        borderRadius: '12px',
-                                        color: '#F8FAFC',
-                                        fontSize: '0.95rem',
-                                        fontWeight: 700,
-                                        cursor: status === 'approving' ? 'wait' : 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                    }}
-                                >
-                                    {status === 'approving' ? (
-                                        <>
-                                            <Loader
-                                                size={18}
-                                                style={{ animation: 'spin 1s linear infinite' }}
-                                            />
-                                            Processing Investment...
-                                        </>
+                                    onClick={walletAddress ? handleInvest : handleConnect}
+                                    disabled={status === 'approving' || status === 'pending'}
+                                    style={{ width: '100%', padding: '1rem', background: (status === 'approving' || status === 'pending') ? 'rgba(59,130,246,0.3)' : 'linear-gradient(135deg, #3B82F6, #2563EB)', border: 'none', borderRadius: '12px', color: '#fff', fontSize: '0.95rem', fontWeight: 700, cursor: (status === 'approving' || status === 'pending') ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                    {status === 'approving' || status === 'pending' ? (
+                                        <><Loader size={18} style={{ animation: 'spin 1s linear infinite' }} /> {status === 'approving' ? 'Confirm in MetaMask…' : 'Waiting for 0G block…'}</>
+                                    ) : walletAddress ? (
+                                        <><ArrowUpRight size={18} /> Invest {amount} 0G on-chain</>
                                     ) : (
-                                        <>
-                                            <ArrowUpRight size={18} />
-                                            Invest {amount} 0G
-                                        </>
+                                        <><Wallet size={18} /> Connect Wallet to Invest</>
                                     )}
                                 </button>
 
-                                <p
-                                    style={{
-                                        fontSize: '0.75rem',
-                                        color: '#64748B',
-                                        marginTop: '1rem',
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    {demoMode
-                                        ? 'Demo transaction (real MetaMask connection not available)'
-                                        : 'You will be asked to confirm this transaction in your wallet.'}
+                                <p style={{ fontSize: '0.68rem', color: '#475569', marginTop: '0.75rem', textAlign: 'center' }}>
+                                    {walletAddress ? 'MetaMask will ask you to confirm this transaction on 0G Galileo.' : 'No MetaMask? Install at metamask.io — then connect above.'}
                                 </p>
                             </>
                         )}

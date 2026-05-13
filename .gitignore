@@ -37,8 +37,8 @@ contracts/broadcast/
 .gemini/
 
 
-QUICK_DEPLOY.sh/
-QUICK_REFERENCE.md/
+QUICK_DEPLOY.sh
+QUICK_REFERENCE.md
 setup-all.sh/
 
 docs/architecture/EXECUTIVE_SUMMARY.md
