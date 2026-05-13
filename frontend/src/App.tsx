@@ -10,6 +10,7 @@ import { connectMetaMask, truncateAddress, liveFeed } from './services/api';
 
 import Dashboard from './components/Dashboard';
 import Leaderboard from './components/Leaderboard';
+import RealityCheckDashboard from './components/RealityCheckDashboard';
 import MarketplacePanel from './components/MarketplacePanel';
 import PortfolioDashboard from './components/PortfolioDashboard';
 import StrategyPanel from './components/StrategyPanel';
@@ -32,6 +33,7 @@ const NAV = [
   { id: 'overview', label: 'Overview', icon: BarChart3, badge: null },
   { id: 'portfolio', label: 'Portfolio', icon: Briefcase, badge: null },
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, badge: 'LIVE' },
+  { id: 'reality', label: 'Reality Check', icon: Shield, badge: 'VERIFY' },
   { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag, badge: '500+' },
   { id: 'strategies', label: 'Strategies', icon: Zap, badge: null },
   { id: 'breeding', label: 'Breeding Lab', icon: Dna, badge: 'NEW' },
@@ -44,12 +46,14 @@ const BADGE_COLORS: Record<string, { bg: string; color: string }> = {
   LIVE: { bg: 'rgba(16,185,129,0.15)', color: '#34D399' },
   'NEW': { bg: 'rgba(59,130,246,0.15)', color: '#60A5FA' },
   '500+': { bg: 'rgba(139,92,246,0.15)', color: '#A78BFA' },
+  'VERIFY': { bg: 'rgba(34,197,94,0.15)', color: '#22C55E' },
 };
 
 const PAGES: Record<string, React.ComponentType<any>> = {
   overview: Dashboard,
   portfolio: PortfolioDashboard,
   leaderboard: Leaderboard,
+  reality: RealityCheckDashboard,
   marketplace: MarketplacePanel,
   strategies: StrategyPanel,
   breeding: BreedingLab,

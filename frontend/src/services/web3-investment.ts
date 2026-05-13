@@ -7,6 +7,13 @@
 
 import { ethers, BrowserProvider, Contract } from 'ethers'
 
+// Declare window.ethereum for TypeScript
+declare global {
+    interface Window {
+        ethereum?: any;
+    }
+}
+
 // ============================================================================
 // Configuration
 // ============================================================================
@@ -137,7 +144,7 @@ export async function isCorrectNetwork(): Promise<boolean> {
         if (!provider) return false
 
         const network = await provider.getNetwork()
-        return network.chainId === CHAIN_ID
+        return Number(network.chainId) === CHAIN_ID
     } catch (error) {
         console.error('[Web3] Network check failed:', error)
         return false
