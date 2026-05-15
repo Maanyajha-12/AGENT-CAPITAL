@@ -1,74 +1,108 @@
+# ===================================
+# AGENT CAPITAL — .gitignore
+# ===================================
+
 # Dependencies
 node_modules/
-.pnp
-.pnp.js
 
 # Build outputs
 dist/
 build/
 out/
-DEMO_GUIDE.md/
 
-# Environment variables (NEVER commit real keys)
+# Environment variables (NEVER commit keys)
 .env
+.env.local
+.env.production
 backend/.env
+frontend/.env
+frontend/.env.local
 
-# IDE
+# IDE / Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+*.sublime-*
 
-# OS
+# OS junk
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Foundry
+# Foundry (Solidity)
 contracts/cache/
 contracts/out/
 contracts/broadcast/
 
-# Misc
-.gemini/
+# Vercel
+frontend/.vercel/
 
+# TypeScript build cache
+*.tsbuildinfo
 
-QUICK_DEPLOY.sh
+# Test / Coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# ===================================
+# Generated / Internal docs
+# Not needed in public repo
+# ===================================
+
+# Dated deployment status files
+DEPLOYMENT_STATUS_*.md
+
+# Internal working docs (keep README.md + DEMO_GUIDE.md only)
+BEFORE_AND_AFTER.md
+CHANGELOG.md
+READY_FOR_DEMO.md
 QUICK_REFERENCE.md
-setup-all.sh/
+DEPLOYMENT.md
 
-docs/architecture/EXECUTIVE_SUMMARY.md
+# Generated shell scripts
+QUICK_DEPLOY.sh
+setup-all.sh
+deploy.sh
 
+# Redundant demo iterations (DEMO_GUIDE.md is the single source)
 docs/demo/3_MINUTE_VIDEO_SCRIPT.md
 docs/demo/3_MINUTE_VIDEO_VISUAL_GUIDE.md
+docs/demo/END_TO_END_TEST_GUIDE.md
+docs/demo/EXECUTIVE_SUMMARY_WINNING_STRATEGY.md
+docs/demo/FINAL_DEMO_SCRIPT_3MIN.md
+docs/demo/JUDGES_EVALUATION_ROADMAP.md
 docs/demo/LIVE_JUDGE_DEMO.md
 docs/demo/PRE_DEMO_CHECKLIST.md
+docs/demo/TEST_RESULTS_MAY_14_2026.md
 
-# implementation internals
+# Internal implementation notes
 docs/implementation/DELIVERY_SUMMARY.md
 docs/implementation/IMPLEMENTATION_FIXES.md
+docs/implementation/IMPLEMENTATION_GUIDE.md
 docs/implementation/OPTION_A_IMPLEMENTATION.md
 docs/implementation/PRODUCTION_COMPLETE.md
 
-# reality-check internals
-docs/reality-check/JUDGE_SELF_TEST_KIT.md
-docs/reality-check/JUDGE_VERIFICATION_GUIDE.md
-docs/reality-check/JUDGES_REALITY_CHECK_GUIDE.md
-docs/reality-check/README_REALITY_CHECK.md
-docs/reality-check/REALITY_CHECK_ANALYSIS.md
-docs/reality-check/REALITY_CHECK_ENTRY.md
-docs/reality-check/REALITY_CHECK_IMPLEMENTATION_SUMMARY.md
-docs/reality-check/SIMULATION_EXPLANATION.md
-docs/reality-check/THE_REALITY_CHECK.md
+# Reality-check drafts (kept in frontend component instead)
+docs/reality-check/
 
-BEFORE_AND_AFTER.md
-CHANGELOG.md
-Procfile
-QUICK_REFERENCE.md
-READY_FOR_DEMO.md
-railway.json
-setup-all.sh
+# Internal testing notes
+docs/USER_TESTING_NOTES.md
+docs/USER_FEEDBACK.md
+
+# Deployment scripts (internal)
+deployment/QUICK_DEPLOY.sh
+deployment/DEPLOYMENT_PROOF.md
+scripts/deploy.sh

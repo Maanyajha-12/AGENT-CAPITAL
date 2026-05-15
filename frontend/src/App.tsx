@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3, Briefcase, Trophy, ShoppingBag, Zap, Dna, Shield,
-  Globe, Activity, TrendingUp, Bell, Wallet, Settings, LogOut,
+  TrendingUp, Bell, Wallet, Settings, LogOut,
   Search, User, Menu, X
 } from 'lucide-react';
 import { useToast } from './components/Toast';
@@ -15,31 +15,29 @@ import MarketplacePanel from './components/MarketplacePanel';
 import PortfolioDashboard from './components/PortfolioDashboard';
 import StrategyPanel from './components/StrategyPanel';
 import BreedingLab from './components/BreedingLab';
-import ArenaPanel from './components/ArenaPanel';
-import CrossChainDashboard from './components/CrossChainDashboard';
-import SystemStats from './components/SystemStats';
 import LandingPage from './components/LandingPage';
 
 const TICKER = [
-  '🟢 ETH $3,842 +2.4%', '⚡ Yield Harvester+ executed $12,400 trade',
-  '🔵 0G verified 247 trades this hour', '🟢 BTC $84,210 +1.8%',
-  '🧬 Epsilon Core Gen 4 breeding complete', '💰 Platform profit $84.2M total',
-  '🔥 Volatility Surge ranked #1 this week', '🟢 ARB/ETH +3.2%',
-  '💎 Stablecoin Pro hit 89.1% win rate', '⚡ $2.3M profit distributed today',
-  '🌐 Cross-chain arb: ETH/Polygon +$1,840/hr', '🟢 SOL $142 +4.1%',
+  '🟢 0G Galileo Testnet · Chain ID 16602 · Live',
+  '⚡ Yield Harvester+ APY: fetching from Aave V3…',
+  '🔵 0G verified agent decisions on-chain this session',
+  '🟢 DeFi Llama API · Real protocol yield data',
+  '🧬 Agent Breeding Lab · Create superior strategies',
+  '🛡️ ProofOfIntelligence.sol · TEE verification live',
+  '🔗 chainscan-galileo.0g.ai · All txns verifiable',
+  '🟢 Stablecoin Pro APY: Aave V3 USDT supply rate',
+  '⚡ 0G Compute Router · Every decision cryptographically proven',
+  '🌐 0G KV Storage · Agent state persisted on-chain',
 ];
 
 const NAV = [
   { id: 'overview', label: 'Overview', icon: BarChart3, badge: null },
   { id: 'portfolio', label: 'Portfolio', icon: Briefcase, badge: null },
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, badge: 'LIVE' },
-  { id: 'reality', label: 'Reality Check', icon: Shield, badge: 'VERIFY' },
-  { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag, badge: '500+' },
+  { id: 'marketplace', label: 'Marketplace', icon: ShoppingBag, badge: null },
   { id: 'strategies', label: 'Strategies', icon: Zap, badge: null },
   { id: 'breeding', label: 'Breeding Lab', icon: Dna, badge: 'NEW' },
-  { id: 'reputation', label: 'Reputation', icon: Shield, badge: null },
-  { id: 'crosschain', label: 'Cross-Chain', icon: Globe, badge: null },
-  { id: 'analytics', label: 'Analytics', icon: Activity, badge: null },
+  { id: 'reality', label: 'Reality Check', icon: Shield, badge: 'VERIFY' },
 ];
 
 const BADGE_COLORS: Record<string, { bg: string; color: string }> = {
@@ -53,13 +51,10 @@ const PAGES: Record<string, React.ComponentType<any>> = {
   overview: Dashboard,
   portfolio: PortfolioDashboard,
   leaderboard: Leaderboard,
-  reality: RealityCheckDashboard,
   marketplace: MarketplacePanel,
   strategies: StrategyPanel,
   breeding: BreedingLab,
-  reputation: ArenaPanel,
-  crosschain: CrossChainDashboard,
-  analytics: SystemStats,
+  reality: RealityCheckDashboard,
 };
 
 export default function App() {
@@ -171,11 +166,11 @@ export default function App() {
         {/* Bottom stats + 0G proof */}
         <div style={{ margin: '0.625rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div style={{ padding: '0.875rem 1rem', background: 'linear-gradient(135deg, rgba(59,130,246,0.07), rgba(139,92,246,0.05))', borderRadius: 'var(--r-lg)', border: '1px solid rgba(59,130,246,0.12)' }}>
-            <p style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Platform</p>
-            {[['TVL', '$84.2M'], ['Avg APY', 'Live ↗'], ['Agents', '500+'], ['Hacks', '0']].map(([l, v]) => (
+            <p style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Contracts on 0G Galileo</p>
+            {[['INFT', '0x1cd6…2d59'], ['POI', '0xdc83…bf2'], ['Registry', '0xc810…2e6']].map(([l, v]) => (
               <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1rem 0', fontSize: '0.7rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>{l}</span>
-                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{v}</span>
+                <span style={{ fontWeight: 700, color: '#60A5FA', fontFamily: 'monospace', fontSize: '0.62rem' }}>{v}</span>
               </div>
             ))}
           </div>

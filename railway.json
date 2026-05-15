@@ -1,0 +1,23 @@
+{
+    "builder": "nixpacks",
+    "buildCommand": "cd backend && npm install && npm run build",
+    "startCommand": "cd backend && npm run start",
+    "enviromentVariables": [
+        "ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY",
+        "OG_KV_ENDPOINT",
+        "OG_LOG_ENDPOINT",
+        "OG_COMPUTE_ENDPOINT",
+        "OG_COMPUTE_ROUTER_API_KEY",
+        "OG_COMPUTE_MODEL",
+        "RPC_URL",
+        "PRIVATE_KEY",
+        "CHAIN_ID",
+        "DELIBERATION_INFT_ADDRESS",
+        "AGENT_REGISTRY_ADDRESS",
+        "PROOF_OF_INTELLIGENCE_ADDRESS",
+        "TOURNAMENT_ARENA_ADDRESS",
+        "CROSS_CHAIN_BRIDGE_ADDRESS",
+        "PORT"
+    ]
+}

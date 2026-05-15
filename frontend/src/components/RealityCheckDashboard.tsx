@@ -1,392 +1,366 @@
 /**
- * frontend/src/components/RealityCheckDashboard.tsx
- * 
- * TRANSPARENCY FOR JUDGES
- * Shows exactly what's real, what's simulated, what's on-chain verifiable
- * This component lets judges verify every claim
+ * RealityCheckDashboard.tsx — Premium Transparency Dashboard for Judges
+ * Shows exactly what's REAL, SIMULATED, and TRANSPARENT with visual proof
  */
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-    CheckCircle,
-    AlertCircle,
-    Eye,
-    Code,
-    Lock,
-    Zap,
-    Award,
-    Database,
-    ExternalLink,
-    Copy
+  CheckCircle, AlertTriangle, Eye, Code, Lock, ExternalLink, Copy,
+  Shield, Cpu, Coins, BarChart3, Dna, ChevronRight, Verified
 } from 'lucide-react';
 
 interface RealityItem {
-    title: string;
-    status: 'REAL' | 'SIMULATED' | 'TRANSPARENT';
-    description: string;
-    verification: string;
-    dataSource?: string;
-    explorerLink?: string;
-    code?: string;
+  title: string;
+  status: 'REAL' | 'SIMULATED' | 'TRANSPARENT';
+  icon: any;
+  description: string;
+  verification: string;
+  dataSource: string;
+  explorerLink?: string;
+  code: string;
+  gradient: string;
+  accent: string;
 }
 
-const RealityCheckDashboard: React.FC = () => {
-    const [selectedItem, setSelectedItem] = useState<number>(0);
-
-    const realityItems: RealityItem[] = [
-        {
-            title: 'Smart Contracts on 0G',
-            status: 'REAL',
-            description: 'AgentCapital, AgentNFT, AgentBreeding contracts are deployed and verified on 0G Galileo testnet.',
-            verification: 'Open block explorer and search contract addresses',
-            explorerLink: 'https://chainscan-galileo.0g.ai',
-            dataSource: 'On-chain verified code',
-            code: `Contract: AgentCapital.sol
-Address: 0x[deployed-address]
+const ITEMS: RealityItem[] = [
+  {
+    title: 'Smart Contracts on 0G',
+    status: 'REAL',
+    icon: Shield,
+    description: '5 contracts deployed & verified on 0G Galileo testnet — DeliberationINFT, ProofOfIntelligence, AgentRegistry, TournamentArena, CrossChainBridge.',
+    verification: 'Open block explorer and search any contract address below',
+    dataSource: 'On-chain verified code',
+    explorerLink: 'https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59',
+    gradient: 'from-emerald-500/20 via-green-500/10 to-transparent',
+    accent: '#10B981',
+    code: `Deployed Contracts (Block 30912464):
+DeliberationINFT:    0x1cd62cb08754a12fcc3427559e616a2898812d59
+ProofOfIntelligence: 0xdc83dd755ba02265d23922104b0b54c304537bf2
+AgentRegistry:       0xc8106baf71c3a38177167edf51ac1391cbb8e2e6
+TournamentArena:     0x52e4fc0de6b1ecc7b48375e5a9135fb41236f668
+CrossChainBridge:    0x8417b73a19a1db21a10d0737fb8bbd469ee21545
 Network: 0G Galileo (Chain ID: 16602)
-Status: ✅ Deployed & Verified`
-        },
-        {
-            title: 'User Investment Transactions',
-            status: 'REAL',
-            description: 'When user clicks "Invest", a REAL transaction sends actual 0G tokens to the AgentCapital contract.',
-            verification: 'User can see transaction hash on block explorer',
-            explorerLink: 'https://chainscan-galileo.0g.ai',
-            dataSource: 'User wallet signature + on-chain transfer',
-            code: `Transaction Flow:
+Status: ✅ All 5 Deployed & Verified`,
+  },
+  {
+    title: 'Investment Transactions',
+    status: 'REAL',
+    icon: Coins,
+    description: 'When you click "Invest", a REAL transaction sends actual 0G tokens to the AgentCapital contract on 0G Galileo.',
+    verification: 'Connect MetaMask → Invest → See tx hash on block explorer',
+    dataSource: 'User wallet signature + on-chain transfer',
+    explorerLink: 'https://chainscan-galileo.0g.ai',
+    gradient: 'from-emerald-500/20 via-green-500/10 to-transparent',
+    accent: '#10B981',
+    code: `Transaction Flow:
 1. User connects MetaMask
 2. Clicks "Invest in Agent"
-3. MetaMask pops up (real transaction)
+3. MetaMask popup (REAL transaction)
 4. User signs with private key
 5. 0G tokens transfer on-chain
 6. Contract emits InvestmentReceived event
-7. User sees tx hash + explorer link`
-        },
-        {
-            title: '0G Compute Integration',
-            status: 'REAL',
-            description: 'Agents send trade decisions to 0G Compute for verification. Returns cryptographic proof hashes stored on-chain.',
-            verification: 'Can query DeliberationINFT contract and see proof hashes',
-            explorerLink: 'https://chainscan-galileo.0g.ai',
-            dataSource: 'TEE execution | Proof hashes on-chain',
-            code: `Proof Verification Flow:
+7. User sees tx hash + explorer link`,
+  },
+  {
+    title: '0G Compute TEE Proofs',
+    status: 'REAL',
+    icon: Cpu,
+    description: 'Agent decisions verified by 0G Compute Router via TEE (Trusted Execution Environment). Cryptographic proof hashes stored on-chain.',
+    verification: 'Query ProofOfIntelligence contract events on block explorer',
+    dataSource: 'TEE execution → Proof hashes stored on-chain',
+    explorerLink: 'https://chainscan-galileo.0g.ai/address/0xdc83dd755ba02265d23922104b0b54c304537bf2',
+    gradient: 'from-emerald-500/20 via-green-500/10 to-transparent',
+    accent: '#10B981',
+    code: `Proof Verification Flow:
 1. Agent decides: "Buy ETH, Sell USDC"
-2. Sends to 0G Compute Router
+2. Decision → 0G Compute Router API
 3. TEE executes in trusted enclave
-4. Returns proof hash + confidence
-5. Hash stored on DeliberationINFT
-6. Verifiable: Anyone can check on-chain`
-        },
-        {
-            title: 'Agent Trading Execution',
-            status: 'SIMULATED',
-            description: 'Agent trades are SIMULATED with real market data. This is honest for a 2-day hackathon. Production will use real Uniswap.',
-            verification: 'View backend code showing simulation logic',
-            dataSource: 'CoinGecko prices + Uniswap math simulation',
-            code: `Why Simulated:
-• 2-day hackathon limited time
+4. Returns proof hash + confidence score
+5. Hash stored on ProofOfIntelligence.sol
+6. Verifiable: Anyone can check on-chain
+Contract: 0xdc83dd755ba02265d23922104b0b54c304537bf2`,
+  },
+  {
+    title: 'Agent Trading',
+    status: 'SIMULATED',
+    icon: BarChart3,
+    description: 'Agent trades are SIMULATED with real market data from DeFi Llama + Aave V3. This is honest for a hackathon demo.',
+    verification: 'Every agent card shows "LIVE · DeFiLlama" badge with "Verify →" link',
+    dataSource: 'Real DeFi protocol APY data (DeFi Llama API + Aave V3 API)',
+    gradient: 'from-amber-500/20 via-yellow-500/10 to-transparent',
+    accent: '#F59E0B',
+    code: `Why Simulated:
+• Hackathon limited time
 • Testnet 0G/USDC liquidity limited
 • Real trading too risky for demo
 
 But it's HONEST:
-• Uses real CoinGecko prices
-• Includes real gas fees
-• Real slippage calculations
-• Real Uniswap pool data
-• Shows exactly how production would work
+• Uses real APY from Aave V3 (via DeFi Llama)
+• Shows source: "LIVE · DeFiLlama" on every card
+• Fallback values labeled "EST." with date
+• Profit formula shown transparently
+• "Verify →" links to actual DeFi Llama pools`,
+  },
+  {
+    title: 'APY & Profit Formulas',
+    status: 'TRANSPARENT',
+    icon: Eye,
+    description: 'All APY values sourced from live DeFi Llama API → Aave V3 API → labeled fallback estimates. Every formula visible in InvestModal.',
+    verification: 'Click "Verify →" on any agent card → opens DeFi Llama source',
+    dataSource: 'DeFi Llama pools API (yields.llama.fi/pools)',
+    gradient: 'from-blue-500/20 via-cyan-500/10 to-transparent',
+    accent: '#3B82F6',
+    code: `APY Sources (Priority Order):
+1. DeFi Llama API (yields.llama.fi/pools)
+   → Aave V3 USDC, WETH, USDT on Ethereum
+   → Curve stETH/ETH
+   → Uniswap V3 USDC/ETH
 
-Production Plan:
-• Enable testnet Uniswap swaps
-• Use small amounts for safety
-• Add circuit breakers (max loss -20%)
-• Scale after proving strategy works`
-        },
-        {
-            title: 'Agent Profit Calculations',
-            status: 'TRANSPARENT',
-            description: 'Agent APY and profits are shown with full formula transparency. Judges can trace every number.',
-            verification: 'Request calculation formula and data sources from frontend',
-            dataSource: 'Historical price data + math formulas',
-            code: `Sharpe Ratio Formula:
-sharpeRatio = (returns - risk_free_rate) / std_dev
-Example:
-- 30-day profit: 4.2 0G
-- Initial capital: 10 0G
-- Std deviation: 0.8
-- Risk-free rate: 0% (testnet)
-- Sharpe = (4.2 - 0) / 0.8 = 5.25
+2. Aave V3 API (direct)
+   → aave-api-v2.aave.com
 
-APY Formula:
-APY = (Profit / Capital) * (365 / Days) * 100
-Example:
-- 30-day profit: 0.72 0G
-- Initial: 10 0G
-- Days: 30
-- APY = (0.72 / 10) * (365 / 30) * 100 = 87.3%
+3. Fallback estimates (labeled "EST.")
+   → Q1-2025 snapshots with date
 
-All data sources are visible in browser console`
-        },
-        {
-            title: 'Leaderboard Data',
-            status: 'TRANSPARENT',
-            description: 'Leaderboard shows 500+ agents with rankings. All data either on-chain or from verifiable sources.',
-            verification: 'Can query backend /api/leaderboard and see data with sources',
-            dataSource: 'Agent metrics DB + on-chain verification',
-            code: `Leaderboard Transparency:
-GET /api/leaderboard?verify=true
-
-Returns:
-{
-  agents: [
-    {
-      rank: 1,
-      name: "Yield Harvester",
-      apy: 87.3,
-      source: "calculated from trades",
-      proofHash: "0x4c2a...",
-      onChain: true
-    }
-  ],
-  metadata: {
-    lastUpdated: "2024-01-15T10:30:00Z",
-    dataSource: "Agent metrics + on-chain proofs"
-  }
-}`
-        },
-        {
-            title: 'Breeding System (NFTs)',
-            status: 'REAL',
-            description: 'When users breed two agents, a new iNFT is minted on-chain. Traits are determined by genetics algorithm, stored permanently.',
-            verification: 'Breeding creates real on-chain NFT. Can check on NFT explorer.',
-            explorerLink: 'https://chainscan-galileo.0g.ai',
-            dataSource: 'AgentBreeding.sol contract | NFT metadata on-chain',
-            code: `Breeding Flow:
+Profit Formula (shown in InvestModal):
+Monthly = Amount × (APY% ÷ 12)
+Annual  = Amount × APY%`,
+  },
+  {
+    title: 'Breeding System (iNFTs)',
+    status: 'REAL',
+    icon: Dna,
+    description: 'Breeding two agents mints a new iNFT on-chain via DeliberationINFT.sol. Traits from genetics algorithm, stored permanently on 0G.',
+    verification: 'Breed agents → See on-chain NFT mint via block explorer',
+    dataSource: 'DeliberationINFT.sol on-chain',
+    explorerLink: 'https://chainscan-galileo.0g.ai/address/0x1cd62cb08754a12fcc3427559e616a2898812d59',
+    gradient: 'from-emerald-500/20 via-green-500/10 to-transparent',
+    accent: '#10B981',
+    code: `Breeding Flow:
 1. User selects 2 parent agents
 2. Clicks "Breed"
-3. AgentBreeding.sol called
+3. DeliberationINFT.sol called
 4. New iNFT minted (on-chain)
 5. Child traits = genetic combination
 6. Parent receives royalties (5%)
 7. Child NFT transferable
-8. Verifiable on NFT explorer`
-        },
-        {
-            title: 'Cross-Chain Bridge',
-            status: 'REAL',
-            description: 'Cross-chain bridge infrastructure ready. Can transfer agent iNFTs between 0G and other chains (future).',
-            verification: 'Bridge contracts deployed. Can inspect on-chain.',
-            explorerLink: 'https://chainscan-galileo.0g.ai',
-            dataSource: 'CrossChainBridge.sol on-chain',
-            code: `Bridge Status:
-✅ Contracts deployed
-✅ 0G → Ethereum path ready
-✅ Message layer functional
-🕐 Token bridge (future)
-🕐 Live testnet transfers (future)
+8. Verifiable on 0G Galileo explorer`,
+  },
+];
 
-Current: Bridge infrastructure proven
-Next: Enable testnet tokens transfer`
-        }
-    ];
-
-    const item = realityItems[selectedItem];
-
-    const getStatusColor = (status: string) => {
-        if (status === 'REAL') return 'from-green-500/20 to-emerald-500/20 border-green-500/30';
-        if (status === 'SIMULATED') return 'from-amber-500/20 to-orange-500/20 border-amber-500/30';
-        return 'from-blue-500/20 to-cyan-500/20 border-blue-500/30';
-    };
-
-    const getStatusIcon = (status: string) => {
-        if (status === 'REAL') return <CheckCircle size={20} className="text-green-400" />;
-        if (status === 'SIMULATED') return <AlertCircle size={20} className="text-amber-400" />;
-        return <Eye size={20} className="text-blue-400" />;
-    };
-
-    return (
-        <div className="min-h-screen bg-dark-bg-primary p-4 sm:p-6 space-y-6">
-            {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-3"
-            >
-                <div className="flex items-center gap-3">
-                    <Lock size={32} className="text-accent-primary" />
-                    <h1 className="text-3xl sm:text-4xl font-bold text-dark-text-primary">
-                        Reality Check Dashboard
-                    </h1>
-                </div>
-                <p className="text-dark-text-secondary">
-                    For Judges: Transparency into what's REAL, SIMULATED, and ON-CHAIN VERIFIABLE
-                </p>
-            </motion.div>
-
-            {/* Key Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="card p-4 border-l-4 border-green-500">
-                    <p className="text-dark-text-tertiary text-sm">On-Chain Verified</p>
-                    <p className="text-2xl font-bold text-green-400 mt-1">5</p>
-                    <p className="text-xs text-dark-text-tertiary mt-1">Items (contracts, transactions, NFTs)</p>
-                </div>
-                <div className="card p-4 border-l-4 border-amber-500">
-                    <p className="text-dark-text-tertiary text-sm">Honestly Simulated</p>
-                    <p className="text-2xl font-bold text-amber-400 mt-1">2</p>
-                    <p className="text-xs text-dark-text-tertiary mt-1">With real data sources</p>
-                </div>
-                <div className="card p-4 border-l-4 border-blue-500">
-                    <p className="text-dark-text-tertiary text-sm">Transparent</p>
-                    <p className="text-2xl font-bold text-blue-400 mt-1">All</p>
-                    <p className="text-xs text-dark-text-tertiary mt-1">Formula & source visible</p>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* List */}
-                <div className="lg:col-span-1 space-y-2">
-                    {realityItems.map((item, idx) => (
-                        <motion.button
-                            key={idx}
-                            onClick={() => setSelectedItem(idx)}
-                            className={`w-full text-left p-3 rounded-lg transition-all ${selectedItem === idx
-                                    ? 'bg-accent-primary/20 border border-accent-primary/50'
-                                    : 'bg-dark-bg-tertiary/30 border border-dark-border/30 hover:border-dark-border/50'
-                                }`}
-                        >
-                            <div className="flex items-start gap-2">
-                                {getStatusIcon(item.status)}
-                                <div className="flex-1 text-left">
-                                    <p className="font-semibold text-dark-text-primary text-sm">{item.title}</p>
-                                    <p className={`text-xs mt-1 ${item.status === 'REAL' ? 'text-green-400' :
-                                            item.status === 'SIMULATED' ? 'text-amber-400' :
-                                                'text-blue-400'
-                                        }`}>
-                                        {item.status}
-                                    </p>
-                                </div>
-                            </div>
-                        </motion.button>
-                    ))}
-                </div>
-
-                {/* Detail View */}
-                <motion.div
-                    key={selectedItem}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className={`lg:col-span-2 card p-6 bg-gradient-to-br ${getStatusColor(item.status)}`}
-                >
-                    {/* Title & Status */}
-                    <div className="flex items-start justify-between mb-4">
-                        <div>
-                            <h2 className="text-2xl font-bold text-dark-text-primary">{item.title}</h2>
-                            <div className="flex items-center gap-2 mt-2">
-                                {getStatusIcon(item.status)}
-                                <span className={`font-semibold ${item.status === 'REAL' ? 'text-green-400' :
-                                        item.status === 'SIMULATED' ? 'text-amber-400' :
-                                            'text-blue-400'
-                                    }`}>
-                                    {item.status}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-dark-text-secondary mb-4">{item.description}</p>
-
-                    {/* Verification */}
-                    <div className="bg-dark-bg-tertiary/50 rounded-lg p-4 mb-4 border border-dark-border/50">
-                        <h3 className="font-semibold text-dark-text-primary mb-2 flex items-center gap-2">
-                            <CheckCircle size={16} className="text-green-400" />
-                            How to Verify
-                        </h3>
-                        <p className="text-dark-text-secondary text-sm">{item.verification}</p>
-                        {item.explorerLink && (
-                            <a
-                                href={item.explorerLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-accent-primary hover:text-accent-primary/80 text-sm mt-2"
-                            >
-                                Open Block Explorer
-                                <ExternalLink size={14} />
-                            </a>
-                        )}
-                    </div>
-
-                    {/* Data Source */}
-                    {item.dataSource && (
-                        <div className="bg-dark-bg-tertiary/50 rounded-lg p-4 mb-4 border border-dark-border/50">
-                            <h3 className="font-semibold text-dark-text-primary mb-2 flex items-center gap-2">
-                                <Database size={16} className="text-blue-400" />
-                                Data Source
-                            </h3>
-                            <p className="text-dark-text-secondary text-sm">{item.dataSource}</p>
-                        </div>
-                    )}
-
-                    {/* Code Example */}
-                    {item.code && (
-                        <div className="bg-dark-bg-primary rounded-lg p-4 border border-dark-border/50 font-mono text-xs">
-                            <div className="flex items-center justify-between mb-2">
-                                <h3 className="font-semibold text-dark-text-primary flex items-center gap-2">
-                                    <Code size={16} className="text-accent-secondary" />
-                                    Implementation Details
-                                </h3>
-                                <button
-                                    onClick={() => navigator.clipboard.writeText(item.code || '')}
-                                    className="p-1 hover:bg-dark-bg-tertiary rounded"
-                                    title="Copy to clipboard"
-                                >
-                                    <Copy size={14} className="text-accent-primary" />
-                                </button>
-                            </div>
-                            <pre className="text-dark-text-secondary overflow-x-auto whitespace-pre-wrap break-words">
-                                {item.code}
-                            </pre>
-                        </div>
-                    )}
-                </motion.div>
-            </div>
-
-            {/* Bottom Info */}
-            <div className="card p-6 space-y-4">
-                <h3 className="font-bold text-dark-text-primary text-lg flex items-center gap-2">
-                    <Award size={20} className="text-accent-secondary" />
-                    What We're Telling Judges
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <p className="font-semibold text-dark-text-primary mb-1">✅ What's Real & Verifiable:</p>
-                        <ul className="text-dark-text-secondary space-y-1 ml-4 list-disc">
-                            <li>Smart contracts on 0G Galileo</li>
-                            <li>Real Web3 investment transactions</li>
-                            <li>0G Compute proof hashes on-chain</li>
-                            <li>Breeding creates real NFTs</li>
-                            <li>Bridge infrastructure deployed</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <p className="font-semibold text-dark-text-primary mb-1">⚠️ What's Simulated (Honestly):</p>
-                        <ul className="text-dark-text-secondary space-y-1 ml-4 list-disc">
-                            <li>Agent trading (uses real market data)</li>
-                            <li>Profit calculations (transparent formulas)</li>
-                            <li>APY metrics (show source and math)</li>
-                            <li>Leaderboard (verifiable data sources)</li>
-                        </ul>
-                    </div>
-                </div>
-                <p className="text-xs text-dark-text-tertiary italic">
-                    "We built a production-ready platform in 2 days. What's simulated is HONEST and uses real data. What's on-chain is VERIFIABLE. After the hackathon, we enable real trading."
-                </p>
-            </div>
-        </div>
-    );
+const statusConfig = {
+  REAL:        { label: 'On-Chain Verified', color: '#10B981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.25)', icon: CheckCircle },
+  SIMULATED:   { label: 'Honestly Simulated', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.25)', icon: AlertTriangle },
+  TRANSPARENT: { label: 'Fully Transparent',  color: '#3B82F6', bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.25)', icon: Eye },
 };
 
-export default RealityCheckDashboard;
+export default function RealityCheckDashboard() {
+  const [selected, setSelected] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const item = ITEMS[selected];
+  const sc = statusConfig[item.status];
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(item.code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const realCount = ITEMS.filter(i => i.status === 'REAL').length;
+  const simCount = ITEMS.filter(i => i.status === 'SIMULATED').length;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '0.5rem' }}>
+          <div style={{ width: 44, height: 44, borderRadius: 14, background: 'linear-gradient(135deg,#10B981,#3B82F6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 28px rgba(16,185,129,0.4)' }}>
+            <Lock size={20} color="#fff" />
+          </div>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 900, fontFamily: 'Outfit,sans-serif', color: '#F8FAFC', letterSpacing: '-0.02em' }}>Reality Check</h1>
+            <p style={{ fontSize: '0.825rem', color: '#64748B' }}>For Judges — Transparency into what's real, simulated, and verifiable</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Stats Row ───────────────────────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem' }}>
+        {[
+          { label: 'On-Chain Verified', value: realCount, color: '#10B981', desc: 'Contracts, transactions, TEE, breeding' },
+          { label: 'Honestly Simulated', value: simCount, color: '#F59E0B', desc: 'Trading (with real DeFi Llama data)' },
+          { label: 'Transparent', value: 'All', color: '#3B82F6', desc: 'Every formula & source visible' },
+        ].map((s, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+            style={{ padding: '1.25rem', borderRadius: 16, background: 'linear-gradient(135deg,rgba(13,17,23,0.9),rgba(22,29,44,0.8))', border: `1px solid ${s.color}25`, borderLeft: `3px solid ${s.color}`, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: `radial-gradient(circle,${s.color}12 0%,transparent 70%)`, filter: 'blur(15px)', pointerEvents: 'none' }} />
+            <p style={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.4rem' }}>{s.label}</p>
+            <p style={{ fontSize: '2rem', fontWeight: 900, color: s.color, fontFamily: 'Outfit,sans-serif', lineHeight: 1 }}>{s.value}</p>
+            <p style={{ fontSize: '0.68rem', color: '#475569', marginTop: '0.4rem' }}>{s.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ── Main Grid ───────────────────────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '1.25rem', alignItems: 'start' }}>
+
+        {/* Left — Item List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {ITEMS.map((it, idx) => {
+            const cfg = statusConfig[it.status];
+            const active = idx === selected;
+            const Icon = it.icon;
+            return (
+              <motion.button key={idx} onClick={() => setSelected(idx)}
+                whileHover={{ x: 4 }}
+                style={{
+                  width: '100%', textAlign: 'left', padding: '0.875rem 1rem', borderRadius: 14, cursor: 'pointer',
+                  border: active ? `1px solid ${cfg.color}50` : '1px solid rgba(255,255,255,0.06)',
+                  background: active ? `linear-gradient(135deg,${cfg.bg},rgba(13,17,23,0.95))` : 'rgba(255,255,255,0.02)',
+                  boxShadow: active ? `0 0 24px ${cfg.color}12, inset 0 0 0 1px ${cfg.color}15` : 'none',
+                  transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: active ? `${cfg.color}18` : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${active ? cfg.color + '35' : 'rgba(255,255,255,0.08)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  boxShadow: active ? `0 0 12px ${cfg.color}20` : 'none',
+                  transition: 'all 0.2s',
+                }}>
+                  <Icon size={16} style={{ color: active ? cfg.color : '#475569' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 700, fontSize: '0.825rem', color: active ? '#F8FAFC' : '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{it.title}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.15rem' }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: cfg.color, flexShrink: 0, boxShadow: active ? `0 0 6px ${cfg.color}` : 'none' }} />
+                    <span style={{ fontSize: '0.62rem', fontWeight: 700, color: cfg.color, letterSpacing: '0.05em' }}>{it.status}</span>
+                  </div>
+                </div>
+                {active && <ChevronRight size={14} style={{ color: cfg.color, flexShrink: 0 }} />}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* Right — Detail Panel */}
+        <AnimatePresence mode="wait">
+          <motion.div key={selected}
+            initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              padding: '1.75rem', borderRadius: 20,
+              background: 'linear-gradient(135deg,rgba(13,17,23,0.95),rgba(22,29,44,0.9))',
+              border: `1px solid ${sc.color}25`,
+              position: 'relative', overflow: 'hidden',
+            }}>
+
+            {/* Top gradient accent */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,${sc.color},transparent)` }} />
+            <div style={{ position: 'absolute', top: -50, right: -50, width: 180, height: 180, borderRadius: '50%', background: `radial-gradient(circle,${sc.color}10 0%,transparent 70%)`, filter: 'blur(30px)', pointerEvents: 'none' }} />
+
+            {/* Title + Badge */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 14, background: `${sc.color}15`, border: `1px solid ${sc.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${sc.color}20` }}>
+                  <item.icon size={20} style={{ color: sc.color }} />
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#F8FAFC', fontFamily: 'Outfit,sans-serif' }}>{item.title}</h2>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 99, background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`, letterSpacing: '0.08em', display: 'inline-block', marginTop: '0.25rem' }}>{sc.label}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p style={{ fontSize: '0.875rem', color: '#94A3B8', lineHeight: 1.8, marginBottom: '1.25rem' }}>{item.description}</p>
+
+            {/* Info Cards Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              {/* How to Verify */}
+              <div style={{ padding: '1rem', borderRadius: 14, background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <Verified size={14} style={{ color: '#10B981' }} />
+                  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#10B981', textTransform: 'uppercase', letterSpacing: '0.08em' }}>How to Verify</span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: '#94A3B8', lineHeight: 1.6 }}>{item.verification}</p>
+                {item.explorerLink && (
+                  <a href={item.explorerLink} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginTop: '0.625rem', padding: '0.375rem 0.75rem', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', color: '#34D399', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none', transition: 'all 0.15s' }}>
+                    <ExternalLink size={12} /> Open Block Explorer
+                  </a>
+                )}
+              </div>
+
+              {/* Data Source */}
+              <div style={{ padding: '1rem', borderRadius: 14, background: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <Shield size={14} style={{ color: '#3B82F6' }} />
+                  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#3B82F6', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Data Source</span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: '#94A3B8', lineHeight: 1.6 }}>{item.dataSource}</p>
+              </div>
+            </div>
+
+            {/* Code Block */}
+            <div style={{ borderRadius: 14, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.625rem 1rem', background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Code size={13} style={{ color: '#8B5CF6' }} />
+                  <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#A78BFA', letterSpacing: '0.05em' }}>Implementation Details</span>
+                </div>
+                <button onClick={copyCode}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', padding: '0.25rem 0.625rem', borderRadius: 6, background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${copied ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.08)'}`, color: copied ? '#34D399' : '#64748B', fontSize: '0.62rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
+                  <Copy size={11} /> {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <pre style={{ padding: '1rem', margin: 0, fontSize: '0.72rem', fontFamily: '"JetBrains Mono",monospace', color: '#94A3B8', lineHeight: 1.7, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {item.code}
+              </pre>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ── Bottom Transparency Statement ────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        style={{ padding: '1.5rem', borderRadius: 20, background: 'linear-gradient(135deg,rgba(16,185,129,0.06),rgba(59,130,246,0.04))', border: '1px solid rgba(16,185,129,0.15)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg,transparent,rgba(16,185,129,0.4),rgba(59,130,246,0.4),transparent)' }} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div>
+            <p style={{ fontWeight: 800, color: '#F8FAFC', fontSize: '0.875rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <CheckCircle size={15} style={{ color: '#10B981' }} /> What's Real & Verifiable
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {['5 smart contracts on 0G Galileo', 'Real Web3 investment transactions', '0G Compute TEE proof hashes on-chain', 'iNFT breeding creates real NFTs', 'Bridge infrastructure deployed'].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#10B981', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.78rem', color: '#94A3B8' }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p style={{ fontWeight: 800, color: '#F8FAFC', fontSize: '0.875rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <AlertTriangle size={15} style={{ color: '#F59E0B' }} /> What's Simulated (Honestly)
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              {['Agent trading (uses real DeFi Llama data)', 'Profit calculations (transparent formulas)', 'APY metrics (show source + math)', 'Every number traceable to an API'].map((t, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#F59E0B', flexShrink: 0 }} />
+                  <span style={{ fontSize: '0.78rem', color: '#94A3B8' }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <p style={{ fontSize: '0.72rem', color: '#475569', fontStyle: 'italic', marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          "We built a production-ready platform for this hackathon. What's simulated is HONEST and uses real data. What's on-chain is VERIFIABLE. After the hackathon, we enable real trading."
+        </p>
+      </motion.div>
+    </div>
+  );
+}

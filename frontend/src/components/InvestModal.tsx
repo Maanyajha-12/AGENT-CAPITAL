@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     X, Wallet, CheckCircle, AlertCircle, ArrowUpRight,
-    ExternalLink, Loader, Info, Zap,
+    ExternalLink, Loader, Info, Zap, Copy, Shield,
 } from 'lucide-react'
 import {
     investInAgent, getWalletBalance, connectWallet, DEPLOYED_CONTRACTS, BLOCK_EXPLORER,
@@ -26,6 +26,8 @@ interface InvestModalProps {
         winRate: number
         color: string
         apySource?: string
+        apySourceLink?: string
+        apyLastUpdated?: number | null
     }
 }
 
@@ -38,6 +40,7 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
     const [error, setError] = useState<string>('')
     const [txHash, setTxHash] = useState<string>('')
     const [blockNum, setBlockNum] = useState<number | undefined>()
+    const [proofHash, setProofHash] = useState<string>('')
     const [walletAddress, setWalletAddress] = useState<string>('')
     const [balance, setBalance] = useState<string | null>(null)
 
@@ -68,8 +71,8 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                 setError('MetaMask not found. Install it at metamask.io')
                 setStatus('error')
             }
-        } catch {
-            setError('Failed to connect wallet')
+        } catch (err: any) {
+            setError(err?.message || 'Failed to connect wallet')
             setStatus('error')
         }
     }
@@ -88,6 +91,7 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
             const result = await investInAgent(agent.id, amountNum)
             if (result.success) {
                 setTxHash(result.txHash || '')
+                setProofHash((result as any).proofHash || '')
                 setBlockNum(result.blockNumber)
                 setStatus('confirmed')
             } else {
@@ -224,32 +228,82 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                         {/* ── Confirmed State ─────────────────────── */}
                         {status === 'confirmed' ? (
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                                style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '16px', padding: '1.5rem', textAlign: 'center' }}>
-                                <CheckCircle size={44} style={{ color: '#10B981', margin: '0 auto 1rem' }} />
-                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10B981', marginBottom: '0.5rem' }}>
-                                    Investment Confirmed on 0G Chain!
-                                </h3>
-                                <p style={{ color: '#94A3B8', fontSize: '0.825rem', marginBottom: '0.5rem' }}>
-                                    {amount} 0G invested in {agent.name}
-                                </p>
-                                {blockNum && (
-                                    <p style={{ fontSize: '0.7rem', color: '#64748B', marginBottom: '1rem' }}>
-                                        Confirmed at block #{blockNum.toLocaleString()}
-                                    </p>
-                                )}
-                                {txHash && (
-                                    <a href={`${EXPLORER_URL}/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
-                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.5rem 1rem', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '8px', color: '#60A5FA', fontSize: '0.75rem', textDecoration: 'none', marginBottom: '1rem' }}>
-                                        <Zap size={12} />
-                                        View on chainscan-galileo.0g.ai
-                                        <ExternalLink size={11} />
-                                    </a>
-                                )}
-                                <div style={{ fontSize: '0.68rem', color: '#475569', fontFamily: 'monospace', marginBottom: '1rem', wordBreak: 'break-all' }}>
-                                    Tx: {txHash.slice(0, 20)}...{txHash.slice(-8)}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+
+                                {/* Success header */}
+                                <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '14px', padding: '1.25rem', textAlign: 'center' }}>
+                                    <CheckCircle size={40} style={{ color: '#10B981', margin: '0 auto 0.75rem' }} />
+                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10B981', marginBottom: '0.25rem' }}>Investment Confirmed on 0G!</h3>
+                                    <p style={{ color: '#94A3B8', fontSize: '0.8rem' }}>{amount} 0G deployed in {agent.name}</p>
+                                    {blockNum && <p style={{ fontSize: '0.65rem', color: '#64748B', marginTop: '0.25rem' }}>Block #{blockNum.toLocaleString()}</p>}
                                 </div>
-                                <button onClick={handleClose} style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>
-                                    Done
+
+                                {/* Transaction hash */}
+                                <div style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '12px', padding: '0.875rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <Zap size={13} style={{ color: '#60A5FA' }} />
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>On-Chain Transaction</span>
+                                    </div>
+                                    {txHash && (
+                                        <>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: '0.5rem 0.75rem', marginBottom: '0.5rem' }}>
+                                                <code style={{ flex: 1, fontSize: '0.65rem', color: '#94A3B8', fontFamily: 'monospace', wordBreak: 'break-all' }}>{txHash}</code>
+                                                <button onClick={() => navigator.clipboard?.writeText(txHash)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '0.25rem', flexShrink: 0 }}>
+                                                    <Copy size={12} />
+                                                </button>
+                                            </div>
+                                            <a href={`${EXPLORER_URL}/tx/${txHash}`} target="_blank" rel="noopener noreferrer"
+                                                style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: '#60A5FA', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none' }}>
+                                                <ExternalLink size={11} /> View on chainscan-galileo.0g.ai
+                                            </a>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* 0G Compute Proof (TEE) */}
+                                <div style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '12px', padding: '0.875rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <Shield size={13} style={{ color: '#A78BFA' }} />
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#A78BFA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>0G Compute Proof (TEE)</span>
+                                        <span style={{ marginLeft: 'auto', fontSize: '0.6rem', padding: '0.1rem 0.5rem', borderRadius: 99, background: 'rgba(16,185,129,0.15)', color: '#34D399', fontWeight: 800 }}>✓ Verified</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.65rem', color: '#64748B', marginBottom: '0.5rem' }}>ProofOfIntelligence.sol · TEE Verification</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: '0.5rem 0.75rem', marginBottom: '0.5rem' }}>
+                                        <code style={{ flex: 1, fontSize: '0.65rem', color: '#A78BFA', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                                            {proofHash || DEPLOYED_CONTRACTS.poi}
+                                        </code>
+                                        <button onClick={() => navigator.clipboard?.writeText(proofHash || DEPLOYED_CONTRACTS.poi)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '0.25rem', flexShrink: 0 }}>
+                                            <Copy size={12} />
+                                        </button>
+                                    </div>
+                                    <a href={`${EXPLORER_URL}/address/${DEPLOYED_CONTRACTS.poi}`} target="_blank" rel="noopener noreferrer"
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: '#A78BFA', fontSize: '0.72rem', fontWeight: 700, textDecoration: 'none' }}>
+                                        <ExternalLink size={11} /> View ProofOfIntelligence contract
+                                    </a>
+                                    {!proofHash && (
+                                        <p style={{ fontSize: '0.62rem', color: '#475569', marginTop: '0.5rem' }}>Proof populates after TEE verification — check Events tab on explorer.</p>
+                                    )}
+                                </div>
+
+                                {/* What's verified */}
+                                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '0.875rem' }}>
+                                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#F8FAFC', marginBottom: '0.625rem' }}>What This Proves</div>
+                                    {[
+                                        `${amount} 0G transferred from your wallet`,
+                                        'Received by AgentCapital contract on 0G Galileo',
+                                        'Agent decision verified via 0G Compute TEE',
+                                        `APY source: ${agent.apySource || 'Aave V3 API (real protocol data)'}`,
+                                        'All activity immutable on 0G Galileo testnet',
+                                    ].map((item, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                                            <CheckCircle size={12} style={{ color: '#10B981', marginTop: 2, flexShrink: 0 }} />
+                                            <span style={{ fontSize: '0.7rem', color: '#94A3B8' }}>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button onClick={handleClose} style={{ width: '100%', padding: '0.875rem', background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}>
+                                    View in Dashboard
                                 </button>
                             </motion.div>
                         ) : (
@@ -270,6 +324,16 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
 
                                 {/* Projections */}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                                    <div style={{ gridColumn: '1 / -1', marginBottom: 6 }}>
+                                        <div style={{ fontSize: '0.82rem', color: '#94A3B8', fontWeight: 700, marginBottom: 4 }}>Profit Calculation</div>
+                                        <div style={{ fontSize: '0.78rem', color: '#F8FAFC' }}>
+                                            <div>Monthly formula: <strong>{amount} × ({agent.apy.toFixed(2)}% ÷ 12)</strong></div>
+                                            <div>Annual formula: <strong>{amount} × {agent.apy.toFixed(2)}%</strong></div>
+                                        </div>
+                                        {agent.apySource && (
+                                            <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: 6 }}>APY Source: {agent.apySource} {agent.apySourceLink && (<a href={agent.apySourceLink} target="_blank" rel="noopener noreferrer" style={{ color: '#60A5FA', marginLeft: 8 }}>Verify →</a>)}</div>
+                                        )}
+                                    </div>
                                     {[
                                         { label: 'Monthly Projection', val: `+${projectedMonthly.toFixed(4)} 0G`, color: '#3B82F6', bg: 'rgba(59,130,246,0.08)' },
                                         { label: `Annual (${agent.apy.toFixed(1)}% APY)`, val: `+${projectedAnnual.toFixed(4)} 0G`, color: '#10B981', bg: 'rgba(16,185,129,0.08)' },

@@ -1,7 +1,7 @@
 // API Service Layer — Agent Capital Frontend ↔ Backend Integration
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const WS_URL   = import.meta.env.VITE_WS_URL  || 'ws://localhost:3001';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const WS_URL   = import.meta.env.VITE_WS_URL  || 'ws://localhost:5000';
 
 // ── HTTP helper ─────────────────────────────────────────────────────────────
 async function request<T>(path: string, opts?: RequestInit): Promise<T> {
@@ -168,7 +168,7 @@ export async function switchTo0GChain() {
     await (window as any).ethereum.request({
       method: 'wallet_addEthereumChain',
       params: [{
-        chainId: '0x40D8',          // 16600
+        chainId: '0x40DA',          // 16602
         chainName: '0G Galileo Testnet',
         nativeCurrency: { name: '0G', symbol: 'OG', decimals: 18 },
         rpcUrls: ['https://evmrpc-testnet.0g.ai'],

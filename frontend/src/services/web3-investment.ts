@@ -86,6 +86,7 @@ export interface InvestmentResult {
     blockNumber?: number
     error?: string
     explorerUrl?: string
+    proofHash?: string
 }
 
 export interface InvestmentStatus {
@@ -114,23 +115,42 @@ export async function getBrowserProvider(): Promise<BrowserProvider | null> {
  * Connect to user's wallet
  */
 export async function connectWallet(): Promise<string | null> {
-    try {
-        const provider = await getBrowserProvider()
-        if (!provider) return null
+    if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error('MetaMask not detected. Install it at metamask.io')
+    }
 
-        const accounts = await window.ethereum!.request({
+    try {
+        // Request accounts — this triggers the MetaMask popup
+        const accounts = await window.ethereum.request({
             method: 'eth_requestAccounts',
         })
 
         if (!accounts || accounts.length === 0) {
-            console.warn('[Web3] No accounts returned')
-            return null
+            throw new Error('No accounts returned. Unlock MetaMask and try again.')
         }
 
-        return accounts[0]
-    } catch (error) {
+        const address = accounts[0]
+        console.log('[Web3] Connected:', address)
+
+        // Auto-switch to 0G Galileo if on wrong network
+        try {
+            const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' })
+            const currentChainId = parseInt(chainIdHex, 16)
+            if (currentChainId !== CHAIN_ID) {
+                console.log(`[Web3] Wrong network (${currentChainId}), switching to 0G Galileo...`)
+                await switchToOGNetwork()
+            }
+        } catch (switchErr) {
+            console.warn('[Web3] Network switch failed, continuing anyway:', switchErr)
+        }
+
+        return address
+    } catch (error: any) {
         console.error('[Web3] Connect wallet failed:', error)
-        return null
+        if (error.code === 4001) {
+            throw new Error('Connection rejected. Please approve in MetaMask.')
+        }
+        throw error
     }
 }
 
@@ -335,14 +355,36 @@ export async function getUserInvestment(
  */
 export async function getWalletBalance(address?: string): Promise<string | null> {
     try {
-        const provider = new BrowserProvider(window.ethereum!)
-        const signer = await provider.getSigner()
-        const account = address || (await signer.getAddress())
+        // Try BrowserProvider first (MetaMask)
+        if (window.ethereum) {
+            const provider = new BrowserProvider(window.ethereum)
+            const account = address || (await provider.getSigner().then(s => s.getAddress()))
+            const balance = await provider.getBalance(account)
+            const formatted = ethers.formatEther(balance)
+            // If balance is 0, it might be wrong network — try direct RPC
+            if (formatted !== '0.0' && formatted !== '0') {
+                return formatted
+            }
+        }
 
-        const balance = await provider.getBalance(account)
-        return ethers.formatEther(balance)
+        // Fallback: query 0G Galileo RPC directly for real balance
+        if (address) {
+            const rpcProvider = new ethers.JsonRpcProvider(RPC_URL)
+            const balance = await rpcProvider.getBalance(address)
+            return ethers.formatEther(balance)
+        }
+
+        return '0'
     } catch (error) {
         console.error('[Web3] Get balance failed:', error)
+        // Last resort: try direct RPC
+        if (address) {
+            try {
+                const rpcProvider = new ethers.JsonRpcProvider(RPC_URL)
+                const balance = await rpcProvider.getBalance(address)
+                return ethers.formatEther(balance)
+            } catch { /* ignore */ }
+        }
         return null
     }
 }
@@ -366,6 +408,10 @@ export function getDemoInvestmentSimulation(agentId: number, amountInOG: number)
         .fill(0)
         .map(() => Math.floor(Math.random() * 16).toString(16))
         .join('')}`
+    const fakeProofHash = `0x${Array(64)
+        .fill(0)
+        .map(() => Math.floor(Math.random() * 16).toString(16))
+        .join('')}`
 
     return {
         success: true,
@@ -375,5 +421,6 @@ export function getDemoInvestmentSimulation(agentId: number, amountInOG: number)
         userAddress: '0x7a3f8B9d2c1E4F5a6D7e8F9a0B1c2D3e4F5a6D7e',
         blockNumber: Math.floor(Math.random() * 1000000) + 1800000,
         explorerUrl: `https://chainscan-galileo.0g.ai/tx/${fakeTxHash}`,
+        proofHash: fakeProofHash,
     }
 }

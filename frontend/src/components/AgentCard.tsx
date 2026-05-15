@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, Heart, ArrowUpRight, Zap, Shield } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
@@ -12,6 +12,9 @@ interface AgentCardProps {
     reviews: number;
     winRate: number;
     apy: number;
+    apySource?: string | null;
+    apySourceLink?: string | null;
+    apyLastUpdated?: number | null;
     sharpeRatio: number;
     maxDrawdown: number;
     creator: string;
@@ -35,6 +38,9 @@ const AgentCard: React.FC<AgentCardProps> = ({
     reviews,
     winRate,
     apy,
+    apySource,
+    apySourceLink,
+    apyLastUpdated,
     sharpeRatio,
     maxDrawdown,
     creator,
@@ -48,6 +54,15 @@ const AgentCard: React.FC<AgentCardProps> = ({
     onInvest,
     onFollow,
 }) => {
+    const timeAgo = (ts?: number | null) => {
+        if (!ts) return 'Unknown';
+        const s = Math.floor((Date.now() - ts) / 1000);
+        if (s < 60) return `${s}s ago`;
+        const m = Math.floor(s / 60);
+        if (m < 60) return `${m}m ago`;
+        const h = Math.floor(m / 60);
+        return `${h}h ago`;
+    };
     const getRiskColor = (level: string) => {
         switch (level) {
             case 'Conservative':
@@ -143,7 +158,20 @@ const AgentCard: React.FC<AgentCardProps> = ({
                 </div>
                 <div className="agent-metric-item">
                     <p className="text-dark-text-tertiary text-xs uppercase tracking-wider">APY</p>
-                    <p className="metric-value text-accent-secondary">{apy}%</p>
+                    <p className="metric-value text-accent-secondary">{apy ?? '—'}%</p>
+                    {apySource && (
+                        <div style={{ marginTop: 6 }}>
+                            <p className="text-xs text-dark-text-tertiary">Source: {apySource}</p>
+                            {apySourceLink && (
+                                <a href={apySourceLink} target="_blank" rel="noopener noreferrer" className="text-xs text-accent-secondary" style={{ textDecoration: 'underline' }}>
+                                    Verify on source →
+                                </a>
+                            )}
+                            {apyLastUpdated && (
+                                <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>Updated {timeAgo(apyLastUpdated)}</div>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div className="agent-metric-item">
                     <p className="text-dark-text-tertiary text-xs uppercase tracking-wider">Sharpe</p>

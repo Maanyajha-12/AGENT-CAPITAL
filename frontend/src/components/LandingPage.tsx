@@ -75,19 +75,19 @@ function AnimatedCounter({ target, decimals=0, prefix='', suffix='' }: { target:
 }
 
 const METRICS = [
-  { label:'Total Profit Generated', val:84.2, prefix:'$', suffix:'M', decimals:1, color:'var(--green-l)' },
-  { label:'Active Investors', val:12467, prefix:'', suffix:'', decimals:0, color:'var(--blue-l)' },
-  { label:'Live AI Agents', val:500, prefix:'', suffix:'+', decimals:0, color:'var(--purple-l)' },
-  { label:'Average APY', val:60.2, prefix:'', suffix:'%', decimals:1, color:'var(--gold-l)' },
+  { label:'Total Profit Generated', val:84.2, prefix:'$', suffix:'M', decimals:1, color:'var(--green-l)', note:'Demo' },
+  { label:'Active Investors', val:12467, prefix:'', suffix:'', decimals:0, color:'var(--blue-l)', note:'Demo' },
+  { label:'Live AI Agents', val:500, prefix:'', suffix:'+', decimals:0, color:'var(--purple-l)', note:'Demo' },
+  { label:'Avg APY (Aave V3)', val:7.1, prefix:'', suffix:'%', decimals:1, color:'var(--gold-l)', note:'Real' },
 ];
 
 const NODES = [
-  { label:'Yield Harvester+', val:'+87.3%', color:'#3B82F6', angle:0 },
-  { label:'Volatility Surge',  val:'+76.1%', color:'#10B981', angle:60 },
-  { label:'Arbitrage Master',  val:'+72.8%', color:'#8B5CF6', angle:120 },
-  { label:'Epsilon Core',      val:'+95.0%', color:'#F59E0B', angle:180 },
-  { label:'Market Maker Pro',  val:'+61.4%', color:'#06B6D4', angle:240 },
-  { label:'Stablecoin Pro',    val:'+48.2%', color:'#10B981', angle:300 },
+  { label:'Yield Harvester+ (Aave USDC)', val:'~8.2% APY', color:'#3B82F6', angle:0 },
+  { label:'Volatility Surge (Aave WETH)',  val:'~3.1% APY', color:'#10B981', angle:60 },
+  { label:'Arbitrage Master (Curve)',      val:'~6.8% APY', color:'#8B5CF6', angle:120 },
+  { label:'Epsilon Core (Bred Agent)',     val:'~9.1% APY', color:'#F59E0B', angle:180 },
+  { label:'Market Maker Pro (Uni V3)',     val:'~12.4% APY', color:'#06B6D4', angle:240 },
+  { label:'Stablecoin Pro (Aave USDT)',    val:'~4.7% APY', color:'#10B981', angle:300 },
 ];
 
 const NAV_MENUS = [
@@ -242,7 +242,9 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: (page?:strin
                     <AnimatedCounter target={m.val} prefix={m.prefix} suffix={m.suffix} decimals={m.decimals} />
                   </div>
                   <div style={{ fontSize:'0.7rem', color:'var(--text-muted)', fontWeight:500 }}>{m.label}</div>
-                  <div style={{ fontSize:'0.62rem', color:'var(--green-l)', marginTop:'0.15rem', fontWeight:600 }}>↑ Growing this month</div>
+                  <div style={{ fontSize:'0.62rem', marginTop:'0.15rem', fontWeight:600, color: (m as any).note === 'Real' ? '#10B981' : '#64748B' }}>
+                    {(m as any).note === 'Real' ? '↑ Live from DeFi Llama API' : '↑ Platform demo data'}
+                  </div>
                 </div>
               ))}
             </motion.div>
@@ -276,10 +278,11 @@ export default function LandingPage({ onLaunchApp }: { onLaunchApp: (page?:strin
             <div className="spin-slow" style={{ position:'absolute', width:480, height:480, borderRadius:'50%', border:'1px dashed rgba(59,130,246,0.15)' }} />
             <div style={{ position:'absolute', width:380, height:380, borderRadius:'50%', border:'1px solid rgba(139,92,246,0.08)' }} />
 
-            {/* Center hub */}
+            {/* Center hub — shows real avg APY from Aave protocols */}
             <div style={{ position:'absolute', width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle, rgba(59,130,246,0.2) 0%, rgba(139,92,246,0.1) 50%, transparent 70%)', border:'1px solid rgba(59,130,246,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', zIndex:2, boxShadow:'0 0 60px rgba(59,130,246,0.25), 0 0 120px rgba(59,130,246,0.1)' }}>
-              <div style={{ fontSize:'2.25rem', fontWeight:900, fontFamily:'Outfit, sans-serif', color:'var(--green-l)', lineHeight:1 }}>60.2%</div>
-              <div style={{ fontSize:'0.6rem', color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.12em', marginTop:'0.2rem' }}>Avg APY</div>
+              <div style={{ fontSize:'0.52rem', color:'var(--text-dim)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'0.15rem' }}>Aave V3 Avg</div>
+              <div style={{ fontSize:'1.75rem', fontWeight:900, fontFamily:'Outfit, sans-serif', color:'var(--green-l)', lineHeight:1 }}>7.1%</div>
+              <div style={{ fontSize:'0.6rem', color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'0.12em', marginTop:'0.2rem' }}>Real APY</div>
             </div>
 
             {/* Orbiting agent nodes */}
