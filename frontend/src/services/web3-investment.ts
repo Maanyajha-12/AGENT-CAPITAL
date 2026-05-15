@@ -346,12 +346,18 @@ export async function getWalletBalance(address?: string): Promise<string | null>
         // Try BrowserProvider first (MetaMask)
         if (window.ethereum) {
             const provider = new BrowserProvider(window.ethereum)
-            const account = address || (await provider.getSigner().then(s => s.getAddress()))
-            const balance = await provider.getBalance(account)
-            const formatted = ethers.formatEther(balance)
-            // If balance is 0, it might be wrong network — try direct RPC
-            if (formatted !== '0.0' && formatted !== '0') {
-                return formatted
+            let account = address
+            if (!account) {
+                const signer = await provider.getSigner()
+                account = await signer.getAddress()
+            }
+            if (account) {
+                const balance = await provider.getBalance(account)
+                const formatted = ethers.formatEther(balance)
+                // If balance is 0, it might be wrong network — try direct RPC
+                if (formatted !== '0.0' && formatted !== '0') {
+                    return formatted
+                }
             }
         }
 
