@@ -127,7 +127,7 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 8 }}
                         transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                        onClick={e => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
                         style={{
                             background: 'linear-gradient(160deg, rgba(8,12,24,0.99) 0%, rgba(12,18,36,0.97) 100%)',
                             border: '1px solid rgba(59,130,246,0.18)',
@@ -135,6 +135,8 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                             padding: '1.875rem',
                             width: '90%',
                             maxWidth: '500px',
+                            maxHeight: '92vh',
+                            overflowY: 'auto',
                             boxShadow: '0 30px 60px -12px rgba(0,0,0,0.7), 0 0 80px rgba(59,130,246,0.08)',
                         }}
                     >
@@ -326,12 +328,15 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
                                     <div style={{ gridColumn: '1 / -1', marginBottom: 6 }}>
                                         <div style={{ fontSize: '0.82rem', color: '#94A3B8', fontWeight: 700, marginBottom: 4 }}>Profit Calculation</div>
-                                        <div style={{ fontSize: '0.78rem', color: '#F8FAFC' }}>
-                                            <div>Monthly formula: <strong>{amount} × ({agent.apy.toFixed(2)}% ÷ 12)</strong></div>
-                                            <div>Annual formula: <strong>{amount} × {agent.apy.toFixed(2)}%</strong></div>
+                                        <div style={{ fontSize: '0.75rem', color: '#F8FAFC', lineHeight: 1.6 }}>
+                                            <div style={{ wordBreak: 'break-word' }}>Monthly: <strong>{amount} × ({agent.apy.toFixed(2)}% ÷ 12)</strong></div>
+                                            <div style={{ wordBreak: 'break-word' }}>Annual: <strong>{amount} × {agent.apy.toFixed(2)}%</strong></div>
                                         </div>
                                         {agent.apySource && (
-                                            <div style={{ fontSize: '0.72rem', color: '#94A3B8', marginTop: 6 }}>APY Source: {agent.apySource} {agent.apySourceLink && (<a href={agent.apySourceLink} target="_blank" rel="noopener noreferrer" style={{ color: '#60A5FA', marginLeft: 8 }}>Verify →</a>)}</div>
+                                            <div style={{ fontSize: '0.68rem', color: '#64748B', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                                                APY Source: <span style={{ color: '#94A3B8' }}>{agent.apySource}</span>
+                                                {agent.apySourceLink && (<a href={agent.apySourceLink} target="_blank" rel="noopener noreferrer" style={{ color: '#60A5FA', marginLeft: 6 }}>Verify →</a>)}
+                                            </div>
                                         )}
                                     </div>
                                     {[
@@ -364,9 +369,20 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
 
                                 {/* Error */}
                                 {error && (
-                                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '0.75rem', marginBottom: '1rem', display: 'flex', gap: '0.625rem', fontSize: '0.8rem', color: '#FCA5A5' }}>
-                                        <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                                        <span>{error}</span>
+                                    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '0.875rem', marginBottom: '1rem' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                                            <AlertCircle size={15} style={{ color: '#F87171', flexShrink: 0, marginTop: 1 }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.8rem', color: '#FCA5A5', fontWeight: 600, marginBottom: '0.25rem' }}>Transaction Error</p>
+                                                <p style={{ fontSize: '0.72rem', color: '#94A3B8', lineHeight: 1.5, wordBreak: 'break-word' }}>{error}</p>
+                                                {error.includes('0G balance') && (
+                                                    <a href="https://hub.0g.ai" target="_blank" rel="noopener noreferrer"
+                                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: '0.5rem', fontSize: '0.72rem', color: '#60A5FA', textDecoration: 'none', fontWeight: 700 }}>
+                                                        Get free testnet 0G → <ExternalLink size={10} />
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
 
