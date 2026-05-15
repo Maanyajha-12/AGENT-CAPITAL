@@ -345,12 +345,21 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                                     ))}
                                 </div>
 
-                                {/* Source disclosure */}
-                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.75rem', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '10px', marginBottom: '1.25rem' }}>
-                                    <Info size={14} style={{ color: '#F59E0B', flexShrink: 0, marginTop: '0.1rem' }} />
-                                    <p style={{ fontSize: '0.68rem', color: '#78716C', lineHeight: 1.5 }}>
-                                        APY projections are calculated from real DeFi protocol rates ({agent.apySource || 'DeFi Llama'}). Returns are simulated on 0G testnet — not financial advice.
-                                    </p>
+                                {/* Transparency Disclosure */}
+                                <div style={{ padding: '0.75rem', background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '10px', marginBottom: '1.25rem' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                        <Info size={14} style={{ color: '#F59E0B', flexShrink: 0 }} />
+                                        <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#F59E0B' }}>Transparency Disclosure</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.65rem', color: '#78716C', lineHeight: 1.6, paddingLeft: '1.375rem' }}>
+                                        <div>✅ <strong style={{ color: '#94A3B8' }}>REAL:</strong> APY from {agent.apySource || 'DeFi Llama / Aave V3'}</div>
+                                        <div>✅ <strong style={{ color: '#94A3B8' }}>REAL:</strong> On-chain transaction on 0G Galileo testnet</div>
+                                        <div>✅ <strong style={{ color: '#94A3B8' }}>REAL:</strong> 0G Compute TEE verification proofs</div>
+                                        <div>⚠️ <strong style={{ color: '#94A3B8' }}>SIMULATED:</strong> Trade execution (testnet demo)</div>
+                                        <div style={{ marginTop: '0.375rem', color: '#64748B', fontStyle: 'italic' }}>
+                                            Mainnet: Real DEX execution via Uniswap/0x
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Error */}

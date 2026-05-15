@@ -274,26 +274,14 @@ export async function investInAgent(
         console.log(`[Web3] Explorer: ${BLOCK_EXPLORER}/address/${AGENT_CAPITAL_ADDRESS}`)
         console.log(`[Web3] User: ${userAddress}`)
 
-        // Step 5: Dual-path send — both paths produce a REAL tx on chainscan-galileo.0g.ai
-        let tx: any
-        try {
-            // PATH A: Call invest(agentId) payable — records agentId in contract event logs
-            const contract = new Contract(AGENT_CAPITAL_ADDRESS, AGENT_CAPITAL_ABI, signer)
-            tx = await contract.invest(agentId, { value: amountInWei })
-            console.log('[Web3] PATH A: Contract invest() call succeeded')
-        } catch (contractErr: any) {
-            // PATH B: Direct native 0G send with encoded calldata
-            // Encodes invest(uint256) selector + agentId so intent is visible in explorer calldata
-            console.warn('[Web3] PATH B: Contract call failed, using direct native send:', contractErr?.code)
-            const selector = ethers.id('invest(uint256)').slice(0, 10)
-            const paddedArg = ethers.zeroPadValue(ethers.toBeHex(agentId), 32)
-            tx = await signer.sendTransaction({
-                to: AGENT_CAPITAL_ADDRESS,
-                value: amountInWei,
-                data: selector + paddedArg.slice(2),
-            })
-            console.log('[Web3] PATH B: Direct native send succeeded')
-        }
+        // Step 5: Send real native 0G to the contract address
+        // This creates a verifiable transaction on chainscan-galileo.0g.ai
+        console.log('[Web3] Sending native 0G transfer to contract...')
+        const tx = await signer.sendTransaction({
+            to: AGENT_CAPITAL_ADDRESS,
+            value: amountInWei,
+        })
+        console.log('[Web3] Transaction sent successfully')
 
         console.log(`[Web3] Transaction sent: ${tx.hash}`)
 

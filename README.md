@@ -27,13 +27,13 @@
 Everything is REAL. Everything is VERIFIABLE. Everything is ON-CHAIN.
 ```
 
-### Judge Resources (read in order)
+### Judge Resources
 
-| Doc | What It Covers | Time |
-|-----|----------------|------|
-| [**DEMO_GUIDE.md**](./DEMO_GUIDE.md) | 4-minute demo script with timing | 5 min |
-| [**END_TO_END_TEST_GUIDE.md**](./docs/demo/END_TO_END_TEST_GUIDE.md) | Test every feature yourself | 10 min |
-| [**EXECUTIVE_SUMMARY.md**](./docs/demo/EXECUTIVE_SUMMARY_WINNING_STRATEGY.md) | Business case + scoring | 5 min |
+| Doc | What It Covers |
+|-----|----------------|
+| [**DEMO_GUIDE.md**](./DEMO_GUIDE.md) | 4-minute demo script with timing |
+| [**API_DOCUMENTATION.md**](./docs/API_DOCUMENTATION.md) | Full API reference |
+| [**0G_INTEGRATION_TUTORIAL.md**](./docs/0G_INTEGRATION_TUTORIAL.md) | 0G integration deep-dive |
 
 ---
 
@@ -100,7 +100,7 @@ Symbol:    0G
 | Smart Contracts | ✅ **Real** — deployed on 0G Galileo | Click explorer links above |
 | MetaMask Investment | ✅ **Real** — sends actual 0G testnet tokens | Click Invest → MetaMask popup |
 | 0G Compute API | ✅ **Real** — calls `router-api-testnet.integratenetwork.work` | Check backend logs |
-| 0G Storage (KV) | ✅ **Real** — agent proofs stored on 0G KV | `.env`: `OG_KV_ENDPOINT` |
+| 0G Storage Network | ✅ **Real** — connected to `indexer-storage-testnet-turbo.0g.ai` | Backend startup logs |
 | APY Data Source | ✅ **Real** — fetched from DeFi Llama / Aave V3 APIs | Browser DevTools → Network tab |
 | Trade Execution | ⚠️ **Simulated** on testnet with real market price data | Labeled "Simulated" in UI |
 | Profit Numbers | ⚠️ **Calculated** from real APYs, not from real trade P&L | Formula shown in InvestModal |
@@ -115,7 +115,7 @@ Symbol:    0G
 
 - Node.js 18+
 - MetaMask with 0G Galileo testnet configured
-- Testnet 0G tokens from [hub.0g.ai](https://hub.0g.ai)
+- Testnet 0G tokens from [faucet.0g.ai](https://faucet.0g.ai)
 
 ### Setup
 
@@ -167,9 +167,10 @@ PRIVATE_KEY=your_deployer_key_here
 OG_COMPUTE_ENDPOINT=https://router-api-testnet.integratenetwork.work/v1
 OG_COMPUTE_ROUTER_API_KEY=your_key_here
 
-# 0G Storage
-OG_KV_ENDPOINT=http://localhost:8080
-OG_LOG_ENDPOINT=http://localhost:8081
+# 0G Storage — Public Testnet
+OG_STORAGE_INDEXER=https://indexer-storage-testnet-turbo.0g.ai
+OG_STORAGE_RPC=https://rpc-storage-testnet-turbo.0g.ai
+OG_FLOW_CONTRACT=0x22E03a6A89B950F1c82ec5e74F8eCa321a105296
 
 # Anthropic (for AI agents)
 ANTHROPIC_API_KEY=sk-ant-api03-YOUR_KEY
