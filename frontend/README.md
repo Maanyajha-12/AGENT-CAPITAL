@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎨 SWARM OS — Frontend
+# 🎨 AGENT CAPITAL — Frontend
 
 ### Real-Time Multi-Agent Dashboard with AI-Native Dark Theme
 
@@ -16,7 +16,7 @@
 
 ## Overview
 
-The SWARM OS frontend is a **React 18 + TypeScript** single-page application built with **Vite 5**. It provides a rich, real-time dashboard for interacting with the multi-agent deliberation pipeline, monitoring agent performance, breeding agents, running tournaments, and visualizing cross-chain activity.
+The AGENT CAPITAL frontend is a **React 18 + TypeScript** single-page application built with **Vite 5**. It provides a rich, real-time dashboard for interacting with the multi-agent deliberation pipeline, monitoring agent performance, breeding agents, running tournaments, and visualizing cross-chain activity.
 
 **Live at:** [frontend-six-steel-45.vercel.app](https://frontend-six-steel-45.vercel.app)
 
@@ -534,6 +534,6 @@ MIT — see [LICENSE](../LICENSE) for details.
 
 <div align="center">
 
-Part of the [SWARM OS](../README.md) ecosystem · Deployed on [Vercel](https://vercel.com) · Powered by [0G Network](https://0g.ai)
+Part of the [AGENT CAPITAL](../README.md) ecosystem · Deployed on [Vercel](https://vercel.com) · Powered by [0G Network](https://0g.ai)
 
 </div>

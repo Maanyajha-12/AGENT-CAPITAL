@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @title AgentRegistry
- * @notice Global agent registry with cross-chain awareness for SWARM OS
+ * @notice Global agent registry with cross-chain awareness for AGENT CAPITAL
  * @dev Tracks agent scores, rankings, and chain-specific performance
  */
 contract AgentRegistry {
@@ -26,8 +26,17 @@ contract AgentRegistry {
 
     address public owner;
 
-    event AgentRegistered(uint256 indexed tokenId, string name, uint256 homeChain);
-    event ScoreUpdated(uint256 indexed tokenId, uint256 chainId, uint256 score, bytes32 proofHash);
+    event AgentRegistered(
+        uint256 indexed tokenId,
+        string name,
+        uint256 homeChain
+    );
+    event ScoreUpdated(
+        uint256 indexed tokenId,
+        uint256 chainId,
+        uint256 score,
+        bytes32 proofHash
+    );
     event MatchRecorded(uint256 indexed tokenId, bool won, uint256 newScore);
 
     modifier onlyOwner() {
@@ -42,7 +51,11 @@ contract AgentRegistry {
     /**
      * @notice Register a new agent
      */
-    function registerAgent(uint256 tokenId, string calldata name, uint256 homeChain) external onlyOwner {
+    function registerAgent(
+        uint256 tokenId,
+        string calldata name,
+        uint256 homeChain
+    ) external onlyOwner {
         require(!agents[tokenId].active, "Already registered");
 
         agents[tokenId] = Agent({
@@ -65,12 +78,17 @@ contract AgentRegistry {
     /**
      * @notice Update an agent's score on a specific chain with proof
      */
-    function updateScore(uint256 tokenId, uint256 chainId, uint256 score, bytes32 proofHash) external onlyOwner {
+    function updateScore(
+        uint256 tokenId,
+        uint256 chainId,
+        uint256 score,
+        bytes32 proofHash
+    ) external onlyOwner {
         require(agents[tokenId].active, "Agent not found");
         require(score <= 100, "Score must be <= 100");
 
         chainScores[tokenId][chainId] = score;
-        
+
         // Recalculate global score (simple average for MVP)
         agents[tokenId].globalScore = score;
 
@@ -101,7 +119,10 @@ contract AgentRegistry {
     /**
      * @notice Get chain-specific score
      */
-    function getChainScore(uint256 tokenId, uint256 chainId) external view returns (uint256) {
+    function getChainScore(
+        uint256 tokenId,
+        uint256 chainId
+    ) external view returns (uint256) {
         return chainScores[tokenId][chainId];
     }
 

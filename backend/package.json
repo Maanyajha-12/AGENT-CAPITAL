@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "SWARM OS Backend - Multi-Agent System with 0G Compute Verification",
+  "description": "AGENT CAPITAL Backend - Multi-Agent System with 0G Compute Verification",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
@@ -17,7 +17,7 @@
     "autonomous",
     "inft"
   ],
-  "author": "SWARM OS",
+  "author": "AGENT CAPITAL",
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",

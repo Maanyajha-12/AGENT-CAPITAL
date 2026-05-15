@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 /**
  * @title CrossChainBridge
- * @notice Bridge contract for cross-chain agent message passing in SWARM OS
+ * @notice Bridge contract for cross-chain agent message passing in AGENT CAPITAL
  * @dev Supports Ethereum, Polygon, and 0G Chain message relay
  */
 contract CrossChainBridge {
@@ -27,8 +27,18 @@ contract CrossChainBridge {
     address public owner;
     uint256 public relayFee = 0.001 ether;
 
-    event MessageSent(uint256 indexed id, uint256 sourceChain, uint256 destChain, bytes32 payloadHash, address sender);
-    event MessageReceived(uint256 indexed id, bytes32 proofHash, address relayer);
+    event MessageSent(
+        uint256 indexed id,
+        uint256 sourceChain,
+        uint256 destChain,
+        bytes32 payloadHash,
+        address sender
+    );
+    event MessageReceived(
+        uint256 indexed id,
+        bytes32 proofHash,
+        address relayer
+    );
     event RelayerAdded(address relayer);
     event RelayerRemoved(address relayer);
     event ChainAdded(uint256 chainId);
@@ -48,9 +58,9 @@ contract CrossChainBridge {
         authorizedRelayers[msg.sender] = true;
 
         // Register default chains
-        supportedChains[16602] = true;     // 0G Galileo Testnet
-        supportedChains[11155111] = true;  // Ethereum Sepolia
-        supportedChains[80001] = true;     // Polygon Mumbai
+        supportedChains[16602] = true; // 0G Galileo Testnet
+        supportedChains[11155111] = true; // Ethereum Sepolia
+        supportedChains[80001] = true; // Polygon Mumbai
     }
 
     /**
@@ -58,7 +68,10 @@ contract CrossChainBridge {
      * @param destChain Target chain ID
      * @param payloadHash Hash of the message payload
      */
-    function sendMessage(uint256 destChain, bytes32 payloadHash) external payable returns (uint256) {
+    function sendMessage(
+        uint256 destChain,
+        bytes32 payloadHash
+    ) external payable returns (uint256) {
         require(supportedChains[destChain], "Unsupported chain");
         require(msg.value >= relayFee, "Insufficient relay fee");
 
@@ -74,7 +87,13 @@ contract CrossChainBridge {
             processed: false
         });
 
-        emit MessageSent(messageCount, block.chainid, destChain, payloadHash, msg.sender);
+        emit MessageSent(
+            messageCount,
+            block.chainid,
+            destChain,
+            payloadHash,
+            msg.sender
+        );
         return messageCount;
     }
 
@@ -83,7 +102,10 @@ contract CrossChainBridge {
      * @param messageId Original message ID
      * @param proofHash Verification proof hash
      */
-    function receiveMessage(uint256 messageId, bytes32 proofHash) external onlyRelayer {
+    function receiveMessage(
+        uint256 messageId,
+        bytes32 proofHash
+    ) external onlyRelayer {
         require(!processedProofs[proofHash], "Already processed");
         processedProofs[proofHash] = true;
 

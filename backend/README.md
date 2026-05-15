@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧠 SWARM OS — Backend
+# 🧠 AGENT CAPITAL — Backend
 
 ### Multi-Agent Orchestration Server with 0G Compute Verification
 
@@ -15,7 +15,7 @@
 
 ## Overview
 
-The SWARM OS backend is a **Node.js + Express + TypeScript** server that orchestrates four specialized AI agents through a structured deliberation pipeline. It integrates with **0G Compute** for TEE-verified inference, **0G Storage** (KV + Log) for persistent state, and broadcasts real-time progress over **WebSocket**.
+The AGENT CAPITAL backend is a **Node.js + Express + TypeScript** server that orchestrates four specialized AI agents through a structured deliberation pipeline. It integrates with **0G Compute** for TEE-verified inference, **0G Storage** (KV + Log) for persistent state, and broadcasts real-time progress over **WebSocket**.
 
 ---
 
@@ -379,7 +379,7 @@ Compiles TypeScript to `dist/` with target `ES2020` and `commonjs` modules.
 NODE_ENV=production npm start
 
 # With PM2 (recommended)
-pm2 start npm --name "swarmos-backend" -- start
+pm2 start npm --name "AGENT CAPITAL-backend" -- start
 
 # With PM2 ecosystem file
 pm2 start ecosystem.config.js
@@ -464,6 +464,6 @@ MIT — see [LICENSE](../LICENSE) for details.
 
 <div align="center">
 
-Part of the [SWARM OS](../README.md) ecosystem · Powered by [Anthropic Claude](https://anthropic.com) & [0G Network](https://0g.ai)
+Part of the [AGENT CAPITAL](../README.md) ecosystem · Powered by [Anthropic Claude](https://anthropic.com) & [0G Network](https://0g.ai)
 
 </div>

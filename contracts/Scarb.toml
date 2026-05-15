@@ -1,6 +1,6 @@
 name: Deliberate
 version: 1.0.0
-description: SWARM OS - Autonomous Multi-Agent System with 0G Compute Verification
+description: AGENT CAPITAL - Autonomous Multi-Agent System with 0G Compute Verification
 
 profiles:
   - name: default

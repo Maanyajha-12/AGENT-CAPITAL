@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 /**
  * @title TournamentArena
  * @notice On-chain tournament coordinator with entry fees and prize distribution
- * @dev Manages competitive elimination tournaments for SWARM OS agents
+ * @dev Manages competitive elimination tournaments for AGENT CAPITAL agents
  */
 contract TournamentArena {
     struct Tournament {
@@ -38,10 +38,25 @@ contract TournamentArena {
     uint256 public protocolFeePercent = 30; // 30% to protocol
     uint256 public totalProtocolFees;
 
-    event TournamentCreated(uint256 indexed id, string prompt, uint256 entryFee, uint256 maxParticipants);
+    event TournamentCreated(
+        uint256 indexed id,
+        string prompt,
+        uint256 entryFee,
+        uint256 maxParticipants
+    );
     event AgentEntered(uint256 indexed tournamentId, uint256 indexed agentId);
-    event TournamentCompleted(uint256 indexed id, uint256 winnerId, uint256 winnerScore, uint256 prize);
-    event ScoreRecorded(uint256 indexed tournamentId, uint256 agentId, uint256 score, uint256 round);
+    event TournamentCompleted(
+        uint256 indexed id,
+        uint256 winnerId,
+        uint256 winnerScore,
+        uint256 prize
+    );
+    event ScoreRecorded(
+        uint256 indexed tournamentId,
+        uint256 agentId,
+        uint256 score,
+        uint256 round
+    );
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Not owner");
@@ -79,14 +94,22 @@ contract TournamentArena {
             proofHash: bytes32(0)
         });
 
-        emit TournamentCreated(tournamentCount, prompt, entryFee, maxParticipants);
+        emit TournamentCreated(
+            tournamentCount,
+            prompt,
+            entryFee,
+            maxParticipants
+        );
         return tournamentCount;
     }
 
     /**
      * @notice Enter an agent into a tournament
      */
-    function enterTournament(uint256 tournamentId, uint256 agentId) external payable {
+    function enterTournament(
+        uint256 tournamentId,
+        uint256 agentId
+    ) external payable {
         Tournament storage t = tournaments[tournamentId];
         require(!t.completed, "Tournament completed");
         require(t.participants.length < t.maxParticipants, "Tournament full");
@@ -113,12 +136,14 @@ contract TournamentArena {
         require(!tournaments[tournamentId].completed, "Tournament completed");
         require(hasEntered[tournamentId][agentId], "Agent not in tournament");
 
-        tournamentResults[tournamentId].push(TournamentResult({
-            agentId: agentId,
-            score: score,
-            round: round,
-            proofHash: proofHash
-        }));
+        tournamentResults[tournamentId].push(
+            TournamentResult({
+                agentId: agentId,
+                score: score,
+                round: round,
+                proofHash: proofHash
+            })
+        );
 
         emit ScoreRecorded(tournamentId, agentId, score, round);
     }
@@ -146,20 +171,29 @@ contract TournamentArena {
         uint256 winnerPrize = t.prizePool - protocolFee;
         totalProtocolFees += protocolFee;
 
-        emit TournamentCompleted(tournamentId, winnerId, winnerScore, winnerPrize);
+        emit TournamentCompleted(
+            tournamentId,
+            winnerId,
+            winnerScore,
+            winnerPrize
+        );
     }
 
     /**
      * @notice Get tournament details
      */
-    function getTournament(uint256 tournamentId) external view returns (Tournament memory) {
+    function getTournament(
+        uint256 tournamentId
+    ) external view returns (Tournament memory) {
         return tournaments[tournamentId];
     }
 
     /**
      * @notice Get tournament results
      */
-    function getResults(uint256 tournamentId) external view returns (TournamentResult[] memory) {
+    function getResults(
+        uint256 tournamentId
+    ) external view returns (TournamentResult[] memory) {
         return tournamentResults[tournamentId];
     }
 

@@ -30,7 +30,7 @@ contract DeployScript is Script {
         console.log("CrossChainBridge deployed at:", address(bridge));
 
         console.log("");
-        console.log("=== All SWARM OS Contracts Deployed ===");
+        console.log("=== All AGENT CAPITAL Contracts Deployed ===");
         console.log("Network: 0G Galileo Testnet (Chain ID: 16602)");
         console.log("Deployer:", msg.sender);
 

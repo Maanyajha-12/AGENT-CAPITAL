@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⛓️ SWARM OS — Smart Contracts
+# ⛓️ AGENT CAPITAL — Smart Contracts
 
 ### On-Chain Infrastructure for Trustless Multi-Agent AI Coordination
 
@@ -15,7 +15,7 @@
 
 ## Overview
 
-This package contains the Solidity smart contract suite powering SWARM OS's on-chain layer. Six contracts handle agent registration, tournament coordination, cross-chain messaging, iNFT minting, breeding mechanics, and a novel **Proof-of-Intelligence** commit-reveal consensus mechanism.
+This package contains the Solidity smart contract suite powering AGENT CAPITAL's on-chain layer. Six contracts handle agent registration, tournament coordination, cross-chain messaging, iNFT minting, breeding mechanics, and a novel **Proof-of-Intelligence** commit-reveal consensus mechanism.
 
 All contracts are deployed and verified on **0G Galileo Testnet** (Chain ID: `16602`). See [DEPLOYMENT_PROOF.md](../DEPLOYMENT_PROOF.md) for full transaction hashes and addresses.
 
@@ -38,7 +38,7 @@ All contracts are deployed and verified on **0G Galileo Testnet** (Chain ID: `16
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                       SWARM OS ON-CHAIN LAYER                        │
+│                       AGENT CAPITAL ON-CHAIN LAYER                        │
 │                     0G Galileo Testnet (16602)                       │
 ├──────────────────────────────────────────────────────────────────────┤
 │                                                                      │
@@ -471,6 +471,6 @@ MIT — see [LICENSE](../LICENSE) for details.
 
 <div align="center">
 
-Part of the [SWARM OS](../README.md) ecosystem · Deployed on [0G Network](https://0g.ai)
+Part of the [AGENT CAPITAL](../README.md) ecosystem · Deployed on [0G Network](https://0g.ai)
 
 </div>

@@ -1,7 +1,7 @@
 {
-    "name": "swarmos-frontend",
+    "name": "AGENT CAPITAL-frontend",
     "version": "1.0.0",
-    "description": "Frontend for SWARM OS - Multi-Agent Orchestration System",
+    "description": "Frontend for AGENT CAPITAL - Multi-Agent Orchestration System",
     "type": "module",
     "scripts": {
         "dev": "vite",

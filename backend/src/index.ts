@@ -936,7 +936,7 @@ const PORT = parseInt(process.env.PORT || "5000", 10);
 
 httpServer.listen(PORT, "0.0.0.0", () => {
     console.log("\n" + "=".repeat(60));
-    console.log("🚀 SWARM OS Backend Server Started");
+    console.log("🚀 AGENT CAPITAL Backend Server Started");
     console.log("=".repeat(60));
     console.log(`HTTP Server: http://0.0.0.0:${PORT}`);
     console.log(`WebSocket: ws://0.0.0.0:${PORT}`);
