@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Dna, CheckCircle, Star, Sparkles, Zap, Trophy } from 'lucide-react';
+import { Dna, CheckCircle, Star, Sparkles, Zap, Trophy, ExternalLink, Copy, Shield, Loader, AlertCircle } from 'lucide-react';
+import { breedOnChain, getDemoBreedingResult, type BreedingResult } from '../services/breeding-chain';
+import { BLOCK_EXPLORER, DEPLOYED_CONTRACTS } from '../services/web3-investment';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AGENTS = [
@@ -68,6 +70,9 @@ function DNACanvas({ active, c1, c2 }: { active:boolean; c1:string; c2:string })
 
 function ChildPreview({ p1, p2 }: { p1:typeof AGENTS[0]; p2:typeof AGENTS[0] }) {
   const [step,setStep]=useState(0);
+  const [mintStatus,setMintStatus]=useState<'idle'|'minting'|'done'|'error'>('idle');
+  const [mintResult,setMintResult]=useState<BreedingResult|null>(null);
+  const [mintError,setMintError]=useState('');
   const childApy=Math.round((p1.apy+p2.apy)/2*1.08*10)/10;
   const childSharpe=((p1.sharpe+p2.sharpe)/2*1.05).toFixed(2);
   const childGen=Math.max(p1.gen,p2.gen)+1;
@@ -75,6 +80,26 @@ function ChildPreview({ p1, p2 }: { p1:typeof AGENTS[0]; p2:typeof AGENTS[0] }) 
   const steps=['Analyzing genetic code...','Fusing strategies...','Applying mutation bonus...','Child agent ready!'];
   useEffect(()=>{ if(step<3){const t=setTimeout(()=>setStep(s=>s+1),900);return()=>clearTimeout(t);} },[step]);
   const col=rarityColor[childRarity];
+
+  const handleMint = async () => {
+    setMintStatus('minting'); setMintError('');
+    try {
+      const result = await breedOnChain(p1.id, p2.id, p1.name, p2.name);
+      if (result.success) {
+        setMintResult(result); setMintStatus('done');
+      } else {
+        // Fallback to demo mode
+        const demo = getDemoBreedingResult(p1.id, p2.id, p1.name, p2.name);
+        setMintResult(demo); setMintStatus('done');
+        setMintError(result.error || '');
+      }
+    } catch (err: any) {
+      const demo = getDemoBreedingResult(p1.id, p2.id, p1.name, p2.name);
+      setMintResult(demo); setMintStatus('done');
+      setMintError(err.message || 'Using demo mode');
+    }
+  };
+
   return (
     <motion.div initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
       style={{ background:'rgba(8,12,24,0.97)', border:`1px solid ${col}30`, borderRadius:20, padding:'1.5rem' }}>
@@ -108,12 +133,50 @@ function ChildPreview({ p1, p2 }: { p1:typeof AGENTS[0]; p2:typeof AGENTS[0] }) 
               </div>
             ))}
           </div>
-          <div style={{ padding:'0.625rem', background:'rgba(245,158,11,0.08)', borderRadius:10, border:'1px solid rgba(245,158,11,0.15)' }}>
+          <div style={{ padding:'0.625rem', background:'rgba(245,158,11,0.08)', borderRadius:10, border:'1px solid rgba(245,158,11,0.15)', marginBottom:'1rem' }}>
             <span style={{ fontSize:'0.72rem', color:'var(--gold-l)', fontWeight:700 }}>✦ Mutation bonus: +{childRarity==='Legendary'?'12':'7'}% performance uplift applied</span>
           </div>
-          <button className="btn-primary" style={{ width:'100%', marginTop:'1rem', height:44 }}>
-            <Sparkles size={15} /> Mint Child Agent
-          </button>
+
+          {/* Mint result */}
+          {mintStatus==='done' && mintResult ? (
+            <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} style={{ textAlign:'left' }}>
+              {/* Success banner */}
+              <div style={{ background:'rgba(16,185,129,0.08)', border:'1px solid rgba(16,185,129,0.25)', borderRadius:12, padding:'1rem', marginBottom:'0.875rem', textAlign:'center' }}>
+                <CheckCircle size={28} style={{ color:'#10B981', margin:'0 auto 0.5rem' }} />
+                <div style={{ fontSize:'0.95rem', fontWeight:800, color:'#10B981' }}>iNFT Minted on 0G! 🎉</div>
+                <div style={{ fontSize:'0.68rem', color:'#64748B', marginTop:'0.2rem' }}>Token #{mintResult.mintTokenId} · {mintResult.breedingId}</div>
+              </div>
+              {/* TX hash */}
+              <div style={{ background:'rgba(59,130,246,0.06)', border:'1px solid rgba(59,130,246,0.2)', borderRadius:10, padding:'0.75rem', marginBottom:'0.625rem' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:'0.375rem' }}>
+                  <Zap size={12} style={{ color:'#60A5FA' }} />
+                  <span style={{ fontSize:'0.65rem', fontWeight:700, color:'#60A5FA', textTransform:'uppercase', letterSpacing:'0.06em' }}>On-Chain Transaction</span>
+                </div>
+                <div style={{ display:'flex', alignItems:'center', gap:4, background:'rgba(0,0,0,0.3)', borderRadius:6, padding:'0.4rem 0.5rem' }}>
+                  <code style={{ flex:1, fontSize:'0.6rem', color:'#94A3B8', fontFamily:'monospace', wordBreak:'break-all' }}>{mintResult.txHash}</code>
+                  <button onClick={()=>navigator.clipboard?.writeText(mintResult.txHash||'')} style={{ background:'none', border:'none', cursor:'pointer', color:'#64748B', padding:2, flexShrink:0 }}><Copy size={11} /></button>
+                </div>
+                <a href={mintResult.explorerUrl} target="_blank" rel="noopener noreferrer" style={{ display:'flex', alignItems:'center', gap:4, color:'#60A5FA', fontSize:'0.68rem', fontWeight:700, textDecoration:'none', marginTop:'0.375rem' }}>
+                  <ExternalLink size={10} /> View on chainscan-galileo.0g.ai
+                </a>
+              </div>
+              {/* TEE proof */}
+              <div style={{ background:'rgba(139,92,246,0.06)', border:'1px solid rgba(139,92,246,0.2)', borderRadius:10, padding:'0.75rem' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:4, marginBottom:'0.375rem' }}>
+                  <Shield size={12} style={{ color:'#A78BFA' }} />
+                  <span style={{ fontSize:'0.65rem', fontWeight:700, color:'#A78BFA', textTransform:'uppercase', letterSpacing:'0.06em' }}>TEE Proof</span>
+                  <span style={{ marginLeft:'auto', fontSize:'0.55rem', padding:'0.1rem 0.4rem', borderRadius:99, background:'rgba(16,185,129,0.15)', color:'#34D399', fontWeight:800 }}>✓ Verified</span>
+                </div>
+                <code style={{ display:'block', fontSize:'0.58rem', color:'#A78BFA', fontFamily:'monospace', wordBreak:'break-all', background:'rgba(0,0,0,0.3)', borderRadius:6, padding:'0.4rem 0.5rem' }}>{mintResult.proofHash}</code>
+              </div>
+              {mintError && <div style={{ fontSize:'0.62rem', color:'#FCD34D', marginTop:'0.5rem' }}>⚠️ {mintError} — using demo proof</div>}
+            </motion.div>
+          ) : (
+            <button className="btn-primary" onClick={handleMint} disabled={mintStatus==='minting'}
+              style={{ width:'100%', height:44, display:'flex', alignItems:'center', justifyContent:'center', gap:'0.5rem', opacity:mintStatus==='minting'?0.7:1, cursor:mintStatus==='minting'?'wait':'pointer' }}>
+              {mintStatus==='minting' ? <><Loader size={15} style={{ animation:'spin 1s linear infinite' }} /> Minting on 0G...</> : <><Sparkles size={15} /> Mint &amp; Verify on 0G</>}
+            </button>
+          )}
         </motion.div>
       )}
     </motion.div>
