@@ -1,6 +1,6 @@
-# Contributing to SWARM OS
+# Contributing to AGENT CAPITAL
 
-Thank you for your interest in contributing to SWARM OS! This project is an autonomous multi-agent deliberation system built on the 0G Network, and we welcome contributions of all kinds.
+Thank you for your interest in contributing to AGENT CAPITAL! This project is an autonomous multi-agent deliberation system built on the 0G Network, and we welcome contributions of all kinds.
 
 ## 🚀 Getting Started
 
@@ -14,8 +14,8 @@ Thank you for your interest in contributing to SWARM OS! This project is an auto
 ### Setup
 
 ```bash
-git clone https://github.com/Maanyajha-12/SWARMOS.git
-cd SWARMOS
+git clone https://github.com/Maanyajha-12/AGENT CAPITAL.git
+cd AGENT CAPITAL
 chmod +x setup-all.sh && ./setup-all.sh
 cp .env.example backend/.env
 # Edit backend/.env with your API key(s)
@@ -35,14 +35,14 @@ cd frontend && npm run dev
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/Maanyajha-12/SWARMOS/issues) first
+1. Check [existing issues](https://github.com/Maanyajha-12/AGENT CAPITAL/issues) first
 2. Use the **Bug Report** template
 3. Include: steps to reproduce, expected vs actual behavior, screenshots if applicable
 
 ### Suggesting Features
 
 1. Open an issue with the **Feature Request** template
-2. Describe the use case and why it improves SWARM OS
+2. Describe the use case and why it improves AGENT CAPITAL
 
 ### Submitting Code
 

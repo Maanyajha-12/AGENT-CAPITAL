@@ -12,7 +12,8 @@ import {
     ExternalLink, Loader, Info, Zap, Copy, Shield,
 } from 'lucide-react'
 import {
-    investInAgent, getWalletBalance, connectWallet, DEPLOYED_CONTRACTS, BLOCK_EXPLORER,
+    investInAgent, getWalletBalance, connectWallet,
+    DEPLOYED_CONTRACTS, BLOCK_EXPLORER, AGENT_CAPITAL_ADDRESS,
 } from '../services/web3-investment'
 
 interface InvestModalProps {
@@ -160,13 +161,13 @@ export default function InvestModal({ isOpen, onClose, agent }: InvestModalProps
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
                                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981' }} />
                                 <div>
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F8FAFC' }}>0G Galileo Testnet · Chain ID 16602</div>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#F8FAFC' }}>AgentCapital Contract · 0G Galileo</div>
                                     <div style={{ fontSize: '0.62rem', color: '#64748B', fontFamily: 'monospace' }}>
-                                        {DEPLOYED_CONTRACTS.inft.slice(0, 10)}...{DEPLOYED_CONTRACTS.inft.slice(-6)}
+                                        {AGENT_CAPITAL_ADDRESS.slice(0, 10)}...{AGENT_CAPITAL_ADDRESS.slice(-6)}
                                     </div>
                                 </div>
                             </div>
-                            <a href={`${EXPLORER_URL}/address/${DEPLOYED_CONTRACTS.inft}`} target="_blank" rel="noopener noreferrer"
+                            <a href={`${EXPLORER_URL}/address/${AGENT_CAPITAL_ADDRESS}`} target="_blank" rel="noopener noreferrer"
                                 style={{ fontSize: '0.62rem', color: '#60A5FA', display: 'flex', alignItems: 'center', gap: '0.25rem', textDecoration: 'none' }}>
                                 View contract <ExternalLink size={10} />
                             </a>

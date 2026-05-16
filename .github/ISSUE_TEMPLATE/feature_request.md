@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a feature for SWARM OS
+about: Suggest a feature for AGENT CAPITAL
 title: "[FEATURE] "
 labels: enhancement
 assignees: ''

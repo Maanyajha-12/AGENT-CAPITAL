@@ -131,7 +131,7 @@ export default function Dashboard() {
       <motion.div {...fadeIn(0)}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
           <div>
-            <h1 style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'Outfit,sans-serif', letterSpacing: '-0.02em' }}>Welcome back, Maanya 👋</h1>
+            <h1 style={{ fontSize: '1.625rem', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'Outfit,sans-serif', letterSpacing: '-0.02em' }}>Welcome back 👋</h1>
             <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Here's what your AI agents are achieving today.</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.875rem', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 'var(--r-full)' }}>

@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in SWARM OS
+about: Report a bug in AGENT CAPITAL
 title: "[BUG] "
 labels: bug
 assignees: ''

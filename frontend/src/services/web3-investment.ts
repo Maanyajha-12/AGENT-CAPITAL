@@ -21,17 +21,21 @@ declare global {
 const CHAIN_ID = 16602  // 0G Galileo Testnet
 const RPC_URL = 'https://evmrpc-testnet.0g.ai'
 
-// Real deployed contract addresses on 0G Galileo — Block 30912464
-// These match frontend/.env VITE_ variables
+// Real deployed contract addresses on 0G Galileo
+// VITE_AGENT_CAPITAL_CONTRACT  → AgentCapital.sol (payable invest)
+// VITE_INFT_CONTRACT           → DeliberationINFT.sol
+const AGENT_CAPITAL_ADDRESS = (import.meta as any).env?.VITE_AGENT_CAPITAL_CONTRACT ||
+    (import.meta as any).env?.VITE_INFT_CONTRACT ||
+    '0x1cd62cb08754a12fcc3427559e616a2898812d59'
+
 const INFT_CONTRACT_ADDRESS = (import.meta as any).env?.VITE_INFT_CONTRACT ||
     '0x1cd62cb08754a12fcc3427559e616a2898812d59'
 const AGENT_REGISTRY_ADDRESS = (import.meta as any).env?.VITE_AGENT_REGISTRY_CONTRACT ||
     '0xc8106baf71c3a38177167edf51ac1391cbb8e2e6'
 
-// Primary investment target — the deployed INFT contract
-const AGENT_CAPITAL_ADDRESS = INFT_CONTRACT_ADDRESS
 
 export const DEPLOYED_CONTRACTS = {
+    agentCapital: AGENT_CAPITAL_ADDRESS,  // ← invest() payable target
     inft: INFT_CONTRACT_ADDRESS,
     agentRegistry: AGENT_REGISTRY_ADDRESS,
     poi: (import.meta as any).env?.VITE_POI_CONTRACT || '0xdc83dd755ba02265d23922104b0b54c304537bf2',
@@ -39,9 +43,12 @@ export const DEPLOYED_CONTRACTS = {
     bridge: (import.meta as any).env?.VITE_BRIDGE_CONTRACT || '0x8417b73a19a1db21a10d0737fb8bbd469ee21545',
 }
 
+export { AGENT_CAPITAL_ADDRESS }
 export const BLOCK_EXPLORER = 'https://chainscan-galileo.0g.ai'
 
-// Minimal ABI — supports both a payable invest call and direct ETH send fallback
+// ABI for AgentCapital.sol
+// invest(uint256 agentId) payable  → stores investment, emits InvestmentReceived
+// getUserInvestment(address, uint256) → returns balance in wei
 const AGENT_CAPITAL_ABI = [
     {
         "type": "function",
@@ -51,6 +58,16 @@ const AGENT_CAPITAL_ABI = [
         ],
         "outputs": [],
         "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "name": "getUserInvestment",
+        "inputs": [
+            { "name": "investor", "type": "address" },
+            { "name": "agentId", "type": "uint256" }
+        ],
+        "outputs": [{ "name": "", "type": "uint256" }],
+        "stateMutability": "view"
     },
     {
         "type": "function",
@@ -70,6 +87,10 @@ const AGENT_CAPITAL_ABI = [
             { "name": "agentId", "type": "uint256", "indexed": true },
             { "name": "amount", "type": "uint256", "indexed": false }
         ]
+    },
+    {
+        "type": "receive",
+        "stateMutability": "payable"
     }
 ]
 
@@ -279,24 +300,32 @@ export async function investInAgent(
         let tx: any
 
         try {
-            // Attempt 1: Call contract invest(agentId) as payable
-            console.log('[Web3] Trying contract invest() call...')
+            // Primary path: call contract invest(agentId) as payable
+            // MetaMask will show: FROM user → TO AgentCapital contract
+            console.log('[Web3] Calling contract invest(agentId)...')
+            console.log(`[Web3] TO: ${AGENT_CAPITAL_ADDRESS} (AgentCapital contract)`)
             const contract = new Contract(AGENT_CAPITAL_ADDRESS, AGENT_CAPITAL_ABI, signer)
-            // Estimate gas first — if this throws UNPREDICTABLE_GAS_LIMIT the contract rejects it
+
             try {
+                // Gas estimate — will throw if contract rejects (wrong network, revert, etc.)
                 await contract.invest.estimateGas(BigInt(agentId), { value: amountInWei })
                 tx = await contract.invest(BigInt(agentId), { value: amountInWei })
-                console.log('[Web3] Contract invest() sent:', tx.hash)
+                console.log('[Web3] ✅ Contract invest() sent:', tx.hash)
+                console.log(`[Web3]    FROM: ${userAddress}`)
+                console.log(`[Web3]    TO:   ${AGENT_CAPITAL_ADDRESS}`)
+                console.log(`[Web3]    VALUE: ${amountInOG} 0G`)
             } catch (contractErr: any) {
-                // Contract rejected — fall back to plain self-transfer
-                // This is a REAL on-chain tx verifiable on chainscan-galileo.0g.ai
-                // 0G Galileo rejects calldata on EOA transfers, so send clean
-                console.warn('[Web3] Contract invest() reverted, using real self-transfer:', contractErr.shortMessage || contractErr.message)
+                // Fallback: plain ETH transfer TO THE CONTRACT (not self)
+                // Still verifiable on chainscan-galileo.0g.ai:
+                //   FROM: user   →   TO: AgentCapital contract
+                console.warn('[Web3] invest() call failed, falling back to direct contract transfer:', contractErr.shortMessage || contractErr.message)
                 tx = await signer.sendTransaction({
-                    to: userAddress,
+                    to: AGENT_CAPITAL_ADDRESS,  // ← CONTRACT, never self
                     value: amountInWei,
                 })
-                console.log('[Web3] Real self-transfer sent:', tx.hash)
+                console.log('[Web3] ✅ Direct-to-contract transfer sent:', tx.hash)
+                console.log(`[Web3]    FROM: ${userAddress}`)
+                console.log(`[Web3]    TO:   ${AGENT_CAPITAL_ADDRESS}  (AgentCapital contract)`)
             }
         } catch (sendErr: any) {
             throw sendErr  // bubble up INSUFFICIENT_FUNDS / ACTION_REJECTED

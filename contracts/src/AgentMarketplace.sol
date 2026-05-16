@@ -37,7 +37,7 @@ contract AgentMarketplace {
 
     Listing[] public listings;
     Sale[] public sales;
-    mapping(uint256 => PriceHistory) public priceHistory; // agentId => price history
+    mapping(uint256 => PriceHistory) internal priceHistory; // agentId => price history (use getPriceHistory())
 
     address public nftContract;
     address public agentCapitalContract;

@@ -50,6 +50,9 @@ contract AgentCapital {
     mapping(uint256 => mapping(uint256 => uint256)) public parentRoyalties; // childId => (parentId => percentage)
     mapping(uint256 => uint256) public dividendsPaid; // agentId => total dividends paid
 
+    // investor => agentId => amount (in wei)
+    mapping(address => mapping(uint256 => uint256)) public investments;
+
     uint256 public agentCounter = 1;
     uint256 public tradeCounter = 1;
 
@@ -66,11 +69,38 @@ contract AgentCapital {
     event TradeExecuted(uint256 indexed agentId, uint256 indexed tradeId, uint256 profit, string proofHash);
     event DividendsPaid(uint256 indexed agentId, uint256 amount);
     event AgentsBred(uint256 indexed parent1, uint256 indexed parent2, uint256 indexed childId);
+    event InvestmentReceived(address indexed investor, uint256 indexed agentId, uint256 amount);
 
     // ============= Constructor =============
 
     constructor() {
         admin = msg.sender;
+    }
+
+    // ============= Investment =============
+
+    /**
+     * @dev Invest native 0G in an agent. Funds are held by this contract.
+     *      FROM: msg.sender (investor)
+     *      TO:   address(this) (AgentCapital contract)
+     */
+    function invest(uint256 agentId) external payable {
+        require(msg.value > 0, "Must send 0G to invest");
+        investments[msg.sender][agentId] += msg.value;
+        agents[agentId].totalCapital += msg.value;
+        emit InvestmentReceived(msg.sender, agentId, msg.value);
+    }
+
+    /**
+     * @dev Accept plain ETH/0G transfers (e.g., direct sends without calldata)
+     */
+    receive() external payable {}
+
+    /**
+     * @dev Get investor's balance for a specific agent
+     */
+    function getUserInvestment(address investor, uint256 agentId) external view returns (uint256) {
+        return investments[investor][agentId];
     }
 
     // ============= Agent Creation =============
