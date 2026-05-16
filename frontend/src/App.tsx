@@ -106,8 +106,14 @@ export default function App() {
       <div className="orb orb-purple" style={{ width: 500, height: 500, top: '35%', left: '38%', opacity: 0.25 }} />
       <div className="grid-overlay" style={{ opacity: 0.6 }} />
 
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 199, backdropFilter: 'blur(4px)' }} />
+      )}
+
       {/* ══ SIDEBAR ══════════════════════════════════════════════════ */}
-      <aside className="sidebar">
+      <aside className={`sidebar${sidebarOpen ? ' mobile-open' : ''}`} onClick={e => e.stopPropagation()}>
         {/* Logo */}
         <div style={{ padding: '1.25rem 1rem 0.875rem', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
@@ -141,7 +147,7 @@ export default function App() {
             const Icon = item.icon;
             const isActive = page === item.id;
             return (
-              <motion.button key={item.id} onClick={() => setPage(item.id)}
+              <motion.button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }}
                 className={`nav-item ${isActive ? 'active' : ''}`}
                 whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }}>
                 <Icon size={15} />
@@ -220,7 +226,7 @@ export default function App() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             {/* AI pulse */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', padding: '0.3rem 0.75rem', background: 'rgba(139,92,246,0.1)', borderRadius: 'var(--r-full)', border: '1px solid rgba(139,92,246,0.2)' }}>
+            <div className="ai-pulse-pill" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', padding: '0.3rem 0.75rem', background: 'rgba(139,92,246,0.1)', borderRadius: 'var(--r-full)', border: '1px solid rgba(139,92,246,0.2)' }}>
               <motion.div animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
                 style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--purple)' }} />
               <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--purple-l)' }}>AI Active</span>
